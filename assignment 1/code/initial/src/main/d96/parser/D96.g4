@@ -10,7 +10,7 @@ options {
 	language = Python3;
 }
 
-program: list_Stmt EOF;
+program: stmt_ClassDeclaration+ EOF;
 
 
 /********************** PARSERS **********************/
@@ -31,7 +31,7 @@ exp_Str: (exp_TermStr (SEQ | SADD) exp_Str) | exp_TermStr;
 exp_TermStr: STATIC? ID | STRLIT | exp_MemberAccess | LB exp_Str RB;
 
 //  Relational operators
-exp_EqualAndNotEqual: exp_TermEQANEQ ('==' | '!=') exp_TermEQANEQ;
+exp_EqualAndNotEqual: exp_TermEQANEQ (EQ | NEQ) exp_TermEQANEQ;
 exp_TermEQANEQ:
 	LB expr RB
 	| INTLIT
@@ -39,7 +39,8 @@ exp_TermEQANEQ:
 	| (STATIC)? ID
 	| LB exp_EqualAndNotEqual RB;
 
-exp_LessLargeEqual: exp_TermLRE ('>' | '<' | '<=' | '>=') exp_TermLRE;
+exp_LessLargeEqual:
+	exp_TermLRE (GT | LT | LTE | GTE) exp_TermLRE;
 exp_TermLRE: LB expr RB | INTLIT | FLOATLIT | (STATIC)? ID;
 
 exp_RelationalOperation: exp_EqualAndNotEqual | exp_LessLargeEqual;
@@ -67,7 +68,9 @@ exp_InstanceMethodInvocationTerm: (LB exp_ClassObject RB | ID | SELF | exp_Stati
 
 exp_StaticMethodInvocation: ID SCOPE STATIC ID LB list_Expr RB;
 
-exp_InstanceAttributeMethod: exp_InstanceAttributeMethod (DOT ID|DOT ID LB list_Expr RB) | exp_InstanceAttributeMethodTerm;
+exp_InstanceAttributeMethod:
+	exp_InstanceAttributeMethod (DOT ID | DOT ID LB list_Expr RB)
+	| exp_InstanceAttributeMethodTerm;
 exp_InstanceAttributeMethodTerm: exp_InstanceAttributeAccess | exp_InstanceMethodInvocation;
 
 
@@ -100,7 +103,9 @@ list_Expr: (expr (CM expr)*)?;
 type_Data: INT | FLOAT | BOOLEAN | STRING | array_Type;
 array_Type: 'Array' LSB type_Data CM INTLIT RSB;
 seq_ID: ID (CM ID)*;
-var_Declaration: (VAL | VAR)? (STATIC)? seq_ID COLON type_Data (ASSIGN list_Expr)? SM;
+stmt_VarDeclaration: (VAL | VAR)? (STATIC)? seq_ID COLON type_Data (
+		ASSIGN list_Expr
+	)? SM;
 
 // Assignment statement
 lhs: ID | expr;
@@ -127,16 +132,27 @@ stmt_Return: RETURN expr? SM;
 // Break statment
 stmt_Break: BREAK SM;
 
-stmt_MethodDeclaration: STATIC? ID LB (list_Parameters)? RB stmt_Block;
-
 // Final description of statement
-stmt: var_Declaration | stmt_Assign | stmt_If | stmt_ForIn | stmt_Block | stmt_MethodInvocation
+stmt:
+	stmt_VarDeclaration
+	| stmt_Assign
+	| stmt_If
+	| stmt_ForIn
+	| stmt_Block
+	| stmt_MethodInvocation
 | stmt_Continue | stmt_Return | stmt_Break | stmt_MethodDeclaration | stmt_Class;
 list_Stmt : stmt*;
 
 /********************** CLASSES **********************/
 
 stmt_Class: class_Construction | class_Destruction | class_Declaration;
+stmt_ClassDeclaration:
+	CLASS ID (COLON ID)? LCB (
+		stmt_VarDeclaration
+		| stmt_MethodDeclaration
+	)* RCB;
+stmt_MethodDeclaration:
+	STATIC? ID LB (list_Parameters)? RB stmt_Block;
 
 class_Declaration: CLASS ID (COLON ID)? LCB list_Stmt RCB;
 class_Construction: CONSTRUCTOR LB (list_Parameters)? RB  stmt_Block;
@@ -145,6 +161,7 @@ class_Destruction: DESTRUCTOR RB LB stmt_Block;
 
 list_Parameters: seq_Parameters (SM seq_Parameters)*;
 seq_Parameters: seq_ID COLON type_Data;
+
 /********************** FRAGMENTS **********************/
 
 fragment DIGIT: [0-9];
@@ -186,6 +203,7 @@ STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
 	content = str(self.text)
 	self.text = content[1:-1]
 }
+//TODO ?
 ;
 
 idx_arraylit: ARRAY LB (datalit (CM datalit)*)? RB;

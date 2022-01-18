@@ -179,8 +179,8 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#var_Declaration.
-    def visitVar_Declaration(self, ctx:D96Parser.Var_DeclarationContext):
+    # Visit a parse tree produced by D96Parser#stmt_VarDeclaration.
+    def visitStmt_VarDeclaration(self, ctx:D96Parser.Stmt_VarDeclarationContext):
         return self.visitChildren(ctx)
 
 
@@ -229,11 +229,6 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#stmt_MethodDeclaration.
-    def visitStmt_MethodDeclaration(self, ctx:D96Parser.Stmt_MethodDeclarationContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by D96Parser#stmt.
     def visitStmt(self, ctx:D96Parser.StmtContext):
         return self.visitChildren(ctx)
@@ -246,6 +241,16 @@ class D96Visitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by D96Parser#stmt_Class.
     def visitStmt_Class(self, ctx:D96Parser.Stmt_ClassContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#stmt_ClassDeclaration.
+    def visitStmt_ClassDeclaration(self, ctx:D96Parser.Stmt_ClassDeclarationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#stmt_MethodDeclaration.
+    def visitStmt_MethodDeclaration(self, ctx:D96Parser.Stmt_MethodDeclarationContext):
         return self.visitChildren(ctx)
 
 

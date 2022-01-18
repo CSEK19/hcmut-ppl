@@ -433,15 +433,15 @@ class D96Lexer(Lexer):
         if actionIndex == 4:
 
                     raise UncloseString(self.text[1:])
-                
+
      
 
     def ILLEGAL_ESCAPE_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 5:
-            	
+
             		illegal_str = str(self.text)
             		raise IllegalEscape(illegal_str[1:])
-            	
+
      
 
 

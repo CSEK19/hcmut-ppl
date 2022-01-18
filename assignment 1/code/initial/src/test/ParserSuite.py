@@ -22,13 +22,13 @@ class ParserSuite(unittest.TestCase):
     def test_203(self):
         """More complex program"""
         input = """Var a: Array[Array[Int,5],5];"""
-        expect = "successful"
+        expect = "Error on line 1 col 0: Var"
         self.assertTrue(TestParser.test(input, expect, 203))
 
     def test_4(self):
         """More complex program"""
         input = """1 + 1 + a.foo()"""
-        expect = "Error on line 1 col 15: <EOF>"
+        expect = "Error on line 1 col 0: 1"
         self.assertTrue(TestParser.test(input, expect, 204))
 
     def test_5(self):
@@ -47,7 +47,9 @@ class ParserSuite(unittest.TestCase):
         """More complex program"""
         input = """
     Class Shape {
-        a[b[1]][c][foo()] = 1;
+        foo(){
+            a[b[1]][c][foo()] = 1;
+        }
         Var e,f : Int = 1 + 1, 1 - 2;
     }
 """
@@ -90,6 +92,10 @@ Class Shape2 {
     """
         expect = "successful"
         self.assertTrue(TestParser.test(input, expect, 209))
+
+
+
+
 
 
 
