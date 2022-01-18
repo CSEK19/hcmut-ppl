@@ -1,1 +1,1 @@
-Error Token "
+0X12ABA,abc123,<EOF>

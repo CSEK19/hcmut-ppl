@@ -1,1 +1,1 @@
-Illegal Escape In String: This is a \a
+0x13A2D321D1,<EOF>

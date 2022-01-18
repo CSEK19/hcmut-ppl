@@ -8,11 +8,11 @@ if os.path.isdir('../target/main/d96/parser') and not '../target/main/d96/parser
 from D96Lexer import D96Lexer
 from D96Parser import D96Parser
 from lexererr import *
-from ASTGeneration import ASTGeneration
+'''from ASTGeneration import ASTGeneration
 from StaticCheck import StaticChecker
 from StaticError import *
 from CodeGenerator import CodeGenerator
-import subprocess
+import subprocess'''
 
 JASMIN_JAR = "./external/jasmin.jar"
 TEST_DIR = "./test/testcases/"
@@ -110,7 +110,7 @@ class TestAST:
         line = dest.read()
         return line == expect
 
-    @staticmethod
+'''    @staticmethod
     def check(soldir,inputfile,num):
         dest = open(os.path.join(soldir,str(num) + ".txt"),"w")
         lexer = Lexer(inputfile)
@@ -192,5 +192,5 @@ class TestCodeGen():
             raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
         finally:
             f.close()
-            
+'''            
             

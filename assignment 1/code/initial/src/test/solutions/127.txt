@@ -1,1 +1,1 @@
-Unclosed String: This is a string 
+0X12ABA,abc,<EOF>

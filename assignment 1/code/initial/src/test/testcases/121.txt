@@ -1,1 +1,1 @@
-True False
+ "This is a string containing tab \t" 

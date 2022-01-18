@@ -1,1 +1,1 @@
-0000,<EOF>
+"abc\\h def",<EOF>
