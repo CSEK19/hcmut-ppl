@@ -1,0 +1,7 @@
+
+    Class Shape {
+        foo(){
+            Val a: Boolean = !!True;
+        }
+    }
+    

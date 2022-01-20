@@ -19,12 +19,19 @@ program: stmt_ClassDeclaration+ EOF;
 exp_IntFloat: exp_0;
 exp_0: exp_0 (ADD | SUB) exp_1 | exp_1;
 exp_1: exp_1 (MUL | DIV | MOD) exp_2 | exp_2;
-exp_2: ID | INTLIT | FLOATLIT | exp_MemberAccess | exp_Method | exp_Idx | LB exp_0 RB;
+exp_2: SUB exp_2 | exp_3;
+exp_3: ID | INTLIT | FLOATLIT | exp_MemberAccess | exp_Method | exp_Idx | LB exp_0 RB;
 
 
 // Boolean operators
-exp_Bool: exp_TermBool (AND | OR) exp_Bool | (NOT)? exp_TermBool;
-exp_TermBool: STATIC? ID | BOOLLIT | exp_MemberAccess | LB exp_Bool RB;
+exp_Logical: exp_LogicalTerm (AND | OR) exp_Logical;
+exp_LogicalTerm: STATIC? ID | BOOLLIT | exp_MemberAccess | LB exp_LogicalTerm RB;
+
+
+exp_LogicalNot: NOT exp_LogicalNot | exp_LogicalNotTerm;
+exp_LogicalNotTerm: STATIC? ID | BOOLLIT | exp_MemberAccess | LB exp_LogicalNotTerm RB ;
+
+exp_Bool: exp_Logical | exp_LogicalNot;
 
 // String operators
 exp_Str: (exp_TermStr (SEQ | SADD) exp_Str) | exp_TermStr;
@@ -91,7 +98,7 @@ expr:
 	| exp_Str
 	| exp_Idx
 	| exp_RelationalOperation
-	| lit_Data
+	| lit_Data | 'True'
 	;
 
 list_Expr: (expr (CM expr)*)?;
@@ -138,23 +145,29 @@ stmt:
 	| stmt_ForIn
 	| stmt_Block
 	| stmt_MethodInvocation
-	| stmt_Continue | stmt_Return | stmt_Break | stmt_MethodDeclaration | stmt_Class;
+	| stmt_Continue | stmt_Return | stmt_Break | stmt_MethodDeclaration | stmt_ClassMethod;
 list_Stmt : stmt*;
 
 /********************** CLASSES **********************/
 
-stmt_Class: class_Construction | class_Destruction | class_Declaration;
-stmt_ClassDeclaration: CLASS seq_ID LCB (stmt_VarDeclaration| stmt_MethodDeclaration)* RCB;
+stmt_ClassMethod: class_Construction | class_Destruction;
+stmt_ClassDeclaration: CLASS ID (COLON ID)? LCB (stmt_VarDeclaration| stmt_MethodDeclaration | stmt_ClassMethod)* RCB;
 stmt_MethodDeclaration: STATIC? ID LB (list_Parameters)? RB stmt_Block;
 
-class_Declaration: CLASS ID (COLON ID)? LCB list_Stmt RCB;
+//class_Declaration: CLASS ID (COLON ID)? LCB list_Stmt RCB;
 class_Construction: CONSTRUCTOR LB (list_Parameters)? RB  stmt_Block;
-class_Destruction: DESTRUCTOR RB LB stmt_Block;
+class_Destruction: DESTRUCTOR LB RB stmt_Block;
 
 
 list_Parameters: seq_Parameters (SM seq_Parameters)*;
 seq_Parameters: seq_ID COLON type_Data;
 
+/********************** RULES **********************/
+
+lit_Array: ARRAY LB (lit_Data (CM lit_Data)*)? RB;
+
+lit_Data: INTLIT | FLOATLIT | BOOLLIT | STRLIT | lit_Array;
+BOOLLIT: TRUE | FALSE;
 /********************** KEYWORDS **********************/
 
 BREAK: 'Break';
@@ -254,11 +267,7 @@ fragment BINARY: '0' ('b' | 'B') ('0' | '1' ('_'? ('0' | '1'))*);
 fragment DECIMAL: (DIGIT_19 ('_' DIGIT | (DIGIT))*) | '0';
 fragment HEXADECIMAL: '0' ('x' | 'X') ('0'| (DIGIT_19 | UPERCASE_AF)( '_'? (DIGIT | UPERCASE_AF))*);
 INTLIT: (OCTAL | BINARY | DECIMAL | HEXADECIMAL) {self.text = self.text.replace('_','')};
-
 FLOATLIT: DECIMAL? (DECIMAL_POINT (SCIENTIFIC)? | SCIENTIFIC) {self.text = self.text.replace('_','')};
-
-BOOLLIT: TRUE | FALSE;
-
 STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
 //{
 //	content = str(self.text)
@@ -266,10 +275,6 @@ STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
 //}
 //TODO ?
 ;
-
-lit_Array: ARRAY LB (lit_Data (CM lit_Data)*)? RB;
-
-lit_Data: INTLIT | FLOATLIT | BOOLLIT | STRLIT | lit_Array;
 
 /******************** IDENTIFIERS *********************/
 

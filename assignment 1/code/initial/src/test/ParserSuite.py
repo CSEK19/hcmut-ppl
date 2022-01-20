@@ -25,13 +25,13 @@ class ParserSuite(unittest.TestCase):
         expect = "Error on line 1 col 0: Var"
         self.assertTrue(TestParser.test(input, expect, 203))
 
-    def test_4(self):
+    def test_204(self):
         """More complex program"""
         input = """1 + 1 + a.foo()"""
         expect = "Error on line 1 col 0: 1"
         self.assertTrue(TestParser.test(input, expect, 204))
 
-    def test_5(self):
+    def test_205(self):
         """More complex program"""
         input = """
     Class Shape {
@@ -43,7 +43,7 @@ class ParserSuite(unittest.TestCase):
         expect = "Error on line 3 col 24: {"
         self.assertTrue(TestParser.test(input, expect, 205))
 
-    def test_6(self):
+    def test_206(self):
         """More complex program"""
         input = """
     Class Shape {
@@ -56,7 +56,7 @@ class ParserSuite(unittest.TestCase):
         expect = "successful"
         self.assertTrue(TestParser.test(input, expect, 206))
 
-    def test_7(self):
+    def test_207(self):
         """More complex program"""
         input = """
 Class Shape2 {
@@ -73,7 +73,7 @@ Class Shape2 {
         expect = "successful"
         self.assertTrue(TestParser.test(input, expect, 207))
 
-    def test_8(self):
+    def test_208(self):
         """More complex program"""
         input = """
     Class Shape {
@@ -83,7 +83,7 @@ Class Shape2 {
         expect = "successful"
         self.assertTrue(TestParser.test(input, expect, 208))
 
-    def test_9(self):
+    def test_209(self):
         """More complex program"""
         input = """
     Class Shape {
@@ -93,9 +93,79 @@ Class Shape2 {
         expect = "successful"
         self.assertTrue(TestParser.test(input, expect, 209))
 
+    def test_210(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            Val a: Boolean = !!True;
+        }
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 210))
 
+    def test_211(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            foo2(1+1,"a"+."b","a"==."b");
+        }
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 211))
 
+    def test_212(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        Val $numOfShape: Int = 0;
+        Val immutableAttribute: Int = 0;
+        Var length, width: Int;
+        $getNumOfShape() {
+            Return $numOfShape;
+        }
+    }
+    Class Rectangle: Shape {
+        getArea() {
+            Return self.length * self.width;
+        }
+    }
+    Class Program {
+        main() {
+            Out.printInt(Shape::$numOfShape);
+        }
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 212))
 
+    def test_213(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        Constructor(width, height : Int; name:String){
+            Self.Area=Self.width*Self.height;
+            Self.name="shape"+.name;
+        } 
+        Destructor(){} 
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 213))
 
+    def test_214(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            a=1------1+1--1;
+        } 
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 214))
 
 
