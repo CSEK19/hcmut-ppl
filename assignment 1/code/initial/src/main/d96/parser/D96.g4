@@ -98,7 +98,7 @@ expr:
 	| exp_Str
 	| exp_Idx
 	| exp_RelationalOperation
-	| lit_Data | 'True'
+	| lit_Data
 	;
 
 list_Expr: (expr (CM expr)*)?;
@@ -169,7 +169,6 @@ lit_Array: ARRAY LB (lit_Data (CM lit_Data)*)? RB;
 lit_Data: INTLIT | FLOATLIT | BOOLLIT | STRLIT | lit_Array;
 BOOLLIT: TRUE | FALSE;
 /********************** KEYWORDS **********************/
-
 BREAK: 'Break';
 CONTINUE: 'Continue';
 IF: 'If';
@@ -196,7 +195,6 @@ BY: 'By';
 
 SELF: 'Self';
 STATIC: '$';
-
 /********************** OPERATORS **********************/
 
 ADD: '+';
@@ -237,9 +235,10 @@ DOT: '.';
 /********************** FRAGMENTS **********************/
 
 fragment DIGIT: [0-9];
-fragment DIGIT_19: [1-9];
+fragment DIGIT_01: [0-1];
+fragment DIGIT_07: [0-7];
 fragment DIGIT_17: [1-7];
-fragment OCTAL_DIGIT: [0-7];
+fragment DIGIT_19: [1-9];
 fragment LOWERCASE: [a-z];
 fragment UPERCASE: [A-Z];
 fragment UPERCASE_AF: [_A-F];
@@ -262,8 +261,8 @@ BLOCK_COMMENT: '##' .*? '##' -> skip;
 
 /********************** LITERALS **********************/
 
-fragment OCTAL: '0' ('0' | DIGIT_17 ('_'? OCTAL_DIGIT)*) ;
-fragment BINARY: '0' ('b' | 'B') ('0' | '1' ('_'? ('0' | '1'))*);
+fragment OCTAL: '0' ('0' | DIGIT_17 ('_'? DIGIT_07)*) ;
+fragment BINARY: '0' ('b' | 'B') ('0' | '1' ('_'? DIGIT_01)*);
 fragment DECIMAL: (DIGIT_19 ('_' DIGIT | (DIGIT))*) | '0';
 fragment HEXADECIMAL: '0' ('x' | 'X') ('0'| (DIGIT_19 | UPERCASE_AF)( '_'? (DIGIT | UPERCASE_AF))*);
 INTLIT: (OCTAL | BINARY | DECIMAL | HEXADECIMAL) {self.text = self.text.replace('_','')};
