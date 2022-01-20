@@ -195,7 +195,7 @@ fragment HEXADECIMAL: '0' ('x' | 'X')  (UPERCASE | DIGIT) ('_'? (UPERCASE | DIGI
 INTLIT: (OCTAL | BINARY | DECIMAL | HEXADECIMAL) {self.text = self.text.replace('_','')};
 
 FLOATLIT: DECIMAL (DECIMAL_POINT (SCIENTIFIC)? | SCIENTIFIC) {self.text = self.text.replace('_','')};
-
+// 21/1/2022
 BOOLLIT: TRUE | FALSE;
 
 STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
