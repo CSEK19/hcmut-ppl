@@ -1,1 +1,1 @@
-Function,Error Token :
+True,&&,True,False,||,False,<EOF>

@@ -1,1 +1,1 @@
-0.0e-4 45E23 254e-56
+abc"This is a string containing tab \n 12asd"23xyz

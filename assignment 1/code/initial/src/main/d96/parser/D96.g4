@@ -91,7 +91,7 @@ expr:
 	| exp_Str
 	| exp_Idx
 	| exp_RelationalOperation
-	| datalit
+	| lit_Data
 	;
 
 list_Expr: (expr (CM expr)*)?;
@@ -102,10 +102,8 @@ list_Expr: (expr (CM expr)*)?;
 // Variable and Constant Declaration
 type_Data: INT | FLOAT | BOOLEAN | STRING | array_Type;
 array_Type: 'Array' LSB type_Data CM INTLIT RSB;
-seq_ID: ID (CM ID)*;
-stmt_VarDeclaration: (VAL | VAR)? (STATIC)? seq_ID COLON type_Data (
-		ASSIGN list_Expr
-	)? SM;
+seq_ID: (STATIC)? ID (CM (STATIC)? ID)*;
+stmt_VarDeclaration: (VAL | VAR)? seq_ID COLON type_Data (ASSIGN list_Expr)? SM;
 
 // Assignment statement
 lhs: ID | expr;
@@ -140,19 +138,14 @@ stmt:
 	| stmt_ForIn
 	| stmt_Block
 	| stmt_MethodInvocation
-| stmt_Continue | stmt_Return | stmt_Break | stmt_MethodDeclaration | stmt_Class;
+	| stmt_Continue | stmt_Return | stmt_Break | stmt_MethodDeclaration | stmt_Class;
 list_Stmt : stmt*;
 
 /********************** CLASSES **********************/
 
 stmt_Class: class_Construction | class_Destruction | class_Declaration;
-stmt_ClassDeclaration:
-	CLASS ID (COLON ID)? LCB (
-		stmt_VarDeclaration
-		| stmt_MethodDeclaration
-	)* RCB;
-stmt_MethodDeclaration:
-	STATIC? ID LB (list_Parameters)? RB stmt_Block;
+stmt_ClassDeclaration: CLASS seq_ID LCB (stmt_VarDeclaration| stmt_MethodDeclaration)* RCB;
+stmt_MethodDeclaration: STATIC? ID LB (list_Parameters)? RB stmt_Block;
 
 class_Declaration: CLASS ID (COLON ID)? LCB list_Stmt RCB;
 class_Construction: CONSTRUCTOR LB (list_Parameters)? RB  stmt_Block;
@@ -161,54 +154,6 @@ class_Destruction: DESTRUCTOR RB LB stmt_Block;
 
 list_Parameters: seq_Parameters (SM seq_Parameters)*;
 seq_Parameters: seq_ID COLON type_Data;
-
-/********************** FRAGMENTS **********************/
-
-fragment DIGIT: [0-9];
-fragment DIGIT_19: [1-9];
-fragment OCTAL_DIGIT: [0-7];
-fragment LOWERCASE: [a-z];
-fragment UPERCASE: [A-Z];
-fragment ALPHABET: [_a-zA-Z];
-fragment SCIENTIFIC: ('e' | 'E') ('-')? DIGIT+;
-fragment DECIMAL_POINT: DOT (DIGIT)+;
-
-fragment DOUBLE_QUOTE: '"';
-fragment ILLEGAL_STRING: '\\' (~[bfrnt'] | '\\');
-fragment QUOTE_IN_STR: '\'"';
-fragment ESC_SEQ: '\\' [bfrnt'\\];
-fragment VALID_STRING:
-	~[\b\f\n\r\t\\"']
-	| ESC_SEQ
-	| QUOTE_IN_STR;
-
-/********************** COMMENTS **********************/
-
-BLOCK_COMMENT: '##' .*? '##' -> skip;
-
-/********************** LITERALS **********************/
-
-fragment OCTAL: '0' OCTAL_DIGIT ('_'? OCTAL_DIGIT)* ;
-fragment BINARY: '0' ('b' | 'B') ('0' | '1') ('_'? ('0' | '1'))*;
-fragment DECIMAL: (('-')? DIGIT_19 ('_'? (DIGIT))*) | '0';
-fragment HEXADECIMAL: '0' ('x' | 'X')  (UPERCASE | DIGIT) ('_'? (UPERCASE | DIGIT))*;
-INTLIT: (OCTAL | BINARY | DECIMAL | HEXADECIMAL) {self.text = self.text.replace('_','')};
-
-FLOATLIT: DECIMAL (DECIMAL_POINT (SCIENTIFIC)? | SCIENTIFIC) {self.text = self.text.replace('_','')};
-// 21/1/2022
-BOOLLIT: TRUE | FALSE;
-
-STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
-{
-	content = str(self.text)
-	self.text = content[1:-1]
-}
-//TODO ?
-;
-
-idx_arraylit: ARRAY LB (datalit (CM datalit)*)? RB;
-
-datalit: INTLIT | FLOATLIT | BOOLLIT | STRLIT | idx_arraylit;
 
 /********************** KEYWORDS **********************/
 
@@ -276,9 +221,59 @@ SM: ';';
 CM: ',';
 DOT: '.';
 
+/********************** FRAGMENTS **********************/
+
+fragment DIGIT: [0-9];
+fragment DIGIT_19: [1-9];
+fragment DIGIT_17: [1-7];
+fragment OCTAL_DIGIT: [0-7];
+fragment LOWERCASE: [a-z];
+fragment UPERCASE: [A-Z];
+fragment UPERCASE_AF: [_A-F];
+fragment ALPHABET: [_a-zA-Z];
+fragment SCIENTIFIC: ('e' | 'E') ('-')? DIGIT+;
+fragment DECIMAL_POINT: DOT DIGIT*;
+
+fragment DOUBLE_QUOTE: '"';
+fragment ILLEGAL_STRING: '\\' (~[bfrnt'] | '\\');
+fragment QUOTE_IN_STR: '\'"';
+fragment ESC_SEQ: '\\' [bfrnt'\\];
+fragment VALID_STRING:
+	~[\b\f\n\r\t\\"]
+	| ESC_SEQ
+	| QUOTE_IN_STR;
+
+/********************** COMMENTS **********************/
+
+BLOCK_COMMENT: '##' .*? '##' -> skip;
+
+/********************** LITERALS **********************/
+
+fragment OCTAL: '0' ('0' | DIGIT_17 ('_'? OCTAL_DIGIT)*) ;
+fragment BINARY: '0' ('b' | 'B') ('0' | '1' ('_'? ('0' | '1'))*);
+fragment DECIMAL: (DIGIT_19 ('_' DIGIT | (DIGIT))*) | '0';
+fragment HEXADECIMAL: '0' ('x' | 'X') ('0'| (DIGIT_19 | UPERCASE_AF)( '_'? (DIGIT | UPERCASE_AF))*);
+INTLIT: (OCTAL | BINARY | DECIMAL | HEXADECIMAL) {self.text = self.text.replace('_','')};
+
+FLOATLIT: DECIMAL? (DECIMAL_POINT (SCIENTIFIC)? | SCIENTIFIC) {self.text = self.text.replace('_','')};
+
+BOOLLIT: TRUE | FALSE;
+
+STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
+//{
+//	content = str(self.text)
+//	self.text = content[1:-1]
+//}
+//TODO ?
+;
+
+lit_Array: ARRAY LB (lit_Data (CM lit_Data)*)? RB;
+
+lit_Data: INTLIT | FLOATLIT | BOOLLIT | STRLIT | lit_Array;
+
 /******************** IDENTIFIERS *********************/
 
-ID: [^a-zA-Z_][A-Za-z0-9_]*;
+ID: [a-zA-Z_][A-Za-z0-9_]*;
 
 /********************** SKIP **********************/
 

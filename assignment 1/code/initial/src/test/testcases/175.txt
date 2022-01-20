@@ -1,1 +1,1 @@
- "This is a string containing tab " 
+0x1_2_3AB 0X4_5_CDE

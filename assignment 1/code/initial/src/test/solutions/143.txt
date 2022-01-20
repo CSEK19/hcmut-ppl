@@ -1,1 +1,1 @@
-(,Var,Error Token :
+Class,Shape,{,},<EOF>

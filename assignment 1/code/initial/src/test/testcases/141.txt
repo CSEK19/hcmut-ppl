@@ -1,1 +1,1 @@
-foo(a[789]) Var: ad,cd;
+foo(a,b:Int;c:String){}

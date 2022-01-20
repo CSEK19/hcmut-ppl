@@ -1,1 +1,1 @@
-For,Error Token @
+"abcdef",<EOF>

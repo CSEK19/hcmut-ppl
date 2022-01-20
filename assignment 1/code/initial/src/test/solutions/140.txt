@@ -1,1 +1,1 @@
-foo,(,a,Error Token [
+Var,a,:,Int,;,<EOF>

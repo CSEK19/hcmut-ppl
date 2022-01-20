@@ -1,1 +1,1 @@
-foo,(,a,Error Token [
+foo,(,a,,,b,:,Int,;,c,:,String,),{,},<EOF>

@@ -1,1 +1,1 @@
-a+b-c+d+.f!a
+ 0xABCD_E_FG 
