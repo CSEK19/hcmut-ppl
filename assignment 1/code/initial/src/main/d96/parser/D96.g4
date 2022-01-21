@@ -108,7 +108,8 @@ list_Expr: (expr (CM expr)*)?;
 
 // Variable and Constant Declaration
 type_Data: INT | FLOAT | BOOLEAN | STRING | array_Type;
-array_Type: 'Array' LSB type_Data CM INTLIT RSB;
+//array_Type: ARRAY LSB type_Data CM ('1' | '2' | '3' | '4' '5' | '6' | '7' | '8' | '9') RSB;
+array_Type: ARRAY LSB type_Data CM INTLIT RSB;
 seq_ID: (STATIC)? ID (CM (STATIC)? ID)*;
 stmt_VarDeclaration: (VAL | VAR)? seq_ID COLON type_Data (ASSIGN list_Expr)? SM;
 

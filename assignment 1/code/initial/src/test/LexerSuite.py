@@ -34,8 +34,6 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.test(""" 1.23e-15 ""","""1.23e-15,<EOF>""",114))
     def test_115(self):
         self.assertTrue(TestLexer.test(""" 1.23e15 ""","""1.23e15,<EOF>""",115))
-    def test_115(self):
-        self.assertTrue(TestLexer.test("""1_234_567""","""1234567,<EOF>""",115))
     def test_116(self):
         self.assertTrue(TestLexer.test("""1_234_567.123""","""1234567.123,<EOF>""",116))
     def test_117(self):
@@ -43,7 +41,7 @@ class LexerSuite(unittest.TestCase):
     def test_118(self):
         self.assertTrue(TestLexer.test("""7E-10""","""7E-10,<EOF>""",118))
     def test_119(self):
-        self.assertTrue(TestLexer.test("""0b11111111""","""0b11111111,<EOF>""",119))
+        self.assertTrue(TestLexer.test(""""The string \\""","""Unclosed String: The string """,119))
     def test_120(self):
         self.assertTrue(TestLexer.test(""" "\\b \\f \\r \\n \\t \\' \\\\ '" " """,""""\\b \\f \\r \\n \\t \\' \\\\ '" ",<EOF>""",120))
     def test_121(self):
@@ -87,7 +85,7 @@ class LexerSuite(unittest.TestCase):
     def test_135(self):
         self.assertTrue(TestLexer.test("0x12bac", "0x12,bac,<EOF>", 135))
     def test_136(self):
-        self.assertTrue(TestLexer.test("0710107_88", "0710107,_88,<EOF>", 136))
+        self.assertTrue(TestLexer.test(""" "Hello\nworld" """, "Unclosed String: Hello", 136))
     def test_137(self):
         self.assertTrue(TestLexer.test("071010_788", "0710107,88,<EOF>", 137))
     def test_138(self):
@@ -121,15 +119,15 @@ class LexerSuite(unittest.TestCase):
     def test_152(self):
         self.assertTrue(TestLexer.test("26.", "26.,<EOF>", 152))
     def test_153(self):
-        self.assertTrue(TestLexer.test("0x26.11e-", "0x26,.11,e,-,<EOF>", 153))
+        self.assertTrue(TestLexer.test("0x26.11e-", "0x26,.,11,e,-,<EOF>", 153))
     def test_154(self):
         self.assertTrue(TestLexer.test("0x26.11e-2", "0x26,.11e-2,<EOF>", 154))
     def test_155(self):
         self.assertTrue(TestLexer.test("0xABCDEFGHI", "0xABCDEF,GHI,<EOF>", 155))
     def test_156(self):
-        self.assertTrue(TestLexer.test("####", "<EOF>", 156))
+        self.assertTrue(TestLexer.test("0_123", "0,_123,<EOF>", 156))
     def test_157(self):
-        self.assertTrue(TestLexer.test("##This is a single-line comment##", "<EOF>", 157))
+        self.assertTrue(TestLexer.test(".26", ".,26,<EOF>", 157))
     def test_158(self):
         self.assertTrue(TestLexer.test("## This is a\\n multi-line \\n comment.\\n ##", "<EOF>", 158))
     def test_159(self):
@@ -203,11 +201,11 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.test(""" "1.0 +. 0.1 1.2 =/= 1.2 5.5 \\. 1.1" ""","""Illegal Escape In String: 1.0 +. 0.1 1.2 =/= 1.2 5.5 \.""",189))
 
     def test_190(self):
-        self.assertTrue(TestLexer.test(""" "TrueFalseTrueFalse" """,""""TrueFalseTrueFalse",<EOF>""", 190))
+        self.assertTrue(TestLexer.test(""" "TrueFalseTrueFalse' " """,""""TrueFalseTrueFalse' ",<EOF>""", 190))
 
 
     def test_191(self):
-        self.assertTrue(TestLexer.test("000_123", "00,0,_123,<EOF>", 191))
+        self.assertTrue(TestLexer.test(""" "abc\\" """, """Illegal Escape In String: abc\\\"""" ,191))
 
     def test_192(self):
         self.assertTrue(TestLexer.test("000_x123", "00,0,_x123,<EOF>", 192))
