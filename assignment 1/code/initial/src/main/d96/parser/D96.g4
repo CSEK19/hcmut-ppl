@@ -25,17 +25,17 @@ exp_3: ID | INTLIT | FLOATLIT | exp_MemberAccess | exp_Method | exp_Idx | LB exp
 
 // Boolean operators
 exp_Logical: exp_LogicalTerm (AND | OR) exp_Logical;
-exp_LogicalTerm: STATIC? ID | BOOLLIT | exp_MemberAccess | LB exp_LogicalTerm RB;
+exp_LogicalTerm: (STATIC_ID | ID) | BOOLLIT | exp_MemberAccess | LB exp_LogicalTerm RB;
 
 
 exp_LogicalNot: NOT exp_LogicalNot | exp_LogicalNotTerm;
-exp_LogicalNotTerm: STATIC? ID | BOOLLIT | exp_MemberAccess | LB exp_LogicalNotTerm RB ;
+exp_LogicalNotTerm: (STATIC_ID | ID) | BOOLLIT | exp_MemberAccess | LB exp_LogicalNotTerm RB ;
 
 exp_Bool: exp_Logical | exp_LogicalNot;
 
 // String operators
 exp_Str: (exp_TermStr (SEQ | SADD) exp_Str) | exp_TermStr;
-exp_TermStr: STATIC? ID | STRLIT | exp_MemberAccess | LB exp_Str RB;
+exp_TermStr: (STATIC_ID | ID) | STRLIT | exp_MemberAccess | LB exp_Str RB;
 
 //  Relational operators
 exp_EqualAndNotEqual: exp_TermEQANEQ (EQ | NEQ) exp_TermEQANEQ;
@@ -43,12 +43,12 @@ exp_TermEQANEQ:
 	LB expr RB
 	| INTLIT
 	| BOOLLIT
-	| (STATIC)? ID
+	| (STATIC_ID | ID)
 	| LB exp_EqualAndNotEqual RB;
 
 exp_LessLargeEqual:
 	exp_TermLRE (GT | LT | LTE | GTE) exp_TermLRE;
-exp_TermLRE: LB expr RB | INTLIT | FLOATLIT | (STATIC)? ID;
+exp_TermLRE: LB expr RB | INTLIT | FLOATLIT | (STATIC_ID | ID);
 
 exp_RelationalOperation: exp_EqualAndNotEqual | exp_LessLargeEqual;
 
@@ -58,30 +58,29 @@ exp_TermIdx:
 	LSB idx_Operators RSB
 	| exp_TermIdx LSB idx_Operators RSB
 	| exp_TermIdx LSB exp_Idx RSB;
-idx_Operators: STATIC? ID | INTLIT | expr | exp_Idx | LB exp_Idx RB;
+idx_Operators: (STATIC_ID | ID) | INTLIT | expr | exp_Idx | LB exp_Idx RB;
 
 
 //  Member access
 exp_InstanceAttributeAccess: exp_InstanceAttributeAccess DOT ID | exp_InstanceAttributeAccessTerm;
-exp_InstanceAttributeAccessTerm: (LB exp_ClassObject RB | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation);
+exp_InstanceAttributeAccessTerm: exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
 
 
-//exp_StaticAttributeAccess: (LB exp_ClassObject RB | ID) SCOPE STATIC ID;
-exp_StaticAttributeAccess: ID SCOPE STATIC ID;
+
+exp_StaticAttributeAccess: ID SCOPE STATIC_ID;
 
 exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID LB list_Expr RB | exp_InstanceMethodInvocationTerm;
-exp_InstanceMethodInvocationTerm: (LB exp_ClassObject RB | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation);
+exp_InstanceMethodInvocationTerm: exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
 
 
-exp_StaticMethodInvocation: ID SCOPE STATIC ID LB list_Expr RB;
+exp_StaticMethodInvocation: ID SCOPE STATIC_ID LB list_Expr RB;
 
-exp_InstanceAttributeMethod:
-	exp_InstanceAttributeMethod (DOT ID | DOT ID LB list_Expr RB)
-	| exp_InstanceAttributeMethodTerm;
+exp_InstanceAttributeMethod: exp_InstanceAttributeMethod (DOT ID | DOT ID LB list_Expr RB) | exp_InstanceAttributeMethodTerm;
 exp_InstanceAttributeMethodTerm: exp_InstanceAttributeAccess | exp_InstanceMethodInvocation;
 
 
-exp_MemberAccess: exp_InstanceAttributeMethod | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
+//exp_MemberAccess: exp_InstanceAttributeMethod | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
+exp_MemberAccess: exp_StaticMethodInvocation |exp_StaticAttributeAccess | exp_InstanceAttributeMethod;
 
 // Object creation
 exp_ObjCreation: NEW ID LB list_Expr RB | LB exp_ObjCreation RB;
@@ -105,12 +104,10 @@ list_Expr: (expr (CM expr)*)?;
 
 /********************** STATEMENTS **********************/
 
-
 // Variable and Constant Declaration
 type_Data: INT | FLOAT | BOOLEAN | STRING | array_Type;
-//array_Type: ARRAY LSB type_Data CM ('1' | '2' | '3' | '4' '5' | '6' | '7' | '8' | '9') RSB;
 array_Type: ARRAY LSB type_Data CM INTLIT RSB;
-seq_ID: (STATIC)? ID (CM (STATIC)? ID)*;
+seq_ID:  ((STATIC_ID | ID)) (CM (STATIC_ID | ID))*;
 stmt_VarDeclaration: (VAL | VAR)? seq_ID COLON type_Data (ASSIGN list_Expr)? SM;
 
 // Assignment statement
@@ -153,7 +150,7 @@ list_Stmt : stmt*;
 
 stmt_ClassMethod: class_Construction | class_Destruction;
 stmt_ClassDeclaration: CLASS ID (COLON ID)? LCB (stmt_VarDeclaration| stmt_MethodDeclaration | stmt_ClassMethod)* RCB;
-stmt_MethodDeclaration: STATIC? ID LB (list_Parameters)? RB stmt_Block;
+stmt_MethodDeclaration: (STATIC_ID | ID) LB (list_Parameters)? RB stmt_Block;
 
 //class_Declaration: CLASS ID (COLON ID)? LCB list_Stmt RCB;
 class_Construction: CONSTRUCTOR LB (list_Parameters)? RB  stmt_Block;
@@ -195,7 +192,7 @@ NEW: 'New';
 BY: 'By';
 
 SELF: 'Self';
-STATIC: '$';
+fragment STATIC: '$';
 /********************** OPERATORS **********************/
 
 ADD: '+';
@@ -248,13 +245,14 @@ fragment SCIENTIFIC: ('e' | 'E') ('-')? DIGIT+;
 fragment DECIMAL_POINT: DOT DIGIT*;
 
 fragment DOUBLE_QUOTE: '"';
-fragment ILLEGAL_STRING: '\\' (~[bfrnt'] | '\\');
+fragment ILLEGAL_STRING: '\\' ~[bfrnt'\\];
 fragment QUOTE_IN_STR: '\'"';
 fragment ESC_SEQ: '\\' [bfrnt'\\];
 fragment VALID_STRING:
 	~[\b\f\n\r\t\\"]
 	| ESC_SEQ
 	| QUOTE_IN_STR;
+
 
 /********************** COMMENTS **********************/
 
@@ -267,7 +265,7 @@ fragment BINARY: '0' ('b' | 'B') ('0' | '1' ('_'? DIGIT_01)*);
 fragment DECIMAL: (DIGIT_19 ('_' DIGIT | (DIGIT))*) | '0';
 fragment HEXADECIMAL: '0' ('x' | 'X') ('0'| (DIGIT_19 | UPERCASE_AF)( '_'? (DIGIT | UPERCASE_AF))*);
 INTLIT: (OCTAL | BINARY | DECIMAL | HEXADECIMAL) {self.text = self.text.replace('_','')};
-FLOATLIT: DECIMAL? (DECIMAL_POINT (SCIENTIFIC)? | SCIENTIFIC) {self.text = self.text.replace('_','')};
+FLOATLIT: ((DECIMAL (DECIMAL_POINT | SCIENTIFIC | DECIMAL_POINT SCIENTIFIC)) | DECIMAL_POINT SCIENTIFIC) {self.text = self.text.replace('_','')};
 STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
 //{
 //	content = str(self.text)
@@ -278,14 +276,15 @@ STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
 
 /******************** IDENTIFIERS *********************/
 
-ID: [a-zA-Z_][A-Za-z0-9_]*;
+STATIC_ID: STATIC [0-9a-zA-Z_]+;
+ID: [a-zA-Z_][a-zA-Z0-9_]*;
 
 /********************** SKIP **********************/
 
 WS: [ \t\r\n\f]+ -> skip; // skip spaces, tabs, newlines
 
 ERROR_CHAR: . {raise ErrorToken(self.text)};
-UNCLOSE_STRING:DOUBLE_QUOTE VALID_STRING*
+UNCLOSE_STRING: DOUBLE_QUOTE VALID_STRING*
 {
         raise UncloseString(self.text[1:])
 };
@@ -294,4 +293,3 @@ ILLEGAL_ESCAPE: DOUBLE_QUOTE VALID_STRING* ILLEGAL_STRING
 		illegal_str = str(self.text)
 		raise IllegalEscape(illegal_str[1:])
 };
-

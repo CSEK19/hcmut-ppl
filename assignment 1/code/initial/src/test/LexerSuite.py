@@ -232,4 +232,4 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.test(""" "abc\n\abc\" """, """Unclosed String: abc""", 199))
 
     def test_200(self):
-        self.assertTrue(TestLexer.test(""" "'$AA 0x1A" """, """"'$AA 0x1A",<EOF>""", 200))
+        self.assertTrue(TestLexer.test(""" $123 """, """$123,<EOF>""", 200))

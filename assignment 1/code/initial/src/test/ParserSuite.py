@@ -168,4 +168,16 @@ Class Shape2 {
         expect = "successful"
         self.assertTrue(TestParser.test(input, expect, 214))
 
+    def test_215(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            a=New X().Y();
+        } 
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 215))
+
 

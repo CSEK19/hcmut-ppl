@@ -1,0 +1,13 @@
+def test_101(self):
+       """test identifiers"""
+       self.assertTrue(TestLexer.test("abc","abc,<EOF>",101))
+def test_102(self):
+       self.assertTrue(TestLexer.test("aCBbdc","aCBbdc,<EOF>",102))
+def test_103(self):
+       self.assertTrue(TestLexer.test("Break","Break,<EOF>",103))
+def test_104(self):
+       self.assertTrue(TestLexer.test(""" "abc\\h def"  ""","""Illegal Escape In String: abc\\h""",104))
+def test_105(self):
+       self.assertTrue(TestLexer.test(""" 1.23e15 ""","""1.23e15,<EOF>""",105))
+def test_106(self):
+       self.assertTrue(TestLexer.test("0x13A2D_321_D_1", "0x13A2D321D1,<EOF>", 106))
