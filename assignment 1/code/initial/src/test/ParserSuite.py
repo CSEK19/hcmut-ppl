@@ -180,4 +180,80 @@ Class Shape2 {
         expect = "successful"
         self.assertTrue(TestParser.test(input, expect, 215))
 
+    def test_216(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            a();
+        } 
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 216))
 
+    def test_217(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            Var a();
+        } 
+    }
+    """
+        expect = "Error on line 4 col 17: ("
+        self.assertTrue(TestParser.test(input, expect, 217))
+
+    def test_218(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            Var r, s: Int;
+            r = 2.0;
+            Var a, b: Array[Int, 5];
+            s = r * r * Self.myPI;
+            a[0] = s;
+        } 
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 218))
+
+    def test_218(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            a.b();
+        } 
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 218))
+
+    def test_219(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            a=b.c.d.e;
+        } 
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 219))
+
+    def test_220(self):
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            Foreach (i In (1+2) .. (100*2-3) By (16-14)) {
+                Out.printInt(i);
+            }
+        } 
+    }
+    """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 220))

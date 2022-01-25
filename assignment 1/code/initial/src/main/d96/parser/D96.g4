@@ -20,7 +20,7 @@ exp_IntFloat: exp_0;
 exp_0: exp_0 (ADD | SUB) exp_1 | exp_1;
 exp_1: exp_1 (MUL | DIV | MOD) exp_2 | exp_2;
 exp_2: SUB exp_2 | exp_3;
-exp_3: ID | INTLIT | FLOATLIT | exp_MemberAccess | exp_Method | exp_Idx | LB exp_0 RB;
+exp_3: ID | ZERO | INTLIT | FLOATLIT | exp_MemberAccess | exp_Method | exp_Idx | LB exp_0 RB;
 
 
 // Boolean operators
@@ -41,6 +41,7 @@ exp_TermStr: (STATIC_ID | ID) | STRLIT | exp_MemberAccess | LB exp_Str RB;
 exp_EqualAndNotEqual: exp_TermEQANEQ (EQ | NEQ) exp_TermEQANEQ;
 exp_TermEQANEQ:
 	LB expr RB
+	| ZERO
 	| INTLIT
 	| BOOLLIT
 	| (STATIC_ID | ID)
@@ -48,7 +49,7 @@ exp_TermEQANEQ:
 
 exp_LessLargeEqual:
 	exp_TermLRE (GT | LT | LTE | GTE) exp_TermLRE;
-exp_TermLRE: LB expr RB | INTLIT | FLOATLIT | (STATIC_ID | ID);
+exp_TermLRE: LB expr RB | ZERO | INTLIT | FLOATLIT | (STATIC_ID | ID);
 
 exp_RelationalOperation: exp_EqualAndNotEqual | exp_LessLargeEqual;
 
@@ -58,7 +59,7 @@ exp_TermIdx:
 	LSB idx_Operators RSB
 	| exp_TermIdx LSB idx_Operators RSB
 	| exp_TermIdx LSB exp_Idx RSB;
-idx_Operators: (STATIC_ID | ID) | INTLIT | expr | exp_Idx | LB exp_Idx RB;
+idx_Operators: (STATIC_ID | ID) | ZERO | INTLIT | expr | exp_Idx | LB exp_Idx RB;
 
 
 //  Member access
@@ -69,13 +70,13 @@ exp_InstanceAttributeAccessTerm: exp_ClassObject | ID | SELF | exp_StaticAttribu
 
 exp_StaticAttributeAccess: ID SCOPE STATIC_ID;
 
-exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID LB list_Expr RB | exp_InstanceMethodInvocationTerm;
+exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID LB list_Expr? RB | exp_InstanceMethodInvocationTerm;
 exp_InstanceMethodInvocationTerm: exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
 
 
-exp_StaticMethodInvocation: ID SCOPE STATIC_ID LB list_Expr RB;
+exp_StaticMethodInvocation: ID SCOPE STATIC_ID LB list_Expr? RB;
 
-exp_InstanceAttributeMethod: exp_InstanceAttributeMethod (DOT ID | DOT ID LB list_Expr RB) | exp_InstanceAttributeMethodTerm;
+exp_InstanceAttributeMethod: exp_InstanceAttributeMethod (DOT ID | DOT ID LB list_Expr? RB) | exp_InstanceAttributeMethodTerm;
 exp_InstanceAttributeMethodTerm: exp_InstanceAttributeAccess | exp_InstanceMethodInvocation;
 
 
@@ -83,10 +84,10 @@ exp_InstanceAttributeMethodTerm: exp_InstanceAttributeAccess | exp_InstanceMetho
 exp_MemberAccess: exp_StaticMethodInvocation |exp_StaticAttributeAccess | exp_InstanceAttributeMethod;
 
 // Object creation
-exp_ObjCreation: NEW ID LB list_Expr RB | LB exp_ObjCreation RB;
+exp_ObjCreation: NEW ID LB list_Expr? RB | LB exp_ObjCreation RB;
 exp_ClassObject: ID | exp_ObjCreation;
 // Method
-exp_Method: ID LB (list_Expr) RB;
+exp_Method: ID LB list_Expr? RB;
 
 // Final defination for expression
 expr:
@@ -100,15 +101,20 @@ expr:
 	| lit_Data
 	;
 
-list_Expr: (expr (CM expr)*)?;
+list_Expr: expr (CM expr)*;
 
 /********************** STATEMENTS **********************/
 
 // Variable and Constant Declaration
 type_Data: INT | FLOAT | BOOLEAN | STRING | array_Type;
 array_Type: ARRAY LSB type_Data CM INTLIT RSB;
-seq_ID:  ((STATIC_ID | ID)) (CM (STATIC_ID | ID))*;
-stmt_VarDeclaration: (VAL | VAR)? seq_ID COLON type_Data (ASSIGN list_Expr)? SM;
+seq_ID: (STATIC_ID | ID) (CM (STATIC_ID | ID))*;
+list_Attribute: (STATIC_ID | ID) list_AttributeTerm expr | seq_ID COLON type_Data;
+list_AttributeTerm: CM (STATIC_ID | ID) list_AttributeTerm expr CM | COLON type_Data ASSIGN;
+stmt_AttributeDeclaration: (VAL | VAR)? list_Attribute SM;
+
+//stmt_VarDeclaration: (VAL | VAR)? seq_ID COLON type_Data (ASSIGN list_Expr)? SM;
+
 
 // Assignment statement
 lhs: ID | expr;
@@ -137,7 +143,7 @@ stmt_Break: BREAK SM;
 
 // Final description of statement
 stmt:
-	stmt_VarDeclaration
+	stmt_AttributeDeclaration
 	| stmt_Assign
 	| stmt_If
 	| stmt_ForIn
@@ -149,7 +155,7 @@ list_Stmt : stmt*;
 /********************** CLASSES **********************/
 
 stmt_ClassMethod: class_Construction | class_Destruction;
-stmt_ClassDeclaration: CLASS ID (COLON ID)? LCB (stmt_VarDeclaration| stmt_MethodDeclaration | stmt_ClassMethod)* RCB;
+stmt_ClassDeclaration: CLASS ID (COLON ID)? LCB (stmt_AttributeDeclaration | stmt_MethodDeclaration | stmt_ClassMethod)* RCB;
 stmt_MethodDeclaration: (STATIC_ID | ID) LB (list_Parameters)? RB stmt_Block;
 
 //class_Declaration: CLASS ID (COLON ID)? LCB list_Stmt RCB;
@@ -164,7 +170,7 @@ seq_Parameters: seq_ID COLON type_Data;
 
 lit_Array: ARRAY LB (lit_Data (CM lit_Data)*)? RB;
 
-lit_Data: INTLIT | FLOATLIT | BOOLLIT | STRLIT | lit_Array;
+lit_Data: ZERO | INTLIT | FLOATLIT | BOOLLIT | STRLIT | lit_Array;
 BOOLLIT: TRUE | FALSE;
 /********************** KEYWORDS **********************/
 BREAK: 'Break';
@@ -239,31 +245,30 @@ fragment DIGIT_17: [1-7];
 fragment DIGIT_19: [1-9];
 fragment LOWERCASE: [a-z];
 fragment UPERCASE: [A-Z];
-fragment UPERCASE_AF: [_A-F];
+fragment UPERCASE_AF: [A-F];
 fragment ALPHABET: [_a-zA-Z];
 fragment SCIENTIFIC: ('e' | 'E') ('-')? DIGIT+;
 fragment DECIMAL_POINT: DOT DIGIT*;
 
-fragment DOUBLE_QUOTE: '"';
+DOUBLE_QUOTE: '"';
 fragment ILLEGAL_STRING: '\\' ~[bfrnt'\\];
+
 fragment QUOTE_IN_STR: '\'"';
 fragment ESC_SEQ: '\\' [bfrnt'\\];
 fragment VALID_STRING:
-	~[\b\f\n\r\t\\"]
+	~[\b\f\r\n\t\\"]
 	| ESC_SEQ
 	| QUOTE_IN_STR;
-
-
 /********************** COMMENTS **********************/
 
 BLOCK_COMMENT: '##' .*? '##' -> skip;
 
 /********************** LITERALS **********************/
 
-fragment OCTAL: '0' ('0' | DIGIT_17 ('_'? DIGIT_07)*) ;
-fragment BINARY: '0' ('b' | 'B') ('0' | '1' ('_'? DIGIT_01)*);
-fragment DECIMAL: (DIGIT_19 ('_' DIGIT | (DIGIT))*) | '0';
-fragment HEXADECIMAL: '0' ('x' | 'X') ('0'| (DIGIT_19 | UPERCASE_AF)( '_'? (DIGIT | UPERCASE_AF))*);
+fragment OCTAL: '0' DIGIT_17 ('_'? DIGIT_07)* ;
+fragment BINARY: '0' ('b' | 'B') '1' ('_'? DIGIT_01)*;
+fragment DECIMAL: DIGIT_19 ('_' DIGIT | (DIGIT))*;
+fragment HEXADECIMAL: '0' ('x' | 'X') (DIGIT_19 | UPERCASE_AF) ( '_'? (DIGIT | UPERCASE_AF))*;
 INTLIT: (OCTAL | BINARY | DECIMAL | HEXADECIMAL) {self.text = self.text.replace('_','')};
 FLOATLIT: ((DECIMAL (DECIMAL_POINT | SCIENTIFIC | DECIMAL_POINT SCIENTIFIC)) | DECIMAL_POINT SCIENTIFIC) {self.text = self.text.replace('_','')};
 STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
@@ -273,7 +278,7 @@ STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
 //}
 //TODO ?
 ;
-
+ZERO: '0' | '00' | '0b0' | '0B0' | '0x0' | '0X0';
 /******************** IDENTIFIERS *********************/
 
 STATIC_ID: STATIC [0-9a-zA-Z_]+;
@@ -284,12 +289,15 @@ ID: [a-zA-Z_][a-zA-Z0-9_]*;
 WS: [ \t\r\n\f]+ -> skip; // skip spaces, tabs, newlines
 
 ERROR_CHAR: . {raise ErrorToken(self.text)};
-UNCLOSE_STRING: DOUBLE_QUOTE VALID_STRING*
-{
-        raise UncloseString(self.text[1:])
+UNCLOSE_STRING: DOUBLE_QUOTE VALID_STRING* ([\r\n]|EOF){
+        text = str(self.text)
+        if (text[-1] == '\r') or (text[-1] == '\n'):
+            raise UncloseString(text[1:-1])
+        else:
+            raise UncloseString(text[1:])
 };
-ILLEGAL_ESCAPE: DOUBLE_QUOTE VALID_STRING* ILLEGAL_STRING
-{
+
+ILLEGAL_ESCAPE: DOUBLE_QUOTE VALID_STRING* ILLEGAL_STRING{
 		illegal_str = str(self.text)
 		raise IllegalEscape(illegal_str[1:])
 };

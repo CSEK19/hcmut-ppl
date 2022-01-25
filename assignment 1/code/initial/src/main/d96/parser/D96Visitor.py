@@ -199,8 +199,18 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#stmt_VarDeclaration.
-    def visitStmt_VarDeclaration(self, ctx:D96Parser.Stmt_VarDeclarationContext):
+    # Visit a parse tree produced by D96Parser#list_Attribute.
+    def visitList_Attribute(self, ctx:D96Parser.List_AttributeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#list_AttributeTerm.
+    def visitList_AttributeTerm(self, ctx:D96Parser.List_AttributeTermContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#stmt_AttributeDeclaration.
+    def visitStmt_AttributeDeclaration(self, ctx:D96Parser.Stmt_AttributeDeclarationContext):
         return self.visitChildren(ctx)
 
 

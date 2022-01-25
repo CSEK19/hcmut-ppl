@@ -41,7 +41,7 @@ class LexerSuite(unittest.TestCase):
     def test_118(self):
         self.assertTrue(TestLexer.test("""7E-10""","""7E-10,<EOF>""",118))
     def test_119(self):
-        self.assertTrue(TestLexer.test(""""The string \\""","""Unclosed String: The string """,119))
+        self.assertTrue(TestLexer.test(""""The string \\""","""",The,string,Error Token \\""",119))
     def test_120(self):
         self.assertTrue(TestLexer.test(""" "\\b \\f \\r \\n \\t \\' \\\\ '" " """,""""\\b \\f \\r \\n \\t \\' \\\\ '" ",<EOF>""",120))
     def test_121(self):
@@ -233,3 +233,5 @@ class LexerSuite(unittest.TestCase):
 
     def test_200(self):
         self.assertTrue(TestLexer.test(""" $123 """, """$123,<EOF>""", 200))
+
+
