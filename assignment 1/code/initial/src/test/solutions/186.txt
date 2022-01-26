@@ -1,1 +1,1 @@
-"abcdef",<EOF>
+Foreach,(,ab,In,12,..,34,By,2,),{,a,.,go,(,),.,bro,(,),;,},<EOF>

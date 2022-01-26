@@ -1,1 +1,1 @@
-True,&&,True,False,||,False,<EOF>
+Foreach,(,ab,In,12,..,34,By,2,),{,mn,=,youtube,;,let,(,),.,go,(,var,+,123,/,12,),;,},<EOF>

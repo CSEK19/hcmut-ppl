@@ -20,7 +20,7 @@ exp_IntFloat: exp_0;
 exp_0: exp_0 (ADD | SUB) exp_1 | exp_1;
 exp_1: exp_1 (MUL | DIV | MOD) exp_2 | exp_2;
 exp_2: SUB exp_2 | exp_3;
-exp_3: ID | ZERO | INTLIT | FLOATLIT | exp_MemberAccess | exp_Method | exp_Idx | LB exp_0 RB;
+exp_3: (STATIC_ID | ID) | ZERO | INTLIT | FLOATLIT | exp_MemberAccess | exp_Method | exp_Idx | LB exp_0 RB;
 
 
 // Boolean operators
@@ -34,7 +34,7 @@ exp_LogicalNotTerm: (STATIC_ID | ID) | BOOLLIT | exp_MemberAccess | LB exp_Logic
 exp_Bool: exp_Logical | exp_LogicalNot;
 
 // String operators
-exp_Str: (exp_TermStr (SEQ | SADD) exp_Str) | exp_TermStr;
+exp_Str: (exp_TermStr (SEQ | SADD) exp_TermStr) | exp_TermStr;
 exp_TermStr: (STATIC_ID | ID) | STRLIT | exp_MemberAccess | LB exp_Str RB;
 
 //  Relational operators
@@ -45,20 +45,24 @@ exp_TermEQANEQ:
 	| INTLIT
 	| BOOLLIT
 	| (STATIC_ID | ID)
-	| LB exp_EqualAndNotEqual RB;
+	| LB exp_EqualAndNotEqual RB
+	| exp_MemberAccess
+	| exp_Idx
+	| NULL
+;
 
-exp_LessLargeEqual:
-	exp_TermLRE (GT | LT | LTE | GTE) exp_TermLRE;
+exp_LessLargeEqual: exp_TermLRE (GT | LT | LTE | GTE) exp_TermLRE;
 exp_TermLRE: LB expr RB | ZERO | INTLIT | FLOATLIT | (STATIC_ID | ID);
 
 exp_RelationalOperation: exp_EqualAndNotEqual | exp_LessLargeEqual;
 
 // Index operators
-exp_Idx: (exp_Method | ID) exp_TermIdx;
+// $a[a]
+exp_Idx: (exp_Method | STATIC_ID | ID | exp_MemberAccess) exp_TermIdx;
 exp_TermIdx:
-	LSB idx_Operators RSB
-	| exp_TermIdx LSB idx_Operators RSB
-	| exp_TermIdx LSB exp_Idx RSB;
+    LSB idx_Operators RSB
+    | exp_TermIdx LSB idx_Operators RSB
+    | exp_TermIdx LSB exp_Idx RSB;
 idx_Operators: (STATIC_ID | ID) | ZERO | INTLIT | expr | exp_Idx | LB exp_Idx RB;
 
 
@@ -81,7 +85,7 @@ exp_InstanceAttributeMethodTerm: exp_InstanceAttributeAccess | exp_InstanceMetho
 
 
 //exp_MemberAccess: exp_InstanceAttributeMethod | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
-exp_MemberAccess: exp_StaticMethodInvocation |exp_StaticAttributeAccess | exp_InstanceAttributeMethod;
+exp_MemberAccess: exp_StaticMethodInvocation | exp_StaticAttributeAccess | exp_InstanceAttributeMethod;
 
 // Object creation
 exp_ObjCreation: NEW ID LB list_Expr? RB | LB exp_ObjCreation RB;
@@ -89,7 +93,7 @@ exp_ClassObject: ID | exp_ObjCreation;
 // Method
 exp_Method: ID LB list_Expr? RB;
 
-// Final defination for expression
+// Final definition for expression
 expr:
     exp_ObjCreation
 	| exp_MemberAccess
@@ -99,6 +103,7 @@ expr:
 	| exp_Idx
 	| exp_RelationalOperation
 	| lit_Data
+	| NULL
 	;
 
 list_Expr: expr (CM expr)*;
@@ -106,18 +111,16 @@ list_Expr: expr (CM expr)*;
 /********************** STATEMENTS **********************/
 
 // Variable and Constant Declaration
-type_Data: INT | FLOAT | BOOLEAN | STRING | array_Type;
+type_Data: ID | INT | FLOAT | BOOLEAN | STRING | array_Type;
 array_Type: ARRAY LSB type_Data CM INTLIT RSB;
 seq_ID: (STATIC_ID | ID) (CM (STATIC_ID | ID))*;
 list_Attribute: (STATIC_ID | ID) list_AttributeTerm expr | seq_ID COLON type_Data;
 list_AttributeTerm: CM (STATIC_ID | ID) list_AttributeTerm expr CM | COLON type_Data ASSIGN;
 stmt_AttributeDeclaration: (VAL | VAR)? list_Attribute SM;
 
-//stmt_VarDeclaration: (VAL | VAR)? seq_ID COLON type_Data (ASSIGN list_Expr)? SM;
-
 
 // Assignment statement
-lhs: ID | expr;
+lhs: STATIC_ID | ID | exp_MemberAccess | exp_Idx;
 stmt_Assign: lhs ASSIGN expr SM;
 
 // If statement
@@ -141,15 +144,22 @@ stmt_Return: RETURN expr? SM;
 // Break statment
 stmt_Break: BREAK SM;
 
+list_AttributeMethod: ID list_AttributeMethodTerm expr | ID (CM ID)* COLON type_Data;
+list_AttributeMethodTerm: CM ID list_AttributeMethodTerm expr CM | COLON type_Data ASSIGN;
+stmt_MethodVarDeclaration: (VAL | VAR)? list_AttributeMethod SM;
+
 // Final description of statement
 stmt:
-	stmt_AttributeDeclaration
+	stmt_MethodVarDeclaration
 	| stmt_Assign
 	| stmt_If
 	| stmt_ForIn
 	| stmt_Block
 	| stmt_MethodInvocation
-	| stmt_Continue | stmt_Return | stmt_Break | stmt_MethodDeclaration | stmt_ClassMethod;
+	| stmt_Continue
+	| stmt_Return
+	| stmt_Break
+	| stmt_ClassMethod;
 list_Stmt : stmt*;
 
 /********************** CLASSES **********************/
@@ -158,7 +168,6 @@ stmt_ClassMethod: class_Construction | class_Destruction;
 stmt_ClassDeclaration: CLASS ID (COLON ID)? LCB (stmt_AttributeDeclaration | stmt_MethodDeclaration | stmt_ClassMethod)* RCB;
 stmt_MethodDeclaration: (STATIC_ID | ID) LB (list_Parameters)? RB stmt_Block;
 
-//class_Declaration: CLASS ID (COLON ID)? LCB list_Stmt RCB;
 class_Construction: CONSTRUCTOR LB (list_Parameters)? RB  stmt_Block;
 class_Destruction: DESTRUCTOR LB RB stmt_Block;
 
@@ -250,7 +259,7 @@ fragment ALPHABET: [_a-zA-Z];
 fragment SCIENTIFIC: ('e' | 'E') ('-')? DIGIT+;
 fragment DECIMAL_POINT: DOT DIGIT*;
 
-DOUBLE_QUOTE: '"';
+fragment DOUBLE_QUOTE: '"';
 fragment ILLEGAL_STRING: '\\' ~[bfrnt'\\];
 
 fragment QUOTE_IN_STR: '\'"';
@@ -259,6 +268,7 @@ fragment VALID_STRING:
 	~[\b\f\r\n\t\\"]
 	| ESC_SEQ
 	| QUOTE_IN_STR;
+
 /********************** COMMENTS **********************/
 
 BLOCK_COMMENT: '##' .*? '##' -> skip;
@@ -279,22 +289,20 @@ STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
 //TODO ?
 ;
 ZERO: '0' | '00' | '0b0' | '0B0' | '0x0' | '0X0';
+
 /******************** IDENTIFIERS *********************/
 
 STATIC_ID: STATIC [0-9a-zA-Z_]+;
-ID: [a-zA-Z_][a-zA-Z0-9_]*;
+ID: [a-zA-Z_][0-9a-zA-Z_]*;
 
 /********************** SKIP **********************/
 
 WS: [ \t\r\n\f]+ -> skip; // skip spaces, tabs, newlines
 
 ERROR_CHAR: . {raise ErrorToken(self.text)};
-UNCLOSE_STRING: DOUBLE_QUOTE VALID_STRING* ([\r\n]|EOF){
-        text = str(self.text)
-        if (text[-1] == '\r') or (text[-1] == '\n'):
-            raise UncloseString(text[1:-1])
-        else:
-            raise UncloseString(text[1:])
+UNCLOSE_STRING: DOUBLE_QUOTE VALID_STRING*{
+        unclose_str = str(self.text)
+        raise UncloseString(unclose_str[1:])
 };
 
 ILLEGAL_ESCAPE: DOUBLE_QUOTE VALID_STRING* ILLEGAL_STRING{

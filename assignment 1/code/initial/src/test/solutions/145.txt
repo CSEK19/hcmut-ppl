@@ -1,1 +1,1 @@
-a,.,b,<EOF>
+Array,(,Array,(,"Attr 1",,,"1",,,11,),,,Array,(,"Attr 2",,,"2",,,2,),,,Array,(,"Attr 3",,,"3",,,33,),,,),<EOF>

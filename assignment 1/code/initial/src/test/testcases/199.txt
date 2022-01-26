@@ -1,2 +1,6 @@
- "abc
-bc" 
+
+            If (flag == 1) {b = c;}
+                Elseif (flag == 2) {gud = mn * 923 / 123;}
+                Else {b=a}
+                de = c/2341****++++123;
+        

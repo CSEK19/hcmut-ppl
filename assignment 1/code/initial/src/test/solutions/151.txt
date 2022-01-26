@@ -1,1 +1,1 @@
-26.11,-,2,<EOF>
+Var,arr,:,Array,[,Int,,,6,],<EOF>

@@ -1,5 +1,4 @@
-Class Rectangle: Shape {
-        getArea() {
-        Return self.length * self.width;
-    }
-}
+Class Program{
+            main(){
+            }
+        }

@@ -1,1 +1,6 @@
-True && True False || False
+
+            Foreach(ab In 12 .. 34 By 2){
+                mn = youtube;
+                let().go(var + 123 /12);
+            }
+        

@@ -1,1 +1,1 @@
-0x00_A_BC
+Self.me = Self.play("foik'"l")

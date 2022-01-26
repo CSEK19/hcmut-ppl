@@ -1,1 +1,1 @@
-abc,Error Token #
+mn,=,b,.,c,(,12,),::,$foo,(,23,_,<EOF>

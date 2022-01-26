@@ -1,1 +1,4 @@
- "This is a string containing tab \t" 
+
+            If (flag == 1) {b = c;}
+            Else {b=a)
+        

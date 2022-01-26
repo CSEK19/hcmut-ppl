@@ -1,1 +1,1 @@
-0X12ABA,abc,<EOF>
+1.2e-2,;,1e3,abd,<EOF>

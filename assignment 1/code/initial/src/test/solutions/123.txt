@@ -1,1 +1,1 @@
-"abc \n def",<EOF>
+1.,a12,<EOF>

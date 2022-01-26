@@ -1,1 +1,1 @@
-Var,a,:,Int,;,<EOF>
+"He asked me: '"Where is John?'"",<EOF>

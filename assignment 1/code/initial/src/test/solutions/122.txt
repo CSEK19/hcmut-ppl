@@ -1,1 +1,1 @@
-"He asked me:'"Where is John?'"",<EOF>
+1.3323,a32,<EOF>

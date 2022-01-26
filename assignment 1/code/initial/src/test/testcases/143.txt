@@ -1,1 +1,1 @@
-Class Shape{}
+ Array(1e-12, "ab\\hc", "str") 

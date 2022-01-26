@@ -1,1 +1,1 @@
-26.
+ Var arr: Array[Array[Array[Float, 10], 6], 6] 

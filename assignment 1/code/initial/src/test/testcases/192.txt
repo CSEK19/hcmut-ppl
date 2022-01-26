@@ -1,1 +1,8 @@
-000_x123
+
+            If (c == 2.....234<<<21321) {de = c/2341****++++123;}
+            Elseif (count == 4) {
+                Var a: Int = 12;
+                Foreach(m good munia In 12.2 .. 123.4 By 1){
+                    Return False;
+            }
+        

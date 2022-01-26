@@ -1,1 +1,1 @@
-"This is a string containing tab \t",<EOF>
+If,(,flag,==,1,),{,b,=,c,;,},Else,{,b,=,a,),<EOF>

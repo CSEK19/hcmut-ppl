@@ -1,1 +1,1 @@
- Array("abc \h") 
+ Var str: String = "abc" +. "def" 

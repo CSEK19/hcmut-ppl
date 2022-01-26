@@ -1,1 +1,1 @@
- "abc\a def"  
+ asdf$as12_32 123_32 

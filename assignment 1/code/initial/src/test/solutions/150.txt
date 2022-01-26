@@ -1,1 +1,1 @@
-Array,(,Illegal Escape In String: abc \h
+Var,str,:,String,=,"abc",+.,"def",<EOF>

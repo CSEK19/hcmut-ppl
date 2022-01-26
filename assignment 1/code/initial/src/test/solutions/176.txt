@@ -1,1 +1,1 @@
-0x0,0,_A_BC,<EOF>
+Self,.,me,=,Self,.,play,(,"foik'"l",),<EOF>

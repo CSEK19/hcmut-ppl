@@ -1,1 +1,1 @@
-Illegal Escape In String: abc\a
+asdf,$as12_32,12332,<EOF>

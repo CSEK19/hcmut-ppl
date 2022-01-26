@@ -1,1 +1,1 @@
-foo(a,b:Int;c:String){}
+ Array(1, 5, 20, -1) 

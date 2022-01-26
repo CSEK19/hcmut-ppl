@@ -1,1 +1,1 @@
-Array,(,"abc \\h",),<EOF>
+Var,var,,,c,,,d,:,Int,=,3,,,2,<EOF>
