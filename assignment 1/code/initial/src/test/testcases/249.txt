@@ -1,8 +1,0 @@
-
-                Class Shape{
-                    foo(){
-                        Var a: Array[Int, 1_23.456e+7];
-                    }
-                }
-
-            

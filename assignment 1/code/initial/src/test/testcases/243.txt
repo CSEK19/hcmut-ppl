@@ -1,9 +1,0 @@
-
-                Class Shape{
-                    foo(){
-                        a=1;
-                    }
-                    Foreach (x In 1 .. 100 by 2){}
-                }
-
-            

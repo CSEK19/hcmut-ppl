@@ -1,1 +1,0 @@
- var New a,b: Int = 123*b/2, 10

@@ -1,8 +1,0 @@
-
-                Class Shape{
-                    foo(){
-                        Return a::$TAloz;
-                    }
-                }
-
-            

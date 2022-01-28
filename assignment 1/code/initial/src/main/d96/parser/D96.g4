@@ -20,16 +20,17 @@ exp_IntFloat: exp_0;
 exp_0: exp_0 (ADD | SUB) exp_1 | exp_1;
 exp_1: exp_1 (MUL | DIV | MOD) exp_2 | exp_2;
 exp_2: SUB exp_2 | exp_3;
-exp_3: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | FLOATLIT | exp_MemberAccess | exp_Idx | LB exp_0 RB;
-
+exp_3: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | FLOATLIT | BOOLLIT |  exp_MemberAccess | exp_Idx | LB exp_0 RB | lit_Data | NOT exp_0;
 
 // Boolean operators
 exp_Logical: exp_LogicalTerm (AND | OR) exp_Logical | exp_LogicalTerm;
 exp_LogicalTerm: (exp_StaticAttributeAccess | ID) | BOOLLIT | exp_MemberAccess | LB exp_LogicalTerm RB | exp_RelationalOperation;
 
+exp_LogicalNot: NOT exp_LogicalNot|exp_LogicalNotTerm;
+exp_LogicalNotTerm: exp_0 | exp_MemberAccess | (exp_StaticAttributeAccess|ID) | BOOLLIT | LB exp_LogicalNot RB;
 
-exp_LogicalNot: NOT exp_LogicalNot | exp_LogicalNotTerm;
-exp_LogicalNotTerm: (exp_StaticAttributeAccess | ID) | BOOLLIT | exp_MemberAccess | LB exp_LogicalNotTerm RB | exp_RelationalOperation;
+//exp_LogicalNot: NOT exp_LogicalNot | exp_LogicalNotTerm;
+//exp_LogicalNotTerm: exp_2 | (exp_StaticMethodInvocation|exp_StaticAttributeAccess | ID) | BOOLLIT | LB exp_LogicalNotTerm RB | exp_RelationalOperation;
 
 exp_Bool: exp_Logical | exp_LogicalNot;
 
@@ -48,8 +49,8 @@ exp_TermEQANEQ:
 	| LB exp_EqualAndNotEqual RB
 	| exp_MemberAccess
 	| exp_Idx
-	| exp_IntFloat
 	| exp_Str
+	| exp_0
 	| NULL
 ;
 
@@ -59,7 +60,7 @@ exp_TermLRE: LB expr RB | ZERO | INTLIT | FLOATLIT | (exp_StaticAttributeAccess 
 exp_RelationalOperation: exp_EqualAndNotEqual | exp_LessLargeEqual;
 
 // Index operators
-exp_Idx: (exp_StaticAttributeAccess | ID | exp_MemberAccess) exp_TermIdx;
+exp_Idx: (exp_StaticAttributeAccess | ID | exp_MemberAccess) exp_TermIdx ;
 exp_TermIdx:
     LSB idx_Operators RSB
     | exp_TermIdx LSB idx_Operators RSB
@@ -69,24 +70,24 @@ idx_Operators: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | expr | exp_Idx
 
 //  Member access
 exp_InstanceAttributeAccess: exp_InstanceAttributeAccess DOT ID | exp_InstanceAttributeAccessTerm;
-exp_InstanceAttributeAccessTerm: exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
+exp_InstanceAttributeAccessTerm: exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | lit_Data;
 
 
 
 exp_StaticAttributeAccess: ID SCOPE STATIC_ID;
 
 exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID LB list_Expr? RB | exp_InstanceMethodInvocationTerm;
-exp_InstanceMethodInvocationTerm: exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | LB expr RB;
-
+exp_InstanceMethodInvocationTerm: exp_InstanceAttributeAccess DOT ID | exp_InstanceAttributeAccessTerm | exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | LB expr RB | lit_Data;
 
 exp_StaticMethodInvocation: ID SCOPE STATIC_ID LB list_Expr? RB;
 
-exp_InstanceAttributeMethod: exp_InstanceAttributeMethod (DOT ID | DOT ID LB list_Expr? RB) | exp_InstanceAttributeMethodTerm;
-exp_InstanceAttributeMethodTerm: exp_InstanceAttributeAccess | exp_InstanceMethodInvocation;
+exp_InstanceAttributeMethod: exp_InstanceAttributeMethod (DOT ID LB list_Expr? RB | DOT ID) | exp_InstanceAttributeMethodTerm;
+exp_InstanceAttributeMethodTerm: exp_InstanceAttributeAccess | exp_InstanceMethodInvocation   | LB exp_InstanceAttributeMethod RB;
 
 
-//exp_MemberAccess: exp_InstanceAttributeMethod | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
-exp_MemberAccess: exp_StaticMethodInvocation | exp_StaticAttributeAccess | exp_InstanceAttributeMethod;
+
+
+exp_MemberAccess : exp_InstanceAttributeMethod | exp_StaticAttributeAccess | exp_StaticMethodInvocation ;
 
 // Object creation
 exp_ObjCreation: NEW ID LB list_Expr? RB | LB exp_ObjCreation RB;
@@ -111,7 +112,8 @@ list_Expr: expr (CM expr)*;
 
 // Variable and Constant Declaration
 type_Data: ID | INT | FLOAT | BOOLEAN | STRING | array_Type;
-array_Type: ARRAY LSB type_Data CM INTLIT RSB;
+type_DataArray: INT | FLOAT | BOOLEAN | STRING | array_Type;
+array_Type: ARRAY LSB type_DataArray CM INTLIT RSB;
 seq_ID: (STATIC_ID | ID) (CM (STATIC_ID | ID))*;
 list_Attribute: (STATIC_ID | ID) list_AttributeTerm expr | seq_ID COLON type_Data;
 list_AttributeTerm: CM (STATIC_ID | ID) list_AttributeTerm expr CM | COLON type_Data ASSIGN;
@@ -133,6 +135,7 @@ stmt_Block: LCB (list_Stmt) RCB ;
 
 // Method Invocation statement
 stmt_MethodInvocation: (exp_InstanceMethodInvocation | exp_StaticMethodInvocation) SM;
+
 
 // Continue statement
 stmt_Continue: CONTINUE SM;
@@ -176,7 +179,7 @@ seq_Parameters: seq_ID COLON type_Data;
 
 /********************** RULES **********************/
 
-lit_Array: ARRAY LB (lit_Data (CM lit_Data)*)? RB;
+lit_Array: ARRAY LB (expr (CM expr)*)? RB;
 
 lit_Data: ZERO | INTLIT | FLOATLIT | BOOLLIT | STRLIT | lit_Array;
 BOOLLIT: TRUE | FALSE;

@@ -1,5 +1,0 @@
-
-                Class Shape{
-                    Foreach(i In 1 . . 100 by 2 ){}
-                }   
-                

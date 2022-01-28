@@ -1,5 +1,0 @@
-
-               $getNumOfShape() {
-                    Return $numOfShape;
-               }
-           

@@ -1,7 +1,0 @@
-
-                Class Shape{
-                    foo(){
-                        Foreach (x In 1+1 .. 100+100 By a.foo()){}
-                    }
-                }
-            

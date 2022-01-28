@@ -1,8 +1,0 @@
-
-                Class Shape{
-                    foo(){
-                        Var a: Array[Int, b::$c.foo()];
-                    }
-                }
-
-            

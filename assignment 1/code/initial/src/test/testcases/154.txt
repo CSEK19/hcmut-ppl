@@ -1,4 +1,0 @@
- Class Rectangle: Shape{
-               getL(){Return Self.length;}
-           }
-           
