@@ -1,1 +1,1 @@
-Class,Student,:,Person,{,main,(,),{,a,=,b,;,},},<EOF>
+Class,Shape,{,Val,$numOfShape,:,Int,=,0,;,},<EOF>

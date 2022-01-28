@@ -1,1 +1,1 @@
- Var str: String = "abc" +. "def" 
+ Var str: String = "string" +. " concat" 

@@ -1,0 +1,5 @@
+
+                Class Shape{
+                    Var a: Array[Array[Array[d,_1_12],1],1];
+                }   
+                

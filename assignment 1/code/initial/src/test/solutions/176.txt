@@ -1,1 +1,1 @@
-Self,.,me,=,Self,.,play,(,"foik'"l",),<EOF>
+Self,.,me,=,Self,.,play,(,foik'"l,),<EOF>

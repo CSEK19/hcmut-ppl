@@ -1,5 +1,6 @@
-Class Program{
-                Val a: Int = 0;
-                Val b: Int = 0;
-                Var c, d: Int;
+
+    Class Shape {
+        $getNumOfShape( {
+            Return self.length * self.width;
         }
+    }

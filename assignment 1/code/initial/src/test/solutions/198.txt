@@ -1,1 +1,1 @@
-Else,{,Var,a,:,Int,=,12,;,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Break,;,},Return,False,;,},},<EOF>
+123.1e3000,0X1D,<EOF>

@@ -1,9 +1,7 @@
 
-            Class Student: Person{
-            Var a, b: String = "str" +. c, "234!";
-            $main(){
-                Var f: String = "string" ==. "string2";
-                a = b;
-            }
-        }
-        
+               Class Program{
+               main(){
+                   Out.printInt(Shape::$numOfShape);
+               }
+           }
+           

@@ -1,1 +1,1 @@
- Array(1e-12, "ab\\hc", "str") 
+ Array(123e-123, "ab\n", "John") 

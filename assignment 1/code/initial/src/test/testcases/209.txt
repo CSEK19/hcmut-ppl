@@ -1,11 +1,5 @@
 
-        Class Program{
-            Val a: Int = 0;
-            Val b: Int = 0;
-            Var c, d: Int;
-            main(){
-                Var var1:String = "str1";
-            }
-            foo();
-        }
-        
+    Class Shape {
+        Var a :Array[Array[Int,2],2] = Array(Array(1,1),Array(1,1));
+    }
+    

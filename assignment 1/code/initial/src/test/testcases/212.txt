@@ -1,16 +1,20 @@
 
-        Class Program{
-            Val a: Int = 0;
-            Val b: Int = 0;
-            Var c, d: Int;
-            main(){
-                Var var1:String = "str1";
-            }
-            foo(){
-                a = b%c + foo();
-                foo2(param1, param2);
-                a1 = foo3(param1, param2);
-                Return True;
-            }
+    Class Shape {
+        Val $numOfShape: Int = 0;
+        Val immutableAttribute: Int = 0;
+        Var length, width: Int;
+        $getNumOfShape() {
+            Return $numOfShape;
         }
-        
+    }
+    Class Rectangle: Shape {
+        getArea() {
+            Return self.length * self.width;
+        }
+    }
+    Class Program {
+        main() {
+            Out.printInt(Shape::$numOfShape);
+        }
+    }
+    

@@ -20,22 +20,22 @@ exp_IntFloat: exp_0;
 exp_0: exp_0 (ADD | SUB) exp_1 | exp_1;
 exp_1: exp_1 (MUL | DIV | MOD) exp_2 | exp_2;
 exp_2: SUB exp_2 | exp_3;
-exp_3: (STATIC_ID | ID) | ZERO | INTLIT | FLOATLIT | exp_MemberAccess | exp_Method | exp_Idx | LB exp_0 RB;
+exp_3: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | FLOATLIT | exp_MemberAccess | exp_Idx | LB exp_0 RB;
 
 
 // Boolean operators
-exp_Logical: exp_LogicalTerm (AND | OR) exp_Logical;
-exp_LogicalTerm: (STATIC_ID | ID) | BOOLLIT | exp_MemberAccess | LB exp_LogicalTerm RB;
+exp_Logical: exp_LogicalTerm (AND | OR) exp_Logical | exp_LogicalTerm;
+exp_LogicalTerm: (exp_StaticAttributeAccess | ID) | BOOLLIT | exp_MemberAccess | LB exp_LogicalTerm RB | exp_RelationalOperation;
 
 
 exp_LogicalNot: NOT exp_LogicalNot | exp_LogicalNotTerm;
-exp_LogicalNotTerm: (STATIC_ID | ID) | BOOLLIT | exp_MemberAccess | LB exp_LogicalNotTerm RB ;
+exp_LogicalNotTerm: (exp_StaticAttributeAccess | ID) | BOOLLIT | exp_MemberAccess | LB exp_LogicalNotTerm RB | exp_RelationalOperation;
 
 exp_Bool: exp_Logical | exp_LogicalNot;
 
 // String operators
 exp_Str: (exp_TermStr (SEQ | SADD) exp_TermStr) | exp_TermStr;
-exp_TermStr: (STATIC_ID | ID) | STRLIT | exp_MemberAccess | LB exp_Str RB;
+exp_TermStr: (exp_StaticAttributeAccess | ID) | STRLIT | exp_MemberAccess | LB exp_Str RB;
 
 //  Relational operators
 exp_EqualAndNotEqual: exp_TermEQANEQ (EQ | NEQ) exp_TermEQANEQ;
@@ -44,26 +44,27 @@ exp_TermEQANEQ:
 	| ZERO
 	| INTLIT
 	| BOOLLIT
-	| (STATIC_ID | ID)
+	| (exp_StaticAttributeAccess | ID)
 	| LB exp_EqualAndNotEqual RB
 	| exp_MemberAccess
 	| exp_Idx
+	| exp_IntFloat
+	| exp_Str
 	| NULL
 ;
 
 exp_LessLargeEqual: exp_TermLRE (GT | LT | LTE | GTE) exp_TermLRE;
-exp_TermLRE: LB expr RB | ZERO | INTLIT | FLOATLIT | (STATIC_ID | ID);
+exp_TermLRE: LB expr RB | ZERO | INTLIT | FLOATLIT | (exp_StaticAttributeAccess | ID);
 
 exp_RelationalOperation: exp_EqualAndNotEqual | exp_LessLargeEqual;
 
 // Index operators
-// $a[a]
-exp_Idx: (exp_Method | STATIC_ID | ID | exp_MemberAccess) exp_TermIdx;
+exp_Idx: (exp_StaticAttributeAccess | ID | exp_MemberAccess) exp_TermIdx;
 exp_TermIdx:
     LSB idx_Operators RSB
     | exp_TermIdx LSB idx_Operators RSB
     | exp_TermIdx LSB exp_Idx RSB;
-idx_Operators: (STATIC_ID | ID) | ZERO | INTLIT | expr | exp_Idx | LB exp_Idx RB;
+idx_Operators: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | expr | exp_Idx | LB exp_Idx RB;
 
 
 //  Member access
@@ -75,7 +76,7 @@ exp_InstanceAttributeAccessTerm: exp_ClassObject | ID | SELF | exp_StaticAttribu
 exp_StaticAttributeAccess: ID SCOPE STATIC_ID;
 
 exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID LB list_Expr? RB | exp_InstanceMethodInvocationTerm;
-exp_InstanceMethodInvocationTerm: exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
+exp_InstanceMethodInvocationTerm: exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | LB expr RB;
 
 
 exp_StaticMethodInvocation: ID SCOPE STATIC_ID LB list_Expr? RB;
@@ -90,8 +91,6 @@ exp_MemberAccess: exp_StaticMethodInvocation | exp_StaticAttributeAccess | exp_I
 // Object creation
 exp_ObjCreation: NEW ID LB list_Expr? RB | LB exp_ObjCreation RB;
 exp_ClassObject: ID | exp_ObjCreation;
-// Method
-exp_Method: ID LB list_Expr? RB;
 
 // Final definition for expression
 expr:
@@ -120,20 +119,20 @@ stmt_AttributeDeclaration: (VAL | VAR)? list_Attribute SM;
 
 
 // Assignment statement
-lhs: STATIC_ID | ID | exp_MemberAccess | exp_Idx;
+lhs:  ID | exp_MemberAccess | exp_Idx;
 stmt_Assign: lhs ASSIGN expr SM;
 
 // If statement
-stmt_If: IF LB expr RB stmt_Block* (ELSEIF LB expr RB  stmt_Block*)* (ELSE stmt_Block*)?;
+stmt_If: IF LB expr RB stmt_Block+ (ELSEIF LB expr RB  stmt_Block+)? (ELSE stmt_Block+)?;
 
 // For/In statement
-stmt_ForIn: FOREACH LB ID IN expr '..' expr (BY expr)? RB stmt_Block ;
+stmt_ForIn: FOREACH LB ID IN expr DOUBLE_DOT expr (BY expr)? RB stmt_Block ;
 
 // Block statement
 stmt_Block: LCB (list_Stmt) RCB ;
 
 // Method Invocation statement
-stmt_MethodInvocation: (exp_InstanceMethodInvocation | exp_StaticMethodInvocation | exp_Method) SM;
+stmt_MethodInvocation: (exp_InstanceMethodInvocation | exp_StaticMethodInvocation) SM;
 
 // Continue statement
 stmt_Continue: CONTINUE SM;
@@ -164,7 +163,7 @@ list_Stmt : stmt*;
 
 /********************** CLASSES **********************/
 
-stmt_ClassMethod: class_Construction | class_Destruction;
+stmt_ClassMethod:  class_Construction | class_Destruction;
 stmt_ClassDeclaration: CLASS ID (COLON ID)? LCB (stmt_AttributeDeclaration | stmt_MethodDeclaration | stmt_ClassMethod)* RCB;
 stmt_MethodDeclaration: (STATIC_ID | ID) LB (list_Parameters)? RB stmt_Block;
 
@@ -181,7 +180,9 @@ lit_Array: ARRAY LB (lit_Data (CM lit_Data)*)? RB;
 
 lit_Data: ZERO | INTLIT | FLOATLIT | BOOLLIT | STRLIT | lit_Array;
 BOOLLIT: TRUE | FALSE;
+
 /********************** KEYWORDS **********************/
+
 BREAK: 'Break';
 CONTINUE: 'Continue';
 IF: 'If';
@@ -208,6 +209,7 @@ BY: 'By';
 
 SELF: 'Self';
 fragment STATIC: '$';
+
 /********************** OPERATORS **********************/
 
 ADD: '+';
@@ -244,6 +246,7 @@ RCB: '}';
 SM: ';';
 CM: ',';
 DOT: '.';
+DOUBLE_DOT: '..';
 
 /********************** FRAGMENTS **********************/
 
@@ -256,7 +259,7 @@ fragment LOWERCASE: [a-z];
 fragment UPERCASE: [A-Z];
 fragment UPERCASE_AF: [A-F];
 fragment ALPHABET: [_a-zA-Z];
-fragment SCIENTIFIC: ('e' | 'E') ('-')? DIGIT+;
+fragment SCIENTIFIC: ('e' | 'E') ('-' | '+')? DIGIT+;
 fragment DECIMAL_POINT: DOT DIGIT*;
 
 fragment DOUBLE_QUOTE: '"';
@@ -280,14 +283,11 @@ fragment BINARY: '0' ('b' | 'B') '1' ('_'? DIGIT_01)*;
 fragment DECIMAL: DIGIT_19 ('_' DIGIT | (DIGIT))*;
 fragment HEXADECIMAL: '0' ('x' | 'X') (DIGIT_19 | UPERCASE_AF) ( '_'? (DIGIT | UPERCASE_AF))*;
 INTLIT: (OCTAL | BINARY | DECIMAL | HEXADECIMAL) {self.text = self.text.replace('_','')};
-FLOATLIT: ((DECIMAL (DECIMAL_POINT | SCIENTIFIC | DECIMAL_POINT SCIENTIFIC)) | DECIMAL_POINT SCIENTIFIC) {self.text = self.text.replace('_','')};
-STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE
-//{
-//	content = str(self.text)
-//	self.text = content[1:-1]
-//}
-//TODO ?
-;
+FLOATLIT: ((('0' | DECIMAL) (DECIMAL_POINT | SCIENTIFIC | DECIMAL_POINT SCIENTIFIC)) | DECIMAL_POINT SCIENTIFIC) {self.text = self.text.replace('_','')};
+STRLIT: DOUBLE_QUOTE VALID_STRING* DOUBLE_QUOTE{
+	content_str = str(self.text)
+	self.text = content_str[1:-1]
+};
 ZERO: '0' | '00' | '0b0' | '0B0' | '0x0' | '0X0';
 
 /******************** IDENTIFIERS *********************/
@@ -299,11 +299,12 @@ ID: [a-zA-Z_][0-9a-zA-Z_]*;
 
 WS: [ \t\r\n\f]+ -> skip; // skip spaces, tabs, newlines
 
-ERROR_CHAR: . {raise ErrorToken(self.text)};
 UNCLOSE_STRING: DOUBLE_QUOTE VALID_STRING*{
         unclose_str = str(self.text)
         raise UncloseString(unclose_str[1:])
 };
+
+ERROR_CHAR: . {raise ErrorToken(self.text)};
 
 ILLEGAL_ESCAPE: DOUBLE_QUOTE VALID_STRING* ILLEGAL_STRING{
 		illegal_str = str(self.text)

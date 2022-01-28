@@ -1,1 +1,1 @@
-"strs\rxc",<EOF>
+string \b,<EOF>

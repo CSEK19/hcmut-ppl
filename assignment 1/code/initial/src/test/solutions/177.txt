@@ -1,1 +1,1 @@
-Self,.,me,%,"easy'e",=,Self,.,play,(,"foik'"l",),<EOF>
+Var,a,:,Int,=,10,;,<EOF>

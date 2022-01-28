@@ -1,8 +1,1 @@
-
-            Foreach(ab In 212 .. 34 By -12){
-                If (break == 1) {
-                    Break;
-                }
-                Else { go(); }
-            }
-        
+1 + 2 * 3 ** 4 ** * 5

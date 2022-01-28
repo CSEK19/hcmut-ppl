@@ -1,5 +1,5 @@
  Array(
-            Array("Attr 1", "1", 11),
-            Array("Attr 2", "2", 2),
-            Array("Attr 3", "3", 33),
-        ) 
+               Array("Volvo", "22", "18"),
+               Array("Saab", "5", "2"),
+               Array("Land Rover", "17", "15"),
+           ) 

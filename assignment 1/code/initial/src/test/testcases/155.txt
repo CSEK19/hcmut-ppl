@@ -1,11 +1,5 @@
 
-            Class Student: Person{
-            Var a, b: Int = 2%s, 3;
-            Var e: Float = 3/2;
-            Val $c:Float = 1.e-3;
-            $main(){
-                Var f: String = "string";
-                a = b;
-            }
-        }
-        
+               $getNumOfShape() {
+                    Return $numOfShape;
+               }
+           

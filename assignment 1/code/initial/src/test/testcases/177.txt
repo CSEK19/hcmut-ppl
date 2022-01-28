@@ -1,1 +1,1 @@
-Self.me % "easy'e" = Self.play("foik'"l")
+Var a : Int = 10;

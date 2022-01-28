@@ -1,1 +1,1 @@
-Foreach,(,m,In,12.2,..,123.4,By,1,),{,Return,False,;,},<EOF>
+Illegal Escape In String: 1.0 +. 0.1 1.2 =/= 1.2 5.5 \.

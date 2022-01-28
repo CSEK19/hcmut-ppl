@@ -1,1 +1,1 @@
-Class,Student,:,Person,{,Var,a,,,b,:,Int,=,2,,,3,;,Val,$c,:,Float,=,1.e-3,;,$main,(,),{,a,=,b,;,},},<EOF>
+Class,Rectangle,:,Shape,{,getL,(,),{,Return,Self,.,length,;,},},<EOF>

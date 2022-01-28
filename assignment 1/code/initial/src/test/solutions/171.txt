@@ -1,1 +1,1 @@
-New,Student,(,12,,,"name",),<EOF>
+New,Student,(,12,,,name,),<EOF>

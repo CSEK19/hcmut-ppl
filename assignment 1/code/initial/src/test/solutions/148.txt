@@ -1,1 +1,1 @@
-Var,var,,,c,,,d,:,Int,=,3,,,2,<EOF>
+var,a,:,Array,[,Int,,,5,],;,<EOF>

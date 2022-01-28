@@ -1,1 +1,1 @@
- Var var, c, d: Int = 3*b/2, 2+>=3, 5 <= 1
+ var New a,b: Int = 123*b/2, 10

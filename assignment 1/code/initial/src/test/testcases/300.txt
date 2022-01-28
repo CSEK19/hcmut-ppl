@@ -1,1 +1,14 @@
-int main() {}
+
+Class Lzzzzz{Destructor(){Return;_9::$g3k.m();} }Class classA1provip123:z{}
+        Class a{
+            foo(){
+                a = "Tao noi cho lam cai test case nay met vai loz luon";
+            }
+        }
+        foo(){
+                a = "26 am roi, vay ma chang duoc 
+                     Sam mua do tet
+                     ma chi co
+                     sap mat lam test
+                     :<<"
+            }

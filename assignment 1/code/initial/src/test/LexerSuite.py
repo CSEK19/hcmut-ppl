@@ -1,328 +1,308 @@
 import unittest
 from TestUtils import TestLexer
 
+
 class LexerSuite(unittest.TestCase):
 
     def test_101(self):
-        self.assertTrue(TestLexer.test("var","var,<EOF>",101))
+        self.assertTrue(TestLexer.test("Val", "Val,<EOF>", 101))
 
     def test_102(self):
-        self.assertTrue(TestLexer.test("1var","1,var,<EOF>",102))
+        self.assertTrue(TestLexer.test(""" "TrueFalseTrueFalseTrueFalseTrueFalse' " """,
+                                       """TrueFalseTrueFalseTrueFalseTrueFalse' ,<EOF>""", 102))
 
     def test_103(self):
-        self.assertTrue(TestLexer.test("_1var","_1var,<EOF>",103))
+        self.assertTrue(TestLexer.test(""" "abc\\" """, """Illegal Escape In String: abc\\\"""", 103))
 
     def test_104(self):
-        self.assertTrue(TestLexer.test("123_3a12","1233,a12,<EOF>",104))
+        self.assertTrue(TestLexer.test("000_x123789", "00,0,_x123789,<EOF>", 104))
 
     def test_105(self):
-        self.assertTrue(TestLexer.test("#asdf##1sd_+##","Error Token #",105))
+        self.assertTrue(TestLexer.test("""He asked me: 'Where is John?'""", "He,asked,me,:,Error Token '", 105))
 
     def test_106(self):
-        self.assertTrue(TestLexer.test("##as##","<EOF>",106))
+        self.assertTrue(TestLexer.test("1_234.567_789e246_357", "1234.567,_789e246_357,<EOF>", 106))
 
     def test_107(self):
-        self.assertTrue(TestLexer.test("##as##21_a", "21,_a,<EOF>", 107))
+        self.assertTrue(TestLexer.test("Something \ ", """Something,Error Token \\""", 107))
 
     def test_108(self):
-        self.assertTrue(TestLexer.test("""3"##as##"21_a""", """3,"##as##",21,_a,<EOF>""", 108))
+        self.assertTrue(TestLexer.test(""" abc" """, """abc,Unclosed String:  """, 108))
 
     def test_109(self):
-        input = """ asdf$as12_32 123_32 """
-        output = """asdf,$as12_32,12332,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 109))
+        self.assertTrue(TestLexer.test(""" "'abc """, """Unclosed String: 'abc """, 109))
 
     def test_110(self):
-        input = """ "abc\\ha" """
-        output = """Illegal Escape In String: abc\\h"""
-        self.assertTrue(TestLexer.test(input, output, 110))
+        self.assertTrue(TestLexer.test(""" 1234.1e2000 0X1F """, """1234.1e2000,0X1F,<EOF>""", 110))
 
     def test_111(self):
-        input = """ "abc\\\\ha" """
-        output = """"abc\\\\ha",<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 111))
+        self.assertTrue(TestLexer.test(""" "abc\n\abc\" """, """Unclosed String: abc""", 111))
 
     def test_112(self):
-        input = """ "abc\\\\" """
-        output = """"abc\\\\",<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 112))
+        self.assertTrue(TestLexer.test(""" $123asd """, """$123asd,<EOF>""", 112))
 
     def test_113(self):
-        input = """ "abc\\ """
-        output = """Illegal Escape In String: abc\ """
-        self.assertTrue(TestLexer.test(input, output, 113))
+        self.assertTrue(TestLexer.test(""" 12_3_32__32_E1_323_1 """, """12332,__32_E1_323_1,<EOF>""", 113))
 
     def test_114(self):
-        input = """## "ab\\##"""
-        output = """<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 114))
+        self.assertTrue(TestLexer.test(""" 0.123_3 """, """0.123,_3,<EOF>""", 114))
 
     def test_115(self):
-        input = """123 456"""
-        output = """123,456,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 115))
+        self.assertTrue(TestLexer.test(""" .3213 """, """.,3213,<EOF>""", 115))
 
     def test_116(self):
-        input = """12_3E1-32"""
-        output = """123E1,-,32,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 116))
+        self.assertTrue(TestLexer.test(""" "## This is a comment ##" """, """## This is a comment ##,<EOF>""", 116))
 
     def test_117(self):
-        input = """12_3E1 _32E-1"""
-        output = """123E1,_32E,-,1,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 117))
+        self.assertTrue(TestLexer.test(""" "TrueFalseTrueFalseTrueFalseTrueFalse'" """,
+                                       """Unclosed String: TrueFalseTrueFalseTrueFalseTrueFalse'" """, 117))
 
     def test_118(self):
-        input = """12_3E1 _32E-1;4e-2"""
-        output = """123E1,_32E,-,1,;,4e-2,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 118))
+        self.assertTrue(TestLexer.test(""" 0 00 0x0 0X0 0b0 0B0 """, """0,00,0x0,0X0,0b0,0B0,<EOF>""", 118))
 
     def test_119(self):
-        input = """12_3_3232E1_323_1"""
-        output = """1233232E1,_323_1,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 119))
+        self.assertTrue(TestLexer.test(""" 0000x00X00b00B0 """, """00,00,x00X00b00B0,<EOF>""", 119))
 
     def test_120(self):
-        input = """12_3_32__32_E1_323_1"""
-        output = """12332,__32_E1_323_1,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 120))
+        self.assertTrue(TestLexer.test(""" 0000x00X00b00B0 """, """00,00,x00X00b00B0,<EOF>""", 120))
 
     def test_121(self):
-        input = """1E-2-3,5"""
-        output = """1E-2,-,3,,,5,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 121))
+        self.assertTrue(TestLexer.test(""" 0000x00X00b00B0 """, """00,00,x00X00b00B0,<EOF>""", 121))
 
     def test_122(self):
-        input = """1.3323a32"""
-        output = """1.3323,a32,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 122))
+        self.assertTrue(TestLexer.test(""" 0e123 .0e123 """, """0e123,.0e123,<EOF>""", 122))
 
     def test_123(self):
-        input = """1.a12"""
-        output = """1.,a12,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 123))
+        self.assertTrue(TestLexer.test(""" 0b0e123 """, """0b0,e123,<EOF>""", 123))
 
     def test_124(self):
-        input = """1_323.e-1_23_4"""
-        output = """1323.e-1,_23_4,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 124))
+        self.assertTrue(TestLexer.test(""" 128397128937_32112312_31242121094582149012_312123123__12389123721 """,
+                                       """1283971289373211231231242121094582149012312123123,__12389123721,<EOF>""",
+                                       124))
 
     def test_125(self):
-        input = """.2abd"""
-        output = """.,2,abd,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 125))
+        self.assertTrue(TestLexer.test(""" 4587.E00000 6754.e-00000 4530.0000e3 """,
+                                       """4587.E00000,6754.e-00000,4530.0000e3,<EOF>""", 125))
 
     def test_126(self):
-        input = """1.2abd"""
-        output = """1.2,abd,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 126))
+        self.assertTrue(TestLexer.test(""" 456789.0e0 0.0e0 12345.E-0 """, """456789.0e0,0.0e0,12345.E-0,<EOF>""", 126))
 
     def test_127(self):
-        input = """1.2e-2;1e3abd"""
-        output = """1.2e-2,;,1e3,abd,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 127))
+        self.assertTrue(TestLexer.test(""" _123412 __218374 """, """_123412,__218374,<EOF>""", 127))
 
     def test_128(self):
-        input = """0x1234e12"""
-        output = """0x1234,e12,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 128))
+        self.assertTrue(TestLexer.test(""" 12341234_ 987435__ """, """12341234,_,987435,__,<EOF>""", 128))
 
     def test_129(self):
-        input = """0x01234e12"""
-        output = """0x0,1234e12,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 129))
+        self.assertTrue(TestLexer.test(""" 0_x123128721 """, """0,_x123128721,<EOF>""", 129))
 
     def test_130(self):
-        input = """0b01234e12"""
-        output = """0b0,1234e12,<EOF>"""
+        input = """0b01234e123abc"""
+        output = """0b0,1234e123,abc,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 130))
 
+
     def test_131(self):
-        input = """001234e12"""
-        output = """00,1234e12,<EOF>"""
+        input = """001234e123abc"""
+        output = """00,1234e123,abc,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 131))
 
+
     def test_132(self):
-        input = """0127A334e12"""
-        output = """0127,A334e12,<EOF>"""
+        input = """0712abc123e45"""
+        output = """0712,abc123e45,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 132))
 
+
     def test_133(self):
-        input = """0x12F3G_3,34e-2"""
-        output = """0x12F3,G_3,,,34e-2,<EOF>"""
+        input = """0xA_B_C_F_G_1,234e-"""
+        output = """0xABCF,_G_1,,,234,e,-,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 133))
 
+
     def test_134(self):
-        input = """0x12F3G_3,34e-2"""
-        output = """0x12F3,G_3,,,34e-2,<EOF>"""
+        input = """0xA_B_C_F_G_1,234e-123"""
+        output = """0xABCF,_G_1,,,234e-123,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 134))
 
+
     def test_135(self):
-        input = """trueTrue True"""
-        output = """trueTrue,True,<EOF>"""
+        input = """_true_ False;True"""
+        output = """_true_,False,;,True,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 135))
 
+
     def test_136(self):
-        input = """Falsefalse"""
-        output = """Falsefalse,<EOF>"""
+        input = """True  False _False;_True"""
+        output = """True,False,_False,;,_True,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 136))
 
+
     def test_137(self):
-        input = """False false"""
+        input = """False ##True;_True## false"""
         output = """False,false,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 137))
 
+
     def test_138(self):
-        input = """ "strs\\rxc" """
-        output = """"strs\\rxc",<EOF>"""
+        input = """ "string \\b" """
+        output = """string \\b,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 138))
 
+
     def test_139(self):
-        input = """ "'strs\\rxc" """
-        output = """"'strs\\rxc",<EOF>"""
+        input = """ "This is a string containing tab \\t" """
+        output = """This is a string containing tab \\t,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 139))
 
+
     def test_140(self):
-        input=""" "He asked me: '"Where is John?'"" """
-        output = """"He asked me: '\"Where is John?'\"",<EOF>"""
+        input = """ "He asked me: '"Where is John?'"" """
+        output = """He asked me: '\"Where is John?'\",<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 140))
 
+
     def test_141(self):
-        input=""" Array(1, 5, 20, -1) """
-        output = """Array,(,1,,,5,,,20,,,-,1,),<EOF>"""
+        input = """ Array(1, 5, 7, 12) """
+        output = """Array,(,1,,,5,,,7,,,12,),<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 141))
 
+
     def test_142(self):
-        input=""" Array(1, 5, "str" , 20, -1) """
-        output = """Array,(,1,,,5,,,"str",,,20,,,-,1,),<EOF>"""
+        input = """ Array("Kangxi", "Yongzheng", "Qianlong") """
+        output = """Array,(,Kangxi,,,Yongzheng,,,Qianlong,),<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 142))
 
+
     def test_143(self):
-        input=""" Array(1e-12, "ab\\\\hc", "str") """
-        output = """Array,(,1e-12,,,"ab\\\\hc",,,"str",),<EOF>"""
+        input = """ Array(123e-123, "ab\\n", "John") """
+        output = """Array,(,123e-123,,,ab\\n,,,John,),<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 143))
 
+
     def test_144(self):
-        input=""" Array(1e-12, "ab\\\\hc", "str) """
-        output = """Array,(,1e-12,,,"ab\\\\hc",,,Unclosed String: str) """
+        input = """ Array(123e-123, "ab\\r", "Doe) """
+        output = """Array,(,123e-123,,,ab\\r,,,Unclosed String: Doe) """
         self.assertTrue(TestLexer.test(input, output, 144))
+
 
     def test_145(self):
         input = """ Array(
-            Array("Attr 1", "1", 11),
-            Array("Attr 2", "2", 2),
-            Array("Attr 3", "3", 33),
-        ) """
-        output = """Array,(,Array,(,"Attr 1",,,"1",,,11,),,,Array,(,"Attr 2",,,"2",,,2,),,,Array,(,"Attr 3",,,"3",,,33,),,,),<EOF>"""
+               Array("Volvo", "22", "18"),
+               Array("Saab", "5", "2"),
+               Array("Land Rover", "17", "15"),
+           ) """
+        output = """Array,(,Array,(,Volvo,,,22,,,18,),,,Array,(,Saab,,,5,,,2,),,,Array,(,Land Rover,,,17,,,15,),,,),<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 145))
 
+
     def test_146(self):
-        input = """ b = 12||!23 """
-        output = """b,=,12,||,!,23,<EOF>"""
+        input = """ a * b, 123 || && !what """
+        output = """a,*,b,,,123,||,&&,!,what,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 146))
 
+
     def test_147(self):
-        input = """ b != 12||ds - 23! """
-        output = """b,!=,12,||,ds,-,23,!,<EOF>"""
+        input = """ abc !=%>= > || abc == 123!= """
+        output = """abc,!=,%,>=,>,||,abc,==,123,!=,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 147))
 
+
     def test_148(self):
-        input = """ Var var, c, d: Int = 3, 2"""
-        output = """Var,var,,,c,,,d,:,Int,=,3,,,2,<EOF>"""
+        input = """ var a: Array[Int, 5];"""
+        output = """var,a,:,Array,[,Int,,,5,],;,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 148))
 
+
     def test_149(self):
-        input = """ Var var, c, d: Int = 3*b/2, 2+>=3, 5 <= 1"""
-        output = """Var,var,,,c,,,d,:,Int,=,3,*,b,/,2,,,2,+,>=,3,,,5,<=,1,<EOF>"""
+        input = """ var New a,b: Int = 123*b/2, 10"""
+        output = """var,New,a,,,b,:,Int,=,123,*,b,/,2,,,10,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 149))
 
+
     def test_150(self):
-        input = """ Var str: String = "abc" +. "def" """
-        output = """Var,str,:,String,=,"abc",+.,"def",<EOF>"""
+        input = """ Var str: String = "string" +. " concat" """
+        output = """Var,str,:,String,=,string,+., concat,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 150))
 
+
     def test_151(self):
-        input = """ Var arr: Array[Int, 6] """
-        output = """Var,arr,:,Array,[,Int,,,6,],<EOF>"""
+        input = """ Var $x,$y: Int = 0,0; """
+        output = """Var,$x,,,$y,:,Int,=,0,,,0,;,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 151))
 
+
     def test_152(self):
-        input = """ Var arr: Array[Array[Array[Float, 10], 6], 6] """
-        output = """Var,arr,:,Array,[,Array,[,Array,[,Float,,,10,],,,6,],,,6,],<EOF>"""
+        input = """ ##dnsaknd io21283u821nqwneui## """
+        output = """<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 152))
 
+
     def test_153(self):
-        input = """ Class Student: Person{
-            main(){
-                a = b;
-            }
-        }
-        """
-        output = """Class,Student,:,Person,{,main,(,),{,a,=,b,;,},},<EOF>"""
+        input = """ Class Shape{
+               Val $numOfShape: Int = 0;
+           }
+           """
+        output = """Class,Shape,{,Val,$numOfShape,:,Int,=,0,;,},<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 153))
 
+
     def test_154(self):
-        input = """ Class Student: Person{
-            Var a, b: Int = 2, 3;
-            Val $c:Float = 1.e-3;
-            $main(){
-                a = b;
-            }
-        }
-        """
-        output = """Class,Student,:,Person,{,Var,a,,,b,:,Int,=,2,,,3,;,Val,$c,:,Float,=,1.e-3,;,$main,(,),{,a,=,b,;,},},<EOF>"""
+        input = """ Class Rectangle: Shape{
+               getL(){Return Self.length;}
+           }
+           """
+        output = """Class,Rectangle,:,Shape,{,getL,(,),{,Return,Self,.,length,;,},},<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 154))
+
 
     def test_155(self):
         input = """
-            Class Student: Person{
-            Var a, b: Int = 2%s, 3;
-            Var e: Float = 3/2;
-            Val $c:Float = 1.e-3;
-            $main(){
-                Var f: String = "string";
-                a = b;
-            }
-        }
-        """
-        output = """Class,Student,:,Person,{,Var,a,,,b,:,Int,=,2,%,s,,,3,;,Var,e,:,Float,=,3,/,2,;,Val,$c,:,Float,=,1.e-3,;,$main,(,),{,Var,f,:,String,=,"string",;,a,=,b,;,},},<EOF>"""
+               $getNumOfShape() {
+                    Return $numOfShape;
+               }
+           """
+        output = """$getNumOfShape,(,),{,Return,$numOfShape,;,},<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 155))
+
 
     def test_156(self):
         input = """
-            Class Student: Person{
-            Var a, b: String = "str" +. c, "234!";
-            $main(){
-                Var f: String = "string" ==. "string2";
-                a = b;
-            }
-        }
-        """
-        output = """Class,Student,:,Person,{,Var,a,,,b,:,String,=,"str",+.,c,,,"234!",;,$main,(,),{,Var,f,:,String,=,"string",==.,"string2",;,a,=,b,;,},},<EOF>"""
+               Class Program{
+               main(){
+                   Out.printInt(Shape::$numOfShape);
+               }
+           }
+           """
+        output = """Class,Program,{,main,(,),{,Out,.,printInt,(,Shape,::,$numOfShape,),;,},},<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 156))
+
 
     def test_157(self):
         input = """
-            arr[2] = [1, 2, 3];
-            arr[3][3] = 421;
-        """
+               arr[2] = [1, 2, 3];
+               arr[3][3] = 421;
+           """
         output = """arr,[,2,],=,[,1,,,2,,,3,],;,arr,[,3,],[,3,],=,421,;,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 157))
+
 
     def test_158(self):
         input = """ arr[23-3/2*10 /2] = 46%2-65/2; """
         output = """arr,[,23,-,3,/,2,*,10,/,2,],=,46,%,2,-,65,/,2,;,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 158))
 
+
     def test_159(self):
         input = """
-            ## Define class #Student ##
-        """
+               ## legal comment ##
+           """
         output = """<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 159))
 
+
     def test_160(self):
-        input = """ ### Define \\\\h class #Student ##"""
+        input = """ ### \\error in comment ##"""
         output = """<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 160))
 
@@ -387,7 +367,7 @@ class LexerSuite(unittest.TestCase):
 
     def test_171(self):
         input = """New Student(12, "name")"""
-        output = """New,Student,(,12,,,"name",),<EOF>"""
+        output = """New,Student,(,12,,,name,),<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 171))
 
     def test_172(self):
@@ -414,12 +394,12 @@ class LexerSuite(unittest.TestCase):
 
     def test_176(self):
         input = """Self.me = Self.play("foik'"l")"""
-        output = """Self,.,me,=,Self,.,play,(,"foik'"l",),<EOF>"""
+        output = """Self,.,me,=,Self,.,play,(,foik'"l,),<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 176))
 
     def test_177(self):
-        input = """Self.me % "easy'e" = Self.play("foik'"l")"""
-        output = """Self,.,me,%,"easy'e",=,Self,.,play,(,"foik'"l",),<EOF>"""
+        input = """Var a : Int = 10;"""
+        output = """Var,a,:,Int,=,10,;,<EOF>"""
         self.assertTrue(TestLexer.test(input, output, 177))
 
     def test_178(self):
@@ -438,250 +418,60 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.test(input, output, 180))
 
     def test_181(self):
-        input = """123________43 +++ 0x099120 / 000b01_200 0x123_32__"""
-        output = """123,________43,+,+,+,0x0,99120,/,00,0b0,1200,0x12332,__,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 181))
-
+        self.assertTrue(TestLexer.test(""" "abc\\'def gh" """, """abc\\'def gh,<EOF>""", 181))
     def test_182(self):
-        input = """12324 % 2ckx +++ = b.foo(000b01_2000x123__32)"""
-        output = """12324,%,2,ckx,+,+,+,=,b,.,foo,(,00,0b0,12000,x123__32,),<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 182))
-
+        self.assertTrue(TestLexer.test(""" "'abcdef" """, """'abcdef,<EOF>""", 182))
     def test_183(self):
-        input = """
-            If (flag == 1) {b = c;}
-            Else {b=a)
-        """
-        output = """If,(,flag,==,1,),{,b,=,c,;,},Else,{,b,=,a,),<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 183))
-
+        self.assertTrue(TestLexer.test(""" "This is a string containing tab \\t" """,
+                                                  """This is a string containing tab \\t,<EOF>""", 183))
     def test_184(self):
-        input = """
-            If (flag == 1) {b = c;}
-            Elseif (flag == 0) {
-                as = mn;
-                as.boo("hehe");
-            }
-            Else {
-                Var c: Int = 123 * 12/23;
-            }
-        """
-        output = """If,(,flag,==,1,),{,b,=,c,;,},Else,{,b,=,a,),<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 184))
-
-    def test_184(self):
-        input = """
-            If (count == 2) {b = c;}
-            Elseif (count == 4) {
-               $ks = kh();
-            }
-            Else {
-                Var d: Float = 123e-10 * 12/23;
-            }
-        """
-        output = """If,(,count,==,2,),{,b,=,c,;,},Elseif,(,count,==,4,),{,$ks,=,kh,(,),;,},Else,{,Var,d,:,Float,=,123e-10,*,12,/,23,;,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 184))
+        self.assertTrue(TestLexer.test("!!!!a", "!,!,!,!,a,<EOF>", 184))
 
     def test_185(self):
-        input = """
-            Foreach(ab In 12 .. 34){}
-        """
-        output = """Foreach,(,ab,In,12,..,34,),{,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 185))
-
+        self.assertTrue(TestLexer.test(""" "++.--.* *.\\\\.<<.>>.<=<=.>=>=.===/=" """,
+                                       """++.--.* *.\\\\.<<.>>.<=<=.>=>=.===/=,<EOF>""", 185))
     def test_186(self):
-        input = """
-            Foreach(ab In 12 .. 34 By 2){
-                a.go().bro();
-            }
-        """
-        output = """Foreach,(,ab,In,12,..,34,By,2,),{,a,.,go,(,),.,bro,(,),;,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 186))
+        self.assertTrue(TestLexer.test(""" "abcdef" """, """abcdef,<EOF>""", 186))
 
     def test_187(self):
-        input = """
-            Foreach(ab In 212 .. 34 By -12){
-                If (break == 1) {
-                    Break;
-                }
-                Else { go(); }
-            }
-        """
-        output = """Foreach,(,ab,In,212,..,34,By,-,12,),{,If,(,break,==,1,),{,Break,;,},Else,{,go,(,),;,},},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 187))
+        self.assertTrue(TestLexer.test("1 + 2 * 3 ** 4 ** * 5", """1,+,2,*,3,*,*,4,*,*,*,5,<EOF>""", 187))
 
     def test_188(self):
-        input = """
-            Foreach(ab In 12 .. 34 By 2){
-                mn = youtube;
-                let().go(var + 123 /12);
-            }
-        """
-        output = """Foreach,(,ab,In,12,..,34,By,2,),{,mn,=,youtube,;,let,(,),.,go,(,var,+,123,/,12,),;,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 188))
+        self.assertTrue(TestLexer.test("True && True False || False", "True,&&,True,False,||,False,<EOF>", 188))
 
     def test_189(self):
-        input = """
-            Foreach(m In 12.2 .. 123.4 By 1){
-                Return False;
-            }
-        """
-        output = """Foreach,(,m,In,12.2,..,123.4,By,1,),{,Return,False,;,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 189))
+        self.assertTrue(TestLexer.test(""" "1.0 +. 0.1 1.2 =/= 1.2 5.5 \\. 1.1" ""","""Illegal Escape In String: 1.0 +. 0.1 1.2 =/= 1.2 5.5 \.""",189))
 
     def test_190(self):
-        input = """
-            Foreach(m In 12.2 .. 123.4 By 1){
-                Return False;
-            }
-        """
-        output = """Foreach,(,m,In,12.2,..,123.4,By,1,),{,Return,False,;,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 190))
+        self.assertTrue(TestLexer.test(""" "TrueFalseTrueFalse' " ""","""TrueFalseTrueFalse' ,<EOF>""", 190))
+
 
     def test_191(self):
-        input = """
-            If (c == 2) {de = c/2341*123;}
-            Elseif (count == 4) {
-               Foreach(m In 12.2 .. 123.4 By 1){
-                    Return False;
-            }
-            }
-            Else {
-                Var d: Float = 123e-10 * 12/23;
-            }
-        """
-        output = """If,(,c,==,2,),{,de,=,c,/,2341,*,123,;,},Elseif,(,count,==,4,),{,Foreach,(,m,In,12.2,..,123.4,By,1,),{,Return,False,;,},},Else,{,Var,d,:,Float,=,123e-10,*,12,/,23,;,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 191))
+        self.assertTrue(TestLexer.test(""" "abc\\" """, """Illegal Escape In String: abc\\\"""" ,191))
 
     def test_192(self):
-        input = """
-            If (c == 2.....234<<<21321) {de = c/2341****++++123;}
-            Elseif (count == 4) {
-                Var a: Int = 12;
-                Foreach(m good munia In 12.2 .. 123.4 By 1){
-                    Return False;
-            }
-        """
-        output = """If,(,c,==,2.,..,..,234,<,<,<,21321,),{,de,=,c,/,2341,*,*,*,*,+,+,+,+,123,;,},Elseif,(,count,==,4,),{,Var,a,:,Int,=,12,;,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Return,False,;,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 192))
+        self.assertTrue(TestLexer.test("000_x123", "00,0,_x123,<EOF>", 192))
 
     def test_193(self):
-        input = """
-            If (c == 2.....234<<<21321) {de = c/2341****++++123;}
-            Elseif (count == 4) {
-                Var a: Int = 12;
-                Foreach(m good munia In 12.2 .. 123.4 By 1){
-                    Return False;
-            }
-        """
-        output = """If,(,c,==,2.,..,..,234,<,<,<,21321,),{,de,=,c,/,2341,*,*,*,*,+,+,+,+,123,;,},Elseif,(,count,==,4,),{,Var,a,:,Int,=,12,;,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Return,False,;,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 193))
+        self.assertTrue(TestLexer.test("""He asked me: 'Where is John?'""", "He,asked,me,:,Error Token '", 193))
 
     def test_194(self):
-        input = """
-            If (c == 2.....234<<<21321) {
-                If (flag == 1) {b = c;}
-                Elseif (flag == 2) {gud = mn * 923 / 123;}
-                Else {b=a}
-                de = c/2341****++++123;
-            }
-            Else {
-                Var a: Int = 12;
-                Foreach(m good munia In 12.2 .. 123.4 By 1){
-                    Return False;
-            }
-        """
-        output = """If,(,c,==,2.,..,..,234,<,<,<,21321,),{,If,(,flag,==,1,),{,b,=,c,;,},Elseif,(,flag,==,2,),{,gud,=,mn,*,923,/,123,;,},Else,{,b,=,a,},de,=,c,/,2341,*,*,*,*,+,+,+,+,123,;,},Else,{,Var,a,:,Int,=,12,;,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Return,False,;,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 194))
+        self.assertTrue(TestLexer.test("1_234.567_789e246_357","1234.567,_789e246_357,<EOF>", 194))
 
     def test_195(self):
-        input = """
-            If (c == 2.....234<<<21321) {
-                If (flag == 1) {b = c;}
-                Elseif (flag == 2) {gud = mn * 923 / 123;}
-                Else {b=a}
-                de = c/2341****++++123;
-            }
-            Else {
-                Var a: Int = 12;
-                Foreach(m good munia In 12.2 .. 123.4 By 1){
-                    Foreach(m good munia In 12.2 .. 123.4 By 1){
-                        Break;
-                    }
-                    Return False;
-                }
-            }
-        """
-        output = """If,(,c,==,2.,..,..,234,<,<,<,21321,),{,If,(,flag,==,1,),{,b,=,c,;,},Elseif,(,flag,==,2,),{,gud,=,mn,*,923,/,123,;,},Else,{,b,=,a,},de,=,c,/,2341,*,*,*,*,+,+,+,+,123,;,},Else,{,Var,a,:,Int,=,12,;,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Break,;,},Return,False,;,},},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 195))
+        self.assertTrue(TestLexer.test("Something \ ", """Something,Error Token \\""", 195))
 
     def test_196(self):
-        input = """
-            If (c == 2.....234<<<21321) {
-                If (flag == 1) {b = c;}
-
-                    }
-                    Return False;
-                }
-            }
-        """
-        output = """If,(,c,==,2.,..,..,234,<,<,<,21321,),{,If,(,flag,==,1,),{,b,=,c,;,},},Return,False,;,},},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 196))
+        self.assertTrue(TestLexer.test(""" abc" """, """abc,Unclosed String:  """, 196))
 
     def test_197(self):
-        input = """
-            Foreach(m In 123.2 .. 1.4 By -2.3){
-                If (True) {}
-                Elseif (flag == 4) {gud = mn * 0x12 / 34%2342;}
-                Else {b=a;
-                    If (flag == 12) {b = c;}
-                    Elseif (flag == 0) {
-                        as = mn & 23;
-                        as.boo("hehe");
-
-            }
-        """
-        output = """Foreach,(,m,In,123.2,..,1.4,By,-,2.3,),{,If,(,True,),{,},Elseif,(,flag,==,4,),{,gud,=,mn,*,0x12,/,34,%,2342,;,},Else,{,b,=,a,;,If,(,flag,==,12,),{,b,=,c,;,},Elseif,(,flag,==,0,),{,as,=,mn,Error Token &"""
-        self.assertTrue(TestLexer.test(input, output, 197))
+        self.assertTrue(TestLexer.test(""" "'abc """, """Unclosed String: 'abc """, 197))
 
     def test_198(self):
-        input = """
-            Else {
-                Var a: Int = 12;
-                Foreach(m good munia In 12.2 .. 123.4 By 1){
-                    Foreach(m good munia In 12.2 .. 123.4 By 1){
-                        Break;
-                    }
-                    Return False;
-                }
-            }
-        """
-        output = """Else,{,Var,a,:,Int,=,12,;,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Break,;,},Return,False,;,},},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 198))
+        self.assertTrue(TestLexer.test(""" 123.1e3000 0X1D """, """123.1e3000,0X1D,<EOF>""", 198))
 
     def test_199(self):
-        input = """
-            If (flag == 1) {b = c;}
-                Elseif (flag == 2) {gud = mn * 923 / 123;}
-                Else {b=a}
-                de = c/2341****++++123;
-        """
-        output = """If,(,flag,==,1,),{,b,=,c,;,},Elseif,(,flag,==,2,),{,gud,=,mn,*,923,/,123,;,},Else,{,b,=,a,},de,=,c,/,2341,*,*,*,*,+,+,+,+,123,;,<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 199))
+        self.assertTrue(TestLexer.test(""" "abc\n\abc\" """, """Unclosed String: abc""", 199))
 
     def test_200(self):
-        input = """
-            If (c == 2.....234<<<21321) {
-                If (flag == 1) {b = c;
-                    Foreach(m In 12.2 .. 123.4 By 1.3){
-                        If (True) {}
-                        Elseif (flag == 2) {gud = mn * 923 / 123;}
-                        Else {b=a}
-                        Continue;
-                    }
-                }
-                de = c/2341****++++123;
-            }
-        """
-        output = """If,(,c,==,2.,..,..,234,<,<,<,21321,),{,If,(,flag,==,1,),{,b,=,c,;,Foreach,(,m,In,12.2,..,123.4,By,1.3,),{,If,(,True,),{,},Elseif,(,flag,==,2,),{,gud,=,mn,*,923,/,123,;,},Else,{,b,=,a,},Continue,;,},},de,=,c,/,2341,*,*,*,*,+,+,+,+,123,;,},<EOF>"""
-        self.assertTrue(TestLexer.test(input, output, 200))
+        self.assertTrue(TestLexer.test(""" Foreach( a In 1 .. 10 ) {} """, """Foreach,(,a,In,1,..,10,),{,},<EOF>""", 200))

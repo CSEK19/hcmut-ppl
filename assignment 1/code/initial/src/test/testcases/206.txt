@@ -1,8 +1,7 @@
-Class Program{
-                Val a: Int = 0;
-                Val b: Int = 0;
-                Var c, d: Int;
-                main(){
-                }
-                foo(){}
+
+    Class Shape {
+        foo(){
+            a[b[1]][c][foo()] = 1;
         }
+        Var e,f : Int = 1 + 1, 1 - 2;
+    }

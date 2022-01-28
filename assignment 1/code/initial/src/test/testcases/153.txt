@@ -1,6 +1,4 @@
- Class Student: Person{
-            main(){
-                a = b;
-            }
-        }
-        
+ Class Shape{
+               Val $numOfShape: Int = 0;
+           }
+           

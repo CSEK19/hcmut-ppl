@@ -1,1 +1,1 @@
-If,(,c,==,2.,..,..,234,<,<,<,21321,),{,If,(,flag,==,1,),{,b,=,c,;,},Elseif,(,flag,==,2,),{,gud,=,mn,*,923,/,123,;,},Else,{,b,=,a,},de,=,c,/,2341,*,*,*,*,+,+,+,+,123,;,},Else,{,Var,a,:,Int,=,12,;,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Foreach,(,m,good,munia,In,12.2,..,123.4,By,1,),{,Break,;,},Return,False,;,},},<EOF>
+Something,Error Token \
