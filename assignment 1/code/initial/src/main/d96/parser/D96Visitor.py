@@ -14,6 +14,21 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by D96Parser#exp_LiteralMethod.
+    def visitExp_LiteralMethod(self, ctx:D96Parser.Exp_LiteralMethodContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#exp_LiteralTerm.
+    def visitExp_LiteralTerm(self, ctx:D96Parser.Exp_LiteralTermContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#exp_LiteralAttribure.
+    def visitExp_LiteralAttribure(self, ctx:D96Parser.Exp_LiteralAttribureContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by D96Parser#exp_IntFloat.
     def visitExp_IntFloat(self, ctx:D96Parser.Exp_IntFloatContext):
         return self.visitChildren(ctx)
@@ -154,8 +169,28 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by D96Parser#exp_IdxFree.
+    def visitExp_IdxFree(self, ctx:D96Parser.Exp_IdxFreeContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#exp_IdxFreeTerm.
+    def visitExp_IdxFreeTerm(self, ctx:D96Parser.Exp_IdxFreeTermContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#exp_IdxFreeTermOperator.
+    def visitExp_IdxFreeTermOperator(self, ctx:D96Parser.Exp_IdxFreeTermOperatorContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by D96Parser#exp_MemberAccess.
     def visitExp_MemberAccess(self, ctx:D96Parser.Exp_MemberAccessContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#exp_MemberAccessMethod.
+    def visitExp_MemberAccessMethod(self, ctx:D96Parser.Exp_MemberAccessMethodContext):
         return self.visitChildren(ctx)
 
 
@@ -316,6 +351,11 @@ class D96Visitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by D96Parser#seq_Parameters.
     def visitSeq_Parameters(self, ctx:D96Parser.Seq_ParametersContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#seq_IDParameters.
+    def visitSeq_IDParameters(self, ctx:D96Parser.Seq_IDParametersContext):
         return self.visitChildren(ctx)
 
 

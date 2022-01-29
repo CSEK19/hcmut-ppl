@@ -61,6 +61,55 @@ class ParserSuite(unittest.TestCase):
         expect = "successful"
         self.assertTrue(TestParser.test(input, expect, 206))
 
+    def test_207(self):
+        input = """
+        Class Triangle:Shape{
+        Val arr : Array[Student,3];
+        foo(){
+            Var a : Student = New Student();
+        }
+        }
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 207))
+
+    def test_208(self):
+        input = """
+        Class Triangle:Shape{
+        Val arr : Array[Student,3];
+        foo(){
+            Var a : Student = New Student();
+        }
+        }
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 208))
+
+    def test_209(self):
+        input = """
+        Class Triangle:Shape{
+        Val arr : Array[Student,3];
+        foo(){
+            Var a : Student = New Student();
+        }
+        }
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 209))
+
+    def test_210(self):
+        input = """
+        Class Triangle:Shape{
+        Val arr : Array[Student,3];
+        foo(){
+            Var a : Student = New Student();
+        }
+        }
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.test(input, expect, 210))
+
+
 
 
 

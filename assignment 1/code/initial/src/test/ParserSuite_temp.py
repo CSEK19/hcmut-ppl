@@ -904,7 +904,7 @@ Class Shape2 {
                     }
                 }   
                 """
-        output = """Error on line 4 col 24: True"""
+        output = """Error on line 4 col 28: ="""
         self.assertTrue(TestParser.test(input, output, 272))
     def test_273(self):
         input = """
@@ -958,7 +958,7 @@ Class Shape2 {
                     Var a: Array[Array[Array[d,1_12],1],1];
                 }   
                 """
-        output = """successful"""
+        output = """Error on line 3 col 45: d"""
         self.assertTrue(TestParser.test(input, output, 278))
     def test_279(self):
         input = """
@@ -966,7 +966,7 @@ Class Shape2 {
                     Var a: Array[Array[Array[d,_1_12],1],1];
                 }   
                 """
-        output = """Error on line 3 col 47: _1_12"""
+        output = """Error on line 3 col 45: d"""
         self.assertTrue(TestParser.test(input, output, 279))
     def test_280(self):
         input = """
@@ -974,7 +974,7 @@ Class Shape2 {
                     Var a: Array[b,Array[c,Array[d,1]]];
                 }   
                 """
-        output = """Error on line 3 col 35: Array"""
+        output = """Error on line 3 col 33: b"""
         self.assertTrue(TestParser.test(input, output, 280))
 
     def test_281(self):
@@ -1089,4 +1089,13 @@ Class Lzzzzz{Destructor(){Return;_9::$g3k.m();} }Class classA1provip123:z{}
             }'''
         expect = 'Error on line 8 col 8: foo'
         self.assertTrue(TestParser.test(input, expect, 300))
+
+
+
+
+
+
+
+
+
 
