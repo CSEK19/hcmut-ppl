@@ -1,8 +1,8 @@
 
         Class Sharp{
                     func(){
-                        Dwagawfd:as:$Dqwfgafas="wfrawsfxvc";
+                        Val a:String ="abc";
+                        D = 1;
                     }
-                    D = 1;
                 }
         

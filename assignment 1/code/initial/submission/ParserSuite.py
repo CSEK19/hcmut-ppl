@@ -623,12 +623,12 @@ class ParserSuite(unittest.TestCase):
         input = """
         Class Sharp{
                     func(){
-                        Dwagawfd:as:$Dqwfgafas="wfrawsfxvc";
+                        Val a:String ="abc";
+                        D = 1;
                     }
-                    D = 1;
                 }
         """
-        output = "Error on line 4 col 35: :"
+        output = "successful"
         self.assertTrue(TestParser.test(input, output, 244))
 
     def test_245(self):
@@ -701,32 +701,32 @@ class ParserSuite(unittest.TestCase):
     def test_251(self):
         input = """
                     Class Shape{
-                        VarAhhh,b:Int=5,6,7;
+                        Var a,b:Int=1,2,3;
                     }{}
 
                 """
-        output = """Error on line 3 col 41: ,"""
+        output = """Error on line 3 col 39: ,"""
         self.assertTrue(TestParser.test(input, output, 251))
 
     def test_252(self):
         input = """
                     Class Shape{
-                        VarAhhh,b,e:Int=5,6;
+                        Var a,f,e: Int=1,2;
 
                     }
 
                 """
-        output = """Error on line 3 col 43: ;"""
+        output = """Error on line 3 col 42: ;"""
         self.assertTrue(TestParser.test(input, output, 252))
 
     def test_253(self):
         input = """
                     Class Shape{
-                        VarAhhh,b:Int=5,6;{}
+                        Var Ahhh,b:Int=5,6;{}
                     }
 
                 """
-        output = """Error on line 3 col 42: {"""
+        output = """Error on line 3 col 43: {"""
         self.assertTrue(TestParser.test(input, output, 253))
 
     def test_254(self):

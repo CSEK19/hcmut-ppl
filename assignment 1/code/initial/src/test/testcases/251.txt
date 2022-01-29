@@ -1,6 +1,6 @@
 
                     Class Shape{
-                        VarAhhh,b:Int=5,6,7;
+                        Var a,b:Int=1,2,3;
                     }{}
 
                 
