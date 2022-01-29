@@ -1,8 +1,5 @@
 
-                Class Shape{
-                    foo(){
-                        Var a: Array[Int, b::$c.foo()];
-                    }
+                 Class Sharp{
+                    Var a,b:Int=53,2631LDAWDAWFA;
                 }
-
-            
+        

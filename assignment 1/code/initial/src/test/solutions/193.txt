@@ -1,1 +1,1 @@
-He,asked,me,:,Error Token '
+Class,Program,{,main,(,),{,Out,.,printInt,(,Shape,::,$numOfShape,),;,},},<EOF>

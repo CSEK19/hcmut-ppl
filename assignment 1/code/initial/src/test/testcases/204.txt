@@ -1,1 +1,6 @@
-1 + 1 + a.foo()
+
+        Class main{
+        Val $a,b : Int = 0,0,1;
+        main(){}
+        }
+        

@@ -1,1 +1,1 @@
-TrueFalseTrueFalse' ,<EOF>
+s,=,r,*,r,*,Self,.,myPI,;,<EOF>

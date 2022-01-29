@@ -1,1 +1,2 @@
-0xABCDEFGHI
+ New line
+in string 

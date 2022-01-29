@@ -1,1 +1,1 @@
-abc\\ def,<EOF>
+$123asd,<EOF>

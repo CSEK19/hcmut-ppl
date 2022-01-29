@@ -1,9 +1,9 @@
 
-                Class Shape{
-                    foo(){
-                        Foreach (x In a::$b() .. a.c.c.c By a::$foo){
-                            Foreach (x In a::$b() .. a.c.c.c By a::$foo){}
+                    Class Shape{
+                        func_tion(){
+                            Foreach (Step In Heck::$b() ..adsda_e.c.c.c By The::$func_tion){
+                                Foreach (Step In What::$b() ..42HDASAO_D.c.c.c By ANGLE::$func_tion){}
+                            }
                         }
-                    }
-                }   
-                
+                    }   
+                    

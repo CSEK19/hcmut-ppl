@@ -1,5 +1,10 @@
 
-    Class Shape {
-        sum(a,b:Int; c,d:Float){}
-    }
-    
+        Class AS{
+                Val a: Int = 0;
+                Var xyz, wfg: Int;
+                main(){
+                    Var $var1:String = "hhello world";
+                }
+                function(){{}}
+        }
+        

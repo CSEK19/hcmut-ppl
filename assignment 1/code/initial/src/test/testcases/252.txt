@@ -1,6 +1,7 @@
 
-                Class Shape{
-                    Var a,b,c:Int=5,6;
-                }
+                    Class Shape{
+                        VarAhhh,b,e:Int=5,6;
 
-            
+                    }
+
+                

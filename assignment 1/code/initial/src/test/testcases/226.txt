@@ -1,7 +1,7 @@
 
-    Class Shape {
-        foo(){
-            a = b == c  == True;
-        } 
-    }
-    
+            Class Eval{
+                getSpeedfromKm(hadhawd, gsiafhQIA, IUEHGFI_eQWEQW: Int; e, gggg: String){
+                    Outscreen.get("The speed = " +.  "1000km/h");
+                }
+            }
+            

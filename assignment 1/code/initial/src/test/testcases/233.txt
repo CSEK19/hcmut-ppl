@@ -1,9 +1,9 @@
 
-    Class Shape {
-        foo(){
-            a::$b=2;
-            a::$e();
-            a::$c::$d=2;
+        Class Polygon {
+        function(){
+            Dqwfgwa::$Dwqags=2312521412;
+            Dqwafgw::$Dwqgasda();
+            dwqfwa::$c::$Dwtgfwadwa=22341412;
         } 
-    }
-    
+        }
+        

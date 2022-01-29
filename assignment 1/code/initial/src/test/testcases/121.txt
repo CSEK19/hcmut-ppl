@@ -1,1 +1,1 @@
- "This is a string containing tab \t" 
+ 0000x00X00b00B0 

@@ -1,7 +1,5 @@
 
-    Class Shape {
-        foo(){
-            a.b();
-        } 
-    }
-    
+            Class Vinfast{
+                Destructor(){}
+            }
+            

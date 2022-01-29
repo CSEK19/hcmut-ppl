@@ -1,1 +1,1 @@
-1-1##1-1##1-1
+ $getNumOfShape() {Return a::$numOfShape;}  

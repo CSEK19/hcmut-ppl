@@ -1,1 +1,1 @@
-0x0,0,_A_BC,<EOF>
+HCMUT = Ho Chi Minh University of Technology,<EOF>

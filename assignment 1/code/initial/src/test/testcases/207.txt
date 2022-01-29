@@ -1,11 +1,9 @@
 
-Class Shape2 {
-    $getNumOfShape() {
-        If (a == (1+1) ){
-            Var b,c:Boolean = True, False;
+        Class F{
+            main(){
+                Val a: Int = 0;
+                Val b: Int = 0;
+                Var c, d: Int;
+            }
         }
-        Foreach (i In 1 .. 100 By 2) {
-             Var a:Boolean = True;
-        }
-    }
-}
+        

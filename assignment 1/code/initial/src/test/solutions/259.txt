@@ -1,1 +1,1 @@
-Error on line 5 col 28: Class
+Error on line 4 col 61: _edasd32_3123

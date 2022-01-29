@@ -1,7 +1,8 @@
 
-    Class Shape {
-        foo(){
-            a = b < c < True;
-        } 
-    }
-    
+            Class Shape {
+            foo(){
+            a = (b < c < e < f) < True < False;
+            } 
+            }
+
+            

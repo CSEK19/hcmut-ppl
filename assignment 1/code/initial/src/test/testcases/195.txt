@@ -1,1 +1,1 @@
-Something \ 
+ "This is a normal string" 

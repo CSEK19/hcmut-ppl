@@ -1,7 +1,7 @@
 
-                Class Shape{
-                    foo(){
-                        True=a;
-                    }
-                }   
-                
+                    Class Shape{
+                        func_tion(){
+                            True=a;
+                        }
+                    }   
+                    

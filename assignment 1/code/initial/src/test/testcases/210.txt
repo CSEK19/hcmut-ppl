@@ -1,7 +1,10 @@
 
-    Class Shape {
-        foo(){
-            Var a: Boolean = !!True;
-        }
-    }
-    
+            Class D{
+                main(){
+                    Var var1:String = "str1";
+                }
+                foo(){
+                        Return True;
+                }
+            }
+            

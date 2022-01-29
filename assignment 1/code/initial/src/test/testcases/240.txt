@@ -1,7 +1,7 @@
 
-    Class Shape {
-        foo(){
-        Var a :Int = $1-----5;
+        Class Loop {
+        function(){
+        i--;
         } 
-    }
-    
+        }
+        

@@ -1,5 +1,5 @@
 
-                Class Shape{
-                    Var a: Array[b,Array[c,Array[d,1]]];
-                }   
-                
+                    Class Shape{
+                        Var Kanon : Array[b,Array[c,Array[d,1]]];
+                    }   
+                    

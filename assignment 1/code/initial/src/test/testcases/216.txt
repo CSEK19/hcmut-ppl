@@ -1,7 +1,11 @@
 
-    Class Shape {
-        foo(){
-            a();
-        } 
-    }
-    
+            Class Vinfast{
+                Var running: Boolean = True;
+                run(){
+                    Self.running = True;
+                }
+                stop(){
+                    Self.running = False;
+                }
+            }
+            

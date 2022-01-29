@@ -1,7 +1,7 @@
 
-                Class Shape{
-                    foo(){
-                        a[b[c[d[e[f::$g]]]]][h::$i][j.k()][Lzzzzz::$m()]=0;
-                    }
-                }   
-                
+                    Class Shape{
+                        func_tion(){
+                           ASDNAIWDQAW_312[b[c[d[e[f::$g]]]]][h::$i][j.k()][Lzzzzz::$m()]=0;
+                        }
+                    }   
+                    

@@ -1,1 +1,1 @@
-foo,(,a,,,b,:,Int,;,c,:,String,),{,},<EOF>
+00,412e122,<EOF>

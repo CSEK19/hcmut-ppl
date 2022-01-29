@@ -1,7 +1,8 @@
 
-                Class Shape{
-                    foo(){}
-                    Class LamTestMetVaiLoz{}
+        Class Sharp{
+                    func(){
+                        Dwagawfd:as:$Dqwfgafas="wfrawsfxvc";
+                    }
+                    D = 1;
                 }
-
-            
+        

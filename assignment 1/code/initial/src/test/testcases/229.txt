@@ -1,8 +1,7 @@
 
-    Class Shape {
-        foo(){
-            a = ("a"+."b")+."b";
-            c = ("a"==."a")==True;
-        } 
-    }
-    
+            Class Shape {
+            foo(){
+                a = ("a"+."b")+."b";
+            } 
+            }
+            

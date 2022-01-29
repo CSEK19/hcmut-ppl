@@ -1,1 +1,1 @@
- 0xABCD_E_FG 
+ Foreach(1.. 100 By 2)  

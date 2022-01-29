@@ -1,9 +1,8 @@
 
-                Class Shape{
+         Class Sharp{
                     foo(){
-                        b::$f=1;
+                        _ID = New X().Y().Z();
+                        Var C : Array[Int, 0b0];
                     }
-                    a = 1;
                 }
-
-            
+        

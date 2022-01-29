@@ -1,10 +1,7 @@
 
-    Class Shape {
-        foo(){
-            a = !!!!!!!!!!!!True;
-            b = ------------5;
-            c=d.d.d.d.d.d.d.d;
-            e=f[1][1][1][1];
-        } 
-    }
-    
+            Class Car : Vehicle{
+                Val speed: String = 0;
+                Val $model, tireNum: Float;
+            }
+
+            

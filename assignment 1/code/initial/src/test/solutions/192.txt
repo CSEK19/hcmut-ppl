@@ -1,1 +1,1 @@
-00,0,_x123,<EOF>
+getArea,(,),{,Return,Self,.,length,*,Self,.,width,;,},<EOF>

@@ -1,1 +1,6 @@
-Var a: Array[Array[Int,5],5];
+
+        Class main{
+        Val $a,b : Int = 0,0;
+        main(){}
+        }
+        

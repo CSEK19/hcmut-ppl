@@ -1,8 +1,8 @@
 
-                Class Shape{
-                    foo(){
-                        Var a: Array[Int, 0b0];
+        Class Sharp{
+                    func(){
+                        Var 123: Array[Int, xyz::$ghz.func()];
                     }
                 }
 
-            
+        

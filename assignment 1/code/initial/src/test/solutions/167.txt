@@ -1,1 +1,1 @@
-abc,Error Token #
+Class,A,(,),{,Val,a,:,Int,=,1,;,},<EOF>

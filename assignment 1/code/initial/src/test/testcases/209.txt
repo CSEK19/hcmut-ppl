@@ -1,5 +1,8 @@
 
-    Class Shape {
-        Var a :Array[Array[Int,2],2] = Array(Array(1,1),Array(1,1));
-    }
-    
+         Class E{
+            main(){
+                Var dawiodjoawid1 : Int = "dawodjawoijdoawd";
+            }
+            abc();
+        }
+        

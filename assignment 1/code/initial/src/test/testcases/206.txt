@@ -1,7 +1,8 @@
 
-    Class Shape {
+        Class Something:Polygon{
+        Val arr : Array[Proplayer, 4];
         foo(){
-            a[b[1]][c][foo()] = 1;
+            Var a : Proplayer = New Student();
         }
-        Var e,f : Int = 1 + 1, 1 - 2;
-    }
+        }
+        

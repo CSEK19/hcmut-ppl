@@ -1,1 +1,1 @@
-<EOF>
+,String,with,single,quote,Error Token '

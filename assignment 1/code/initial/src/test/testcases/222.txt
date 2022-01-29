@@ -1,7 +1,16 @@
 
-    Class Shape {
-        foo(){
-            Foreach (i In a[1] .. foo() By _123()) {}
-        } 
-    }
-    
+            Class DAWFAWDFAW {
+            function() {
+                If (1214125412 + 112312421412 == 0) {
+                    Outscreen.print(1 / 2);
+                }
+                Elseif (1 + 2 == 43124124123) {
+                    Sys32.sus(11 - "3222");
+                }
+                Else {
+                    Break;
+                    Return;
+                }
+            }
+        }
+            

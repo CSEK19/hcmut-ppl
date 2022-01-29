@@ -1,9 +1,9 @@
 
-                Class Shape{
-                    Var $a,b:Int=5,6;
-                    foo(){
-                        Var $c,d:Int=5,6;
+                    Class Shape{
+                        Var $a,b:Int=5,6;
+                        func_tion(){
+                            Var $c,d:Int=5,6;
+                        }
                     }
-                }
 
-            
+                

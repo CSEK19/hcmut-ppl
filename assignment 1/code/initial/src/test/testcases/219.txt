@@ -1,7 +1,10 @@
 
-    Class Shape {
-        foo(){
-            a=b.c.d.e;
-        } 
-    }
-    
+            Class Vinfast{
+                Constructor(speed: Float, name: String){
+                    Self.speed = speed;
+                    Self.name = name;
+                }
+                Destructor(){}
+            }
+            Class Car:Vinfast{}
+            

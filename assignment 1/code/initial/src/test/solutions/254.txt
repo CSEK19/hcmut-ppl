@@ -1,1 +1,1 @@
-Error on line 5 col 28: $c
+Error on line 5 col 32: $c

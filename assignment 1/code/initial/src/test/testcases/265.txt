@@ -1,10 +1,10 @@
 
-                Class Shape{
-                    foo(){
-                        If ( a == -1--1){
-                            If(b == "c"+."c"){}
-                            Elseif( a == b ==. c){}
+                    Class Shape{
+                        func_tion(){
+                            If (3123_321412_312321_DAWDAW == -1--1){
+                                If(b == "c"+."c"){}
+                                Elseif(SHAPE == b ==. c){}
+                            }
                         }
-                    }
-                }   
-                
+                    }   
+                    

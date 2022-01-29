@@ -1,1 +1,1 @@
-Something,Error Token \
+This is a normal string,<EOF>

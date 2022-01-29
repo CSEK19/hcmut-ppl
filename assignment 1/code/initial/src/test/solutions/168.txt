@@ -1,1 +1,1 @@
-123,<EOF>
+Var,$A,:,Array,[,Int,,,10,],;,<EOF>

@@ -1,8 +1,12 @@
 
-                Class Shape{
-                    foo(){
-                        Class LamTestMetVaiLoz{}
+        Class Sharp{
+                    func(){
+                        Var a: Array[Int, 01];
+                        Var a: Array[Int, 0x1];
+                        Var a: Array[Int, 0X1];
+                        Var a: Array[Int, 0b1];
+                        Var a: Array[Int, 0B1];
+                        Var a: Array[Int, 1];
                     }
                 }
-
-            
+        

@@ -1,1 +1,1 @@
-## This is a\n multi-line \n comment.\n ##
+ ""String with single quote 'this is good'"" 

@@ -1,1 +1,1 @@
-1,-,-,-,-,-,-,1,+,1,<EOF>
+Val,My1stCons,,,My2ndCons,:,Int,=,1,+,5,,,2,;,<EOF>

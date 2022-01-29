@@ -1,9 +1,14 @@
 
-    Class Shape {
-        Constructor(width, height : Int; name:String){
-            Self.Area=Self.width*Self.height;
-            Self.name="shape"+.name;
-        } 
-        Destructor(){} 
-    }
-    
+            Class B{
+                main(){
+                }
+                foo(){
+                    a = b%c + Self.foo();
+                    Self.foo2(param1, param2);
+                    a1 = Self.foo3(param1, param2);
+                    Var $b = 1 >= 3;
+                    Val val1 = True == False;
+                    b = ! val1;
+                }
+            }
+            

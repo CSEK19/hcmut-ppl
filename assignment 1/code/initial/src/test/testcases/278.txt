@@ -1,5 +1,5 @@
 
-                Class Shape{
-                    Var a: Array[Array[Array[d,1_12],1],1];
-                }   
-                
+                    Class Shape{
+                        Var fhawifawh: Array[Array[Array[d,1_12],1],1];
+                    }   
+                    

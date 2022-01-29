@@ -1,9 +1,8 @@
 
-                Class Shape{
+        Class Sharp{
                     foo(){
-                        a = New X().Y();
-                        Var a: Array[Int, 0];
+                        _ID = New X().Y().Z();
+                        Var C : Array[Int, 0];
                     }
                 }
-
-            
+        

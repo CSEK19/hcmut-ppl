@@ -1,8 +1,8 @@
 
-                Class Shape{
-                    foo(){
-                        Foreach (x In a::$b() .. a.c.c.c By a::$foo){
-                            Var $a:Int;
-                        }
-                }
-                
+                    Class Shape{
+                        func_tion(){
+                            Foreach (Step In Canon::$b() ..hawuid_3123.c.c.c By IN_D::$func_tion){
+                                Var $a:Int;
+                            }
+                    }
+                    

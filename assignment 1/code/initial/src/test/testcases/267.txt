@@ -1,15 +1,15 @@
 
-                Class Shape{
-                    foo(){
-                        If ( a == -1--1){
-                            Foreach(x In 1 .. 100 By 2){
-                                If ( a == -1--1){
-                                    Foreach(x In 1 .. 100 By 2){
+                    Class Shape{
+                        func_tion(){
+                            If (DAWDZXCAWR == -1--1){
+                                Foreach(Step In 1 .. 100 By 2){
+                                    If (AhhEWAEWAEh == -1--1){
+                                        Foreach(Step In 1 .. 100 By 2){
 
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                }   
-                
+                    }   
+                    

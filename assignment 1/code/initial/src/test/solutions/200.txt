@@ -1,1 +1,1 @@
-$123,<EOF>
+End_of_Lexer_test,<EOF>

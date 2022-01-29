@@ -1,0 +1,163 @@
+import unittest
+from TestUtils import TestLexer
+class LexerSuite(unittest.TestCase):
+	def test_0(self):
+		self.assertTrue(TestLexer.test("0b0010_01_1001010","0b0,010011001010,<EOF>",0))
+	def test_1(self):
+		self.assertTrue(TestLexer.test("413414.572","413414.572,<EOF>",1))
+	def test_2(self):
+		self.assertTrue(TestLexer.test("_27226.11972e+_377","_27226,.,11972,e,+,_377,<EOF>",2))
+	def test_3(self):
+		self.assertTrue(TestLexer.test("81139913870014","81139913870014,<EOF>",3))
+	def test_4(self):
+		self.assertTrue(TestLexer.test("0x78DCA6FC328F14","0x78DCA6FC328F14,<EOF>",4))
+	def test_5(self):
+		self.assertTrue(TestLexer.test("827448.54_68831","827448.54,_68831,<EOF>",5))
+	def test_6(self):
+		self.assertTrue(TestLexer.test("0b000101011000","0b0,00,101011000,<EOF>",6))
+	def test_7(self):
+		self.assertTrue(TestLexer.test("0b10_10010001_1100011_","0b10100100011100011,_,<EOF>",7))
+	def test_8(self):
+		self.assertTrue(TestLexer.test("049555_3713e+0736362","04,95553713e+0736362,<EOF>",8))
+	def test_9(self):
+		self.assertTrue(TestLexer.test("028976972014430364","02,8976972014430364,<EOF>",9))
+	def test_10(self):
+		self.assertTrue(TestLexer.test("025251_15640217562","02525115640217562,<EOF>",10))
+	def test_11(self):
+		self.assertTrue(TestLexer.test("04076055763251316_2","040760557632513162,<EOF>",11))
+	def test_12(self):
+		self.assertTrue(TestLexer.test("04772661","04772661,<EOF>",12))
+	def test_13(self):
+		self.assertTrue(TestLexer.test("05752100062","05752100062,<EOF>",13))
+	def test_14(self):
+		self.assertTrue(TestLexer.test("19891","19891,<EOF>",14))
+	def test_15(self):
+		self.assertTrue(TestLexer.test("0620345","0620345,<EOF>",15))
+	def test_16(self):
+		self.assertTrue(TestLexer.test("0b01011101111_110_101","0b0,1011101111110101,<EOF>",16))
+	def test_17(self):
+		self.assertTrue(TestLexer.test("0b1000_","0b1000,_,<EOF>",17))
+	def test_18(self):
+		self.assertTrue(TestLexer.test("0b0001010011","0b0,00,1010011,<EOF>",18))
+	def test_19(self):
+		self.assertTrue(TestLexer.test("0142735","0142735,<EOF>",19))
+	def test_20(self):
+		self.assertTrue(TestLexer.test("00504504031_1406","00,5045040311406,<EOF>",20))
+	def test_21(self):
+		self.assertTrue(TestLexer.test("643486_4274e-75167_17","6434864274e-75167,_17,<EOF>",21))
+	def test_22(self):
+		self.assertTrue(TestLexer.test("_8763768","_8763768,<EOF>",22))
+	def test_23(self):
+		self.assertTrue(TestLexer.test("0x37D6854","0x37D6854,<EOF>",23))
+	def test_24(self):
+		self.assertTrue(TestLexer.test("0030_763104550000","00,30763104550000,<EOF>",24))
+	def test_25(self):
+		self.assertTrue(TestLexer.test("812041.68601e+","812041.68601,e,+,<EOF>",25))
+	def test_26(self):
+		self.assertTrue(TestLexer.test("0_4251650432","0,_4251650432,<EOF>",26))
+	def test_27(self):
+		self.assertTrue(TestLexer.test("670027.","670027.,<EOF>",27))
+	def test_28(self):
+		self.assertTrue(TestLexer.test("067512274717724_6_11","067512274717724611,<EOF>",28))
+	def test_29(self):
+		self.assertTrue(TestLexer.test("0067427703545110","00,67427703545110,<EOF>",29))
+	def test_30(self):
+		self.assertTrue(TestLexer.test("46128","46128,<EOF>",30))
+	def test_31(self):
+		self.assertTrue(TestLexer.test("0b00101_10","0b0,010110,<EOF>",31))
+	def test_32(self):
+		self.assertTrue(TestLexer.test("0430303","0430303,<EOF>",32))
+	def test_33(self):
+		self.assertTrue(TestLexer.test("0b00101101001011010","0b0,0101101001011010,<EOF>",33))
+	def test_34(self):
+		self.assertTrue(TestLexer.test("0_071472_1_0_","0,_071472_1_0_,<EOF>",34))
+	def test_35(self):
+		self.assertTrue(TestLexer.test("0341075__701434_2360","0341075,__701434_2360,<EOF>",35))
+	def test_36(self):
+		self.assertTrue(TestLexer.test("035__53","035,__53,<EOF>",36))
+	def test_37(self):
+		self.assertTrue(TestLexer.test("0754354_007","0754354007,<EOF>",37))
+	def test_38(self):
+		self.assertTrue(TestLexer.test("0xC2916137B35A92482","0xC2916137B35A92482,<EOF>",38))
+	def test_39(self):
+		self.assertTrue(TestLexer.test("0x350738ACE","0x350738ACE,<EOF>",39))
+	def test_40(self):
+		self.assertTrue(TestLexer.test("uBzLDkWvHXjy1S5","uBzLDkWvHXjy1S5,<EOF>",40))
+	def test_41(self):
+		self.assertTrue(TestLexer.test("BGr8sDsSEW9b","BGr8sDsSEW9b,<EOF>",41))
+	def test_42(self):
+		self.assertTrue(TestLexer.test("AviFN","AviFN,<EOF>",42))
+	def test_43(self):
+		self.assertTrue(TestLexer.test("j6w8SuVveJk","j6w8SuVveJk,<EOF>",43))
+	def test_44(self):
+		self.assertTrue(TestLexer.test("Qf6cy1","Qf6cy1,<EOF>",44))
+	def test_45(self):
+		self.assertTrue(TestLexer.test("wCrKxKhD","wCrKxKhD,<EOF>",45))
+	def test_46(self):
+		self.assertTrue(TestLexer.test("Jml4ktJY55d1lf0i","Jml4ktJY55d1lf0i,<EOF>",46))
+	def test_47(self):
+		self.assertTrue(TestLexer.test("TOkiRlaIAabORvcue","TOkiRlaIAabORvcue,<EOF>",47))
+	def test_48(self):
+		self.assertTrue(TestLexer.test("BLBpFy5FEPNUNWtHef4w","BLBpFy5FEPNUNWtHef4w,<EOF>",48))
+	def test_49(self):
+		self.assertTrue(TestLexer.test("0sn5lImuox","0,sn5lImuox,<EOF>",49))
+	def test_50(self):
+		self.assertTrue(TestLexer.test("sXBv7","sXBv7,<EOF>",50))
+	def test_51(self):
+		self.assertTrue(TestLexer.test("8m1uqyCQG","8,m1uqyCQG,<EOF>",51))
+	def test_52(self):
+		self.assertTrue(TestLexer.test("TFGLa","TFGLa,<EOF>",52))
+	def test_53(self):
+		self.assertTrue(TestLexer.test("m4OV7VphJaUWu","m4OV7VphJaUWu,<EOF>",53))
+	def test_54(self):
+		self.assertTrue(TestLexer.test("qbMiY4yae","qbMiY4yae,<EOF>",54))
+	def test_55(self):
+		self.assertTrue(TestLexer.test("K6PQvDFNav7kA","K6PQvDFNav7kA,<EOF>",55))
+	def test_56(self):
+		self.assertTrue(TestLexer.test("Ea6_70e","Ea6_70e,<EOF>",56))
+	def test_57(self):
+		self.assertTrue(TestLexer.test("x0iwCnM3C","x0iwCnM3C,<EOF>",57))
+	def test_58(self):
+		self.assertTrue(TestLexer.test("mEW3Jv_pM7Wlh","mEW3Jv_pM7Wlh,<EOF>",58))
+	def test_59(self):
+		self.assertTrue(TestLexer.test("eZ_zv","eZ_zv,<EOF>",59))
+	def test_60(self):
+		self.assertTrue(TestLexer.test(""" "u<FBFQF87Hsb)@g%X[}/" """,""""u<FBFQF87Hsb)@g%X[}/",<EOF>""",60))
+	def test_61(self):
+		self.assertTrue(TestLexer.test(""" "{);Cm>_e" """,""""{);Cm>_e",<EOF>""",61))
+	def test_62(self):
+		self.assertTrue(TestLexer.test(""" ";|&y"=Z<MYGR\" ""","""";|&y",=,Z,<,MYGR,Unclosed String:  """,62))
+	def test_63(self):
+		self.assertTrue(TestLexer.test(""" "|eFB'"" """,""""|eFB'"",<EOF>""",63))
+	def test_64(self):
+		self.assertTrue(TestLexer.test(""" "hNn)|Vn/F5'!;i!B," """,""""hNn)|Vn/F5'!;i!B,",<EOF>""",64))
+	def test_65(self):
+		self.assertTrue(TestLexer.test(""" "s.mc;" """,""""s.mc;",<EOF>""",65))
+	def test_66(self):
+		self.assertTrue(TestLexer.test(""" "'LeLKO-," """,""""'LeLKO-,",<EOF>""",66))
+	def test_67(self):
+		self.assertTrue(TestLexer.test(""" "Hl>ZhsPUY/@B2" """,""""Hl>ZhsPUY/@B2",<EOF>""",67))
+	def test_68(self):
+		self.assertTrue(TestLexer.test(""" "g^J)`" """,""""g^J)`",<EOF>""",68))
+	def test_69(self):
+		self.assertTrue(TestLexer.test(""" "">}f9!" """,""""",>,},f9,!,Unclosed String:  """,69))
+	def test_70(self):
+		self.assertTrue(TestLexer.test(""" "9awsB>#A" """,""""9awsB>#A",<EOF>""",70))
+	def test_71(self):
+		self.assertTrue(TestLexer.test(""" "[D-3A" """,""""[D-3A",<EOF>""",71))
+	def test_72(self):
+		self.assertTrue(TestLexer.test(""" ",L!y'`Pz`0w.^uS" ""","""",L!y'`Pz`0w.^uS",<EOF>""",72))
+	def test_73(self):
+		self.assertTrue(TestLexer.test(""" "J]X'"~we[" """,""""J]X'"~we[",<EOF>""",73))
+	def test_74(self):
+		self.assertTrue(TestLexer.test(""" "lqPE,jT" """,""""lqPE,jT",<EOF>""",74))
+	def test_75(self):
+		self.assertTrue(TestLexer.test(""" "KwpD,M" """,""""KwpD,M",<EOF>""",75))
+	def test_76(self):
+		self.assertTrue(TestLexer.test(""" "`S]!oLI'IqjV6"Jtp" """,""""`S]!oLI'IqjV6",Jtp,Unclosed String:  """,76))
+	def test_77(self):
+		self.assertTrue(TestLexer.test(""" "P3-VDzaYq" """,""""P3-VDzaYq",<EOF>""",77))
+	def test_78(self):
+		self.assertTrue(TestLexer.test(""" ";dP1b8ha)f^%3" ""","""";dP1b8ha)f^%3",<EOF>""",78))
+	def test_79(self):
+		self.assertTrue(TestLexer.test(""" "`y]}0p/1,a`U+!s" """,""""`y]}0p/1,a`U+!s",<EOF>""",79))

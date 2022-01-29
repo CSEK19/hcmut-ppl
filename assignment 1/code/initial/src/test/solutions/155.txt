@@ -1,1 +1,1 @@
-0xABCDEF,GHI,<EOF>
+New,line,in,string,<EOF>

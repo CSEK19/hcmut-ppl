@@ -1,1 +1,1 @@
-True && True False || False
+ r = 2.0; 

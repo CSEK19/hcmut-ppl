@@ -1,7 +1,7 @@
 
-                Class Shape{
-                    foo(){
-                        Return a::$TAloz*a::$TAloz---------a::$TAloz;
+                    Class Shape{
+                        func_tion(){
+                            ReturnAhhh::$TAloz*a::$TAloz---------a::$TAloz;
+                        }
                     }
-                }
-            
+                

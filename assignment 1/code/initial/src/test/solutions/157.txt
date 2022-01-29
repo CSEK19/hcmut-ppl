@@ -1,1 +1,1 @@
-.,26,<EOF>
+,String,with,inside,,<EOF>

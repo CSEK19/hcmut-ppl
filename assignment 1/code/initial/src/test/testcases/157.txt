@@ -1,1 +1,1 @@
-.26
+ ""String with ##Comment## inside"" 

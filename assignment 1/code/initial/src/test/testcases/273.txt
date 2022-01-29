@@ -1,7 +1,7 @@
 
-                Class Shape{
-                    foo(){
-                        a=b==c==d;
-                    }
-                }   
-                
+                    Class Shape{
+                        func_tion(){
+                           1428172_231468=b==c==d;
+                        }
+                    }   
+                    

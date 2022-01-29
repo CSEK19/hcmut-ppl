@@ -1,9 +1,9 @@
 
-                Class Shape{
-                    foo(){
-                        Foreach (x In a::$b() .. a.c.c.c By a::$foo){
-                            Class Shape{}
+                    Class Shape{
+                        func_tion(){
+                            Foreach (Step In E::$b() ..312412_edasd32_3123.c.c.c F::$func_tion){
+                                Class Shape{}
+                            }
                         }
                     }
-                }
-            
+                

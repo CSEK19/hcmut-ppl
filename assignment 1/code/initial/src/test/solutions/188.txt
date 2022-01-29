@@ -1,1 +1,1 @@
-True,&&,True,False,||,False,<EOF>
+r,=,2.0,;,<EOF>

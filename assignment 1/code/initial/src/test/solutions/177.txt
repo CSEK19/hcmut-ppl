@@ -1,1 +1,1 @@
-00,xAB_C,<EOF>
+a,.,foo,(,),<EOF>

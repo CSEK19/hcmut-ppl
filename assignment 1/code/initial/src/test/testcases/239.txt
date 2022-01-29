@@ -1,7 +1,7 @@
 
-    Class Shape {
-        foo(){
-        b=1+-1--1+-1-+-1;
+       Class Loop {
+        function(){
+        i=-1;
         } 
-    }
-    
+        }
+        
