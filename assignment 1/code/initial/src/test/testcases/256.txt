@@ -1,6 +1,6 @@
 
                     Class Shape{
-                        ReturnAhhh::$TAloz*a::$TAloz---------a::$TAloz;
+                        Return DEF::$TALOL*a::$TALOL---------a::$TALOL;
                     }
 
                 
