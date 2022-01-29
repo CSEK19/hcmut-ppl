@@ -24,7 +24,7 @@ exp_IntFloat: exp_0;
 exp_0: exp_0 (ADD | SUB) exp_1 | exp_1;
 exp_1: exp_1 (MUL | DIV | MOD) exp_2 | exp_2;
 exp_2: SUB exp_2 | exp_3;
-exp_3: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | FLOATLIT | BOOLLIT |  exp_MemberAccess | exp_Idx | LB exp_0 RB | lit_Data | NOT exp_0 | exp_LiteralAttribure;
+exp_3: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | FLOATLIT | BOOLLIT |  exp_MemberAccess | exp_Idx | LB exp_0 RB | lit_Data | NOT exp_0 | exp_LiteralAttribure | exp_LiteralMethod;
 
 // Boolean operators
 exp_Logical: exp_Logical (AND | OR) exp_LogicalTerm | exp_LogicalTerm;
@@ -66,7 +66,7 @@ exp_TermIdx:
     LSB idx_Operators RSB
     | exp_TermIdx LSB idx_Operators RSB
     | exp_TermIdx LSB exp_Idx RSB;
-idx_Operators: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | expr | exp_Idx | LB exp_Idx RB;
+idx_Operators: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | expr | exp_Idx | LB exp_Idx RB | exp_IntFloat | exp_LogicalNot | exp_MemberAccess;
 
 
 //  Member access
@@ -137,7 +137,7 @@ stmt_ForIn: FOREACH LB ID IN expr DOUBLE_DOT expr (BY expr)? RB stmt_Block ;
 stmt_Block: LCB (list_Stmt) RCB ;
 
 // Method Invocation statement
-stmt_MethodInvocation: (exp_InstanceMethodInvocation | exp_StaticMethodInvocation | exp_LiteralMethod | exp_MemberAccessMethod) SM;
+stmt_MethodInvocation: (exp_MemberAccess | exp_LiteralMethod | exp_MemberAccessMethod) SM;
 
 
 // Continue statement
