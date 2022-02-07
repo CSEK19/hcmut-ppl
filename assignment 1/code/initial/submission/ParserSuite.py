@@ -280,33 +280,6 @@ class ParserSuite(unittest.TestCase):
         output = "Error on line 3 col 40: ,"
         self.assertTrue(TestParser.test(input, output, 219))
 
-
-    def test_220(self):
-        input = """
-            Class Vehicle{
-                Var $numOfVehicle: Int;
-                Constructor(speed: Float; model_name: String){
-                Self.speed = speed;
-                Self.name = name;
-                }
-                Constructor(){
-                    Self.speed = 321321421421;
-                }
-
-                Destructor(){}
-                run(){
-                    Self.is_running = True;
-                }
-                stop(){
-                    Self.is_running = False;
-                }
-            }
-            Class Car:Vehicle{}
-            """
-        output = "successful"
-        self.assertTrue(TestParser.test(input, output, 220))
-
-
     def test_220(self):
         input = """
             Class __AWFJIAWFHBAWIUF__ {
@@ -356,22 +329,6 @@ class ParserSuite(unittest.TestCase):
             """
         output = "successful"
         self.assertTrue(TestParser.test(input, output, 222))
-
-
-    def test_223(self):
-        input = """
-            Class Car:Vehicle{
-                open(){
-                    ## Open hood ##
-                    If (Hood==False){
-                        Hood = True;
-                    }
-                }
-            }
-            """
-        output = "successful"
-        self.assertTrue(TestParser.test(input, output, 223))
-
 
     def test_223(self):
         input = """
@@ -746,7 +703,7 @@ class ParserSuite(unittest.TestCase):
         input = """
                     Class Shape{
                         func_tion(){
-                            ReturnAhhh::$TAloz;
+                            Return DEF::$TALOL;
                         }
                     }
 
@@ -757,22 +714,22 @@ class ParserSuite(unittest.TestCase):
     def test_256(self):
         input = """
                     Class Shape{
-                        ReturnAhhh::$TAloz*a::$TAloz---------a::$TAloz;
+                        Return DEF::$TALOL*a::$TALOL---------a::$TALOL;
                     }
 
                 """
-        output = """Error on line 3 col 34: ::"""
+        output = """Error on line 3 col 24: Return"""
         self.assertTrue(TestParser.test(input, output, 256))
 
     def test_257(self):
         input = """
                     Class Shape{
                         func_tion(){
-                            ReturnAhhh::$TAloz*a::$TAloz---------a::$TAloz;
+                            Return DEF::$TALOL*a::$TALOL---------a::$TALOL;
                         }
                     }
                 """
-        output = """Error on line 4 col 46: *"""
+        output = """successful"""
         self.assertTrue(TestParser.test(input, output, 257))
 
     def test_258(self):
