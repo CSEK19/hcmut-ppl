@@ -88,7 +88,6 @@ stmt_Block: LCB (list_Stmt) RCB ;
 // Method Invocation statement
 stmt_MethodInvocation: (exp_InstanceMethodInvocation  | exp_StaticMethodInvocation) SM;
 
-
 // Continue statement
 stmt_Continue: CONTINUE SM;
 
@@ -129,6 +128,7 @@ class_Destruction: DESTRUCTOR LB RB stmt_Block;
 list_Parameters: seq_Parameters (SM seq_Parameters)*;
 seq_Parameters: seq_IDParameters COLON type_Data;
 seq_IDParameters: ID (CM ID)*;
+
 /********************** RULES **********************/
 
 lit_Array: ARRAY LB (expr (CM expr)*)? RB;
