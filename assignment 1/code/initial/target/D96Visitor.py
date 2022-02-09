@@ -14,23 +14,8 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_LiteralMethod.
-    def visitExp_LiteralMethod(self, ctx:D96Parser.Exp_LiteralMethodContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_LiteralTerm.
-    def visitExp_LiteralTerm(self, ctx:D96Parser.Exp_LiteralTermContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_LiteralAttribure.
-    def visitExp_LiteralAttribure(self, ctx:D96Parser.Exp_LiteralAttribureContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_IntFloat.
-    def visitExp_IntFloat(self, ctx:D96Parser.Exp_IntFloatContext):
+    # Visit a parse tree produced by D96Parser#expr.
+    def visitExpr(self, ctx:D96Parser.ExprContext):
         return self.visitChildren(ctx)
 
 
@@ -54,63 +39,48 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_Logical.
-    def visitExp_Logical(self, ctx:D96Parser.Exp_LogicalContext):
+    # Visit a parse tree produced by D96Parser#exp_4.
+    def visitExp_4(self, ctx:D96Parser.Exp_4Context):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_LogicalTerm.
-    def visitExp_LogicalTerm(self, ctx:D96Parser.Exp_LogicalTermContext):
+    # Visit a parse tree produced by D96Parser#exp_5.
+    def visitExp_5(self, ctx:D96Parser.Exp_5Context):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_LogicalNot.
-    def visitExp_LogicalNot(self, ctx:D96Parser.Exp_LogicalNotContext):
+    # Visit a parse tree produced by D96Parser#exp_6.
+    def visitExp_6(self, ctx:D96Parser.Exp_6Context):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_LogicalNotTerm.
-    def visitExp_LogicalNotTerm(self, ctx:D96Parser.Exp_LogicalNotTermContext):
+    # Visit a parse tree produced by D96Parser#exp_7.
+    def visitExp_7(self, ctx:D96Parser.Exp_7Context):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_Bool.
-    def visitExp_Bool(self, ctx:D96Parser.Exp_BoolContext):
+    # Visit a parse tree produced by D96Parser#exp_8.
+    def visitExp_8(self, ctx:D96Parser.Exp_8Context):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_Str.
-    def visitExp_Str(self, ctx:D96Parser.Exp_StrContext):
+    # Visit a parse tree produced by D96Parser#exp_9.
+    def visitExp_9(self, ctx:D96Parser.Exp_9Context):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_TermStr.
-    def visitExp_TermStr(self, ctx:D96Parser.Exp_TermStrContext):
+    # Visit a parse tree produced by D96Parser#exp_10.
+    def visitExp_10(self, ctx:D96Parser.Exp_10Context):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_EqualAndNotEqual.
-    def visitExp_EqualAndNotEqual(self, ctx:D96Parser.Exp_EqualAndNotEqualContext):
+    # Visit a parse tree produced by D96Parser#exp_11.
+    def visitExp_11(self, ctx:D96Parser.Exp_11Context):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_TermEQANEQ.
-    def visitExp_TermEQANEQ(self, ctx:D96Parser.Exp_TermEQANEQContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_LessLargeEqual.
-    def visitExp_LessLargeEqual(self, ctx:D96Parser.Exp_LessLargeEqualContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_TermLRE.
-    def visitExp_TermLRE(self, ctx:D96Parser.Exp_TermLREContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_RelationalOperation.
-    def visitExp_RelationalOperation(self, ctx:D96Parser.Exp_RelationalOperationContext):
+    # Visit a parse tree produced by D96Parser#exp_RelationalOperand.
+    def visitExp_RelationalOperand(self, ctx:D96Parser.Exp_RelationalOperandContext):
         return self.visitChildren(ctx)
 
 
@@ -119,13 +89,23 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_TermIdx.
-    def visitExp_TermIdx(self, ctx:D96Parser.Exp_TermIdxContext):
+    # Visit a parse tree produced by D96Parser#idx_Operators.
+    def visitIdx_Operators(self, ctx:D96Parser.Idx_OperatorsContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#idx_Operators.
-    def visitIdx_Operators(self, ctx:D96Parser.Idx_OperatorsContext):
+    # Visit a parse tree produced by D96Parser#exp_IdxMemberAccess.
+    def visitExp_IdxMemberAccess(self, ctx:D96Parser.Exp_IdxMemberAccessContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#idx_MemberAccessOperators.
+    def visitIdx_MemberAccessOperators(self, ctx:D96Parser.Idx_MemberAccessOperatorsContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#scalar_Variable.
+    def visitScalar_Variable(self, ctx:D96Parser.Scalar_VariableContext):
         return self.visitChildren(ctx)
 
 
@@ -139,11 +119,6 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_StaticAttributeAccess.
-    def visitExp_StaticAttributeAccess(self, ctx:D96Parser.Exp_StaticAttributeAccessContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by D96Parser#exp_InstanceMethodInvocation.
     def visitExp_InstanceMethodInvocation(self, ctx:D96Parser.Exp_InstanceMethodInvocationContext):
         return self.visitChildren(ctx)
@@ -154,58 +129,18 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by D96Parser#exp_StaticAttributeAccess.
+    def visitExp_StaticAttributeAccess(self, ctx:D96Parser.Exp_StaticAttributeAccessContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by D96Parser#exp_StaticMethodInvocation.
     def visitExp_StaticMethodInvocation(self, ctx:D96Parser.Exp_StaticMethodInvocationContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_InstanceAttributeMethod.
-    def visitExp_InstanceAttributeMethod(self, ctx:D96Parser.Exp_InstanceAttributeMethodContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_InstanceAttributeMethodTerm.
-    def visitExp_InstanceAttributeMethodTerm(self, ctx:D96Parser.Exp_InstanceAttributeMethodTermContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_IdxFree.
-    def visitExp_IdxFree(self, ctx:D96Parser.Exp_IdxFreeContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_IdxFreeTerm.
-    def visitExp_IdxFreeTerm(self, ctx:D96Parser.Exp_IdxFreeTermContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_IdxFreeTermOperator.
-    def visitExp_IdxFreeTermOperator(self, ctx:D96Parser.Exp_IdxFreeTermOperatorContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_MemberAccess.
-    def visitExp_MemberAccess(self, ctx:D96Parser.Exp_MemberAccessContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_MemberAccessMethod.
-    def visitExp_MemberAccessMethod(self, ctx:D96Parser.Exp_MemberAccessMethodContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by D96Parser#exp_ObjCreation.
     def visitExp_ObjCreation(self, ctx:D96Parser.Exp_ObjCreationContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#exp_ClassObject.
-    def visitExp_ClassObject(self, ctx:D96Parser.Exp_ClassObjectContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#expr.
-    def visitExpr(self, ctx:D96Parser.ExprContext):
         return self.visitChildren(ctx)
 
 

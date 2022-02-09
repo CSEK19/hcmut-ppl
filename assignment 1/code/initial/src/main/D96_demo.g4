@@ -15,8 +15,8 @@ program: stmt_ClassDeclaration+ EOF;
 
 /********************** PARSERS **********************/
 
-exp_LiteralMethod: exp_LiteralTerm DOT ID LB list_Expr RB;
-exp_LiteralTerm : lit_Data| exp_LiteralTerm DOT ID LB list_Expr RB| exp_LiteralTerm DOT ID;
+exp_LiteralMethod: exp_LiteralTerm DOT ID LB list_Expr? RB;
+exp_LiteralTerm : lit_Data | exp_LiteralTerm DOT ID LB list_Expr? RB| exp_LiteralTerm DOT ID;
 exp_LiteralAttribure: exp_LiteralTerm DOT ID;
 
 // Arithmetic operators
@@ -24,14 +24,14 @@ exp_IntFloat: exp_0;
 exp_0: exp_0 (ADD | SUB) exp_1 | exp_1;
 exp_1: exp_1 (MUL | DIV | MOD) exp_2 | exp_2;
 exp_2: SUB exp_2 | exp_3;
-exp_3: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | FLOATLIT | BOOLLIT |  exp_MemberAccess | exp_Idx | LB exp_0 RB | lit_Data | NOT exp_0;
+exp_3: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | FLOATLIT | BOOLLIT |  exp_MemberAccess | exp_Idx | LB exp_0 RB | lit_Data | NOT exp_0 | exp_LiteralAttribure | exp_LiteralMethod;
 
 // Boolean operators
 exp_Logical: exp_Logical (AND | OR) exp_LogicalTerm | exp_LogicalTerm;
 exp_LogicalTerm: (exp_StaticAttributeAccess | ID) | BOOLLIT | exp_MemberAccess | LB exp_LogicalTerm RB | exp_RelationalOperation | exp_LogicalNot;
 
 exp_LogicalNot: NOT exp_LogicalNot|exp_LogicalNotTerm;
-exp_LogicalNotTerm: exp_0 | exp_MemberAccess | (exp_StaticAttributeAccess|ID) | BOOLLIT | LB exp_LogicalNot RB;
+exp_LogicalNotTerm: exp_0 | exp_MemberAccess | (exp_StaticAttributeAccess|ID) | BOOLLIT | LB exp_LogicalNot RB | lit_Data | exp_LiteralAttribure;
 
 exp_Bool: exp_Logical | exp_LogicalNot;
 
@@ -66,14 +66,12 @@ exp_TermIdx:
     LSB idx_Operators RSB
     | exp_TermIdx LSB idx_Operators RSB
     | exp_TermIdx LSB exp_Idx RSB;
-idx_Operators: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | expr | exp_Idx | LB exp_Idx RB;
+idx_Operators: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | expr | exp_Idx | LB exp_Idx RB | exp_IntFloat | exp_LogicalNot | exp_MemberAccess;
 
 
 //  Member access
 exp_InstanceAttributeAccess: exp_InstanceAttributeAccess DOT ID | exp_InstanceAttributeAccessTerm;
-exp_InstanceAttributeAccessTerm: exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | NULL | exp_IdxFree;
-
-
+exp_InstanceAttributeAccessTerm: exp_InstanceAttributeAccessTerm DOT ID LB list_Expr? RB|exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | NULL | exp_IdxFree;
 
 exp_StaticAttributeAccess: ID SCOPE STATIC_ID;
 
@@ -91,7 +89,7 @@ exp_IdxFreeTermOperator: ID|INTLIT| expr| LB exp_IdxFree RB;
 
 
 exp_MemberAccess : exp_InstanceAttributeMethod | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
-
+exp_MemberAccessMethod: exp_MemberAccessMethod DOT ID LB list_Expr? RB | exp_InstanceAttributeMethodTerm;
 // Object creation
 exp_ObjCreation: NEW ID LB list_Expr? RB | LB exp_ObjCreation RB;
 exp_ClassObject: ID | exp_ObjCreation;
@@ -139,7 +137,7 @@ stmt_ForIn: FOREACH LB ID IN expr DOUBLE_DOT expr (BY expr)? RB stmt_Block ;
 stmt_Block: LCB (list_Stmt) RCB ;
 
 // Method Invocation statement
-stmt_MethodInvocation: (exp_InstanceMethodInvocation | exp_StaticMethodInvocation | exp_LiteralMethod) SM;
+stmt_MethodInvocation: (exp_MemberAccess | exp_LiteralMethod | exp_MemberAccessMethod) SM;
 
 
 // Continue statement

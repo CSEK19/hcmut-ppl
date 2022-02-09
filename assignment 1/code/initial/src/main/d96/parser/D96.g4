@@ -15,100 +15,49 @@ program: stmt_ClassDeclaration+ EOF;
 
 /********************** PARSERS **********************/
 
-exp_LiteralMethod: exp_LiteralTerm DOT ID LB list_Expr? RB;
-exp_LiteralTerm : lit_Data | exp_LiteralTerm DOT ID LB list_Expr? RB| exp_LiteralTerm DOT ID;
-exp_LiteralAttribure: exp_LiteralTerm DOT ID;
 
-// Arithmetic operators
-exp_IntFloat: exp_0;
-exp_0: exp_0 (ADD | SUB) exp_1 | exp_1;
-exp_1: exp_1 (MUL | DIV | MOD) exp_2 | exp_2;
-exp_2: SUB exp_2 | exp_3;
-exp_3: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | FLOATLIT | BOOLLIT |  exp_MemberAccess | exp_Idx | LB exp_0 RB | lit_Data | NOT exp_0 | exp_LiteralAttribure | exp_LiteralMethod;
+expr: exp_0;
+exp_0: exp_1 (SADD | SEQ) exp_1 | exp_1;
+exp_1: exp_2 exp_RelationalOperand exp_2 | exp_2;
+exp_2: exp_2 (AND | OR) exp_3 | exp_3;
+exp_3: exp_3 (ADD | SUB) exp_4 | exp_4;
+exp_4: exp_4 (MUL | DIV | MOD) exp_5 | exp_5;
+exp_5: NOT exp_5 | exp_6;
+exp_6: SUB exp_6 | exp_7;
+exp_7: exp_7 LSB expr RSB | exp_8;
+exp_8: exp_8 DOT ID (LB list_Expr? RB)? | exp_9;
+exp_9: ID SCOPE STATIC_ID (LB list_Expr? RB)? | exp_10;
+exp_10: NEW exp_10 LB list_Expr? RB | exp_11;
+exp_11: ID | SELF | NULL | lit_Data | LB expr RB;
 
-// Boolean operators
-exp_Logical: exp_Logical (AND | OR) exp_LogicalTerm | exp_LogicalTerm;
-exp_LogicalTerm: (exp_StaticAttributeAccess | ID) | BOOLLIT | exp_MemberAccess | LB exp_LogicalTerm RB | exp_RelationalOperation | exp_LogicalNot;
 
-exp_LogicalNot: NOT exp_LogicalNot|exp_LogicalNotTerm;
-exp_LogicalNotTerm: exp_0 | exp_MemberAccess | (exp_StaticAttributeAccess|ID) | BOOLLIT | LB exp_LogicalNot RB | lit_Data | exp_LiteralAttribure;
+exp_RelationalOperand: LT | LTE | GT | GTE | EQ | NEQ;
 
-exp_Bool: exp_Logical | exp_LogicalNot;
 
-// String operators
-exp_Str: (exp_TermStr (SEQ | SADD) exp_TermStr) | exp_TermStr;
-exp_TermStr: (exp_StaticAttributeAccess | ID) | STRLIT | exp_MemberAccess | LB exp_Str RB | exp_IntFloat;
-
-//  Relational operators
-exp_EqualAndNotEqual: exp_TermEQANEQ (EQ | NEQ) exp_TermEQANEQ;
-exp_TermEQANEQ:
-	LB expr RB
-	| ZERO
-	| INTLIT
-	| BOOLLIT
-	| (exp_StaticAttributeAccess | ID)
-	| LB exp_EqualAndNotEqual RB
-	| exp_MemberAccess
-	| exp_Idx
-	| exp_Str
-	| exp_0
-	| NULL
-;
-
-exp_LessLargeEqual: exp_TermLRE (GT | LT | LTE | GTE) exp_TermLRE;
-exp_TermLRE: LB expr RB | ZERO | INTLIT | FLOATLIT | (exp_StaticAttributeAccess | ID) | exp_Idx | BOOLLIT | exp_IntFloat;
-
-exp_RelationalOperation: exp_EqualAndNotEqual | exp_LessLargeEqual;
 
 // Index operators
-exp_Idx: (exp_StaticAttributeAccess | ID | exp_MemberAccess) exp_TermIdx?;
-exp_TermIdx:
-    LSB idx_Operators RSB
-    | exp_TermIdx LSB idx_Operators RSB
-    | exp_TermIdx LSB exp_Idx RSB;
-idx_Operators: (exp_StaticAttributeAccess | ID) | ZERO | INTLIT | expr | exp_Idx | LB exp_Idx RB | exp_IntFloat | exp_LogicalNot | exp_MemberAccess;
+exp_Idx: (ID | exp_StaticAttributeAccess | exp_InstanceAttributeAccess) idx_Operators;
+idx_Operators: LSB expr RSB idx_Operators?;
 
 
 //  Member access
+exp_IdxMemberAccess: LB ID idx_MemberAccessOperators RB;
+idx_MemberAccessOperators: LSB expr RSB idx_MemberAccessOperators?;
+scalar_Variable: ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | exp_ObjCreation | exp_IdxMemberAccess;
+
 exp_InstanceAttributeAccess: exp_InstanceAttributeAccess DOT ID | exp_InstanceAttributeAccessTerm;
-exp_InstanceAttributeAccessTerm: exp_InstanceAttributeAccessTerm DOT ID LB list_Expr? RB|exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | NULL | exp_IdxFree;
+exp_InstanceAttributeAccessTerm: scalar_Variable DOT ID LB list_Expr? RB | scalar_Variable | LB scalar_Variable RB;
+
+exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID (LB list_Expr? RB)? | exp_InstanceMethodInvocationTerm;
+exp_InstanceMethodInvocationTerm: exp_11 | exp_InstanceAttributeAccess;
 
 exp_StaticAttributeAccess: ID SCOPE STATIC_ID;
-
-exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID LB list_Expr? RB | exp_InstanceMethodInvocationTerm;
-exp_InstanceMethodInvocationTerm: exp_InstanceAttributeAccess DOT ID | exp_InstanceAttributeAccessTerm | exp_ClassObject | ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | LB expr RB;
-
 exp_StaticMethodInvocation: ID SCOPE STATIC_ID LB list_Expr? RB;
 
-exp_InstanceAttributeMethod: exp_InstanceAttributeMethod (DOT ID LB list_Expr? RB | DOT ID) | exp_InstanceAttributeMethodTerm;
-exp_InstanceAttributeMethodTerm: exp_InstanceAttributeAccess | exp_InstanceMethodInvocation   | LB exp_InstanceAttributeMethod RB | exp_IdxFree;
-
-exp_IdxFree: LB exp_IdxFreeTerm RB;
-exp_IdxFreeTerm: LSB exp_IdxFreeTermOperator RSB| exp_IdxFreeTerm LSB exp_IdxFreeTermOperator RSB | exp_IdxFreeTerm LSB exp_IdxFree RSB;
-exp_IdxFreeTermOperator: ID|INTLIT| expr| LB exp_IdxFree RB;
-
-
-exp_MemberAccess : exp_InstanceAttributeMethod | exp_StaticAttributeAccess | exp_StaticMethodInvocation;
-exp_MemberAccessMethod: exp_MemberAccessMethod DOT ID LB list_Expr? RB | exp_InstanceAttributeMethodTerm;
 // Object creation
 exp_ObjCreation: NEW ID LB list_Expr? RB | LB exp_ObjCreation RB;
-exp_ClassObject: ID | exp_ObjCreation;
 
-// Final definition for expression
-expr:
-    exp_ObjCreation
-	| exp_MemberAccess
-	| exp_IntFloat
-	| exp_Bool
-	| exp_Str
-	| exp_Idx
-	| exp_RelationalOperation
-	| lit_Data
-	| NULL
-	| exp_LiteralAttribure
-	| exp_LiteralMethod
-	;
-
+// List of expressions
 list_Expr: expr (CM expr)*;
 
 /********************** STATEMENTS **********************/
@@ -137,8 +86,7 @@ stmt_ForIn: FOREACH LB ID IN expr DOUBLE_DOT expr (BY expr)? RB stmt_Block ;
 stmt_Block: LCB (list_Stmt) RCB ;
 
 // Method Invocation statement
-stmt_MethodInvocation: (exp_MemberAccess | exp_LiteralMethod | exp_MemberAccessMethod) SM;
-
+stmt_MethodInvocation: (exp_InstanceMethodInvocation  | exp_StaticMethodInvocation) SM;
 
 // Continue statement
 stmt_Continue: CONTINUE SM;
@@ -180,6 +128,7 @@ class_Destruction: DESTRUCTOR LB RB stmt_Block;
 list_Parameters: seq_Parameters (SM seq_Parameters)*;
 seq_Parameters: seq_IDParameters COLON type_Data;
 seq_IDParameters: ID (CM ID)*;
+
 /********************** RULES **********************/
 
 lit_Array: ARRAY LB (expr (CM expr)*)? RB;
