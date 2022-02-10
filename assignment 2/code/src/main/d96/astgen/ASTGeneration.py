@@ -6,10 +6,10 @@ from AST import *
 class ASTGeneration(D96Visitor):
     def visitProgram(self, ctx: D96Parser.ProgramContext):
         #program: stmt_ClassDeclaration+ EOF;
-        result = []
-        for decl in ctx.stmt_ClassDeclaration():
-            result.append(self.visit(decl))
-        return Program(result)
+        classList = []
+        for classDecl in ctx.stmt_ClassDeclaration():
+            classList.append(self.visit(classDecl))
+        return Program(classList)
 
     def visitStmt_ClassDeclaration(self, ctx:D96Parser.Stmt_ClassDeclarationContext):
         className = Id(ctx.ID()[0].getText())
@@ -17,7 +17,6 @@ class ASTGeneration(D96Visitor):
         parentName = None
         if len(ctx.ID()) == 2:
             parentName = Id(ctx.ID()[1].getText())
-
         return ClassDecl(className, memList, parentName)
 
 

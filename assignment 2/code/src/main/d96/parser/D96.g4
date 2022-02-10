@@ -117,12 +117,15 @@ list_Stmt : stmt*;
 
 /********************** CLASSES **********************/
 
-stmt_ClassMethod:  class_Construction | class_Destruction;
-stmt_ClassDeclaration: CLASS ID (COLON ID)? LCB (stmt_AttributeDeclaration | stmt_MethodDeclaration | stmt_ClassMethod)* RCB;
-stmt_MethodDeclaration: (STATIC_ID | ID) LB (list_Parameters)? RB stmt_Block;
 
-class_Construction: CONSTRUCTOR LB (list_Parameters)? RB  stmt_Block;
-class_Destruction: DESTRUCTOR LB RB stmt_Block;
+stmt_ClassDeclaration: CLASS ID (COLON ID)? stmt_ClassBody;
+
+stmt_MethodDeclaration: (STATIC_ID | ID) LB (list_Parameters)? RB stmt_Block;
+stmt_ClassConstruction: CONSTRUCTOR LB (list_Parameters)? RB  stmt_Block;
+stmt_ClassDestruction: DESTRUCTOR LB RB stmt_Block;
+stmt_ClassMethod:  stmt_ClassConstruction | stmt_ClassDestruction;
+
+stmt_ClassBody: LCB (stmt_AttributeDeclaration | stmt_MethodDeclaration | stmt_ClassMethod)* RCB;
 
 
 list_Parameters: seq_Parameters (SM seq_Parameters)*;
