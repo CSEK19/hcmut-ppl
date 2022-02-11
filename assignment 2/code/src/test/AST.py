@@ -307,7 +307,7 @@ class MethodDecl(MemDecl):
     body: Block
 
     def __str__(self):
-        return "MethodDecl(" + str(self.name) + ',' + str(self.kind) + ",[" + ','.join(i.toParam() for i in self.param) + "]," + + str(self.body) + ")"
+        return "MethodDecl(" + str(self.name) + ',' + str(self.kind) + ",[" + ','.join(i.toParam() for i in self.param) + "]," + str(self.body) + ")"
 # used for mutable (variable) or immutable (constant) declaration
 
 

@@ -24,10 +24,10 @@ exp_3: exp_3 (ADD | SUB) exp_4 | exp_4;
 exp_4: exp_4 (MUL | DIV | MOD) exp_5 | exp_5;
 exp_5: NOT exp_5 | exp_6;
 exp_6: SUB exp_6 | exp_7;
-exp_7: exp_7 LSB expr RSB | exp_8;
-exp_8: exp_8 DOT ID (LB list_Expr? RB)? | exp_9;
-exp_9: ID SCOPE STATIC_ID (LB list_Expr? RB)? | exp_10;
-exp_10: NEW exp_10 LB list_Expr? RB | exp_11;
+exp_7: exp_7 (LSB expr RSB)+ | exp_8;
+exp_8: exp_8 DOT ID (LB list_Expr RB)? | exp_9;
+exp_9: ID SCOPE STATIC_ID (LB list_Expr RB)? | exp_10;
+exp_10: NEW exp_10 LB list_Expr RB | exp_11;
 exp_11: ID | SELF | NULL | lit_Data | LB expr RB;
 
 
@@ -46,19 +46,19 @@ idx_MemberAccessOperators: LSB expr RSB idx_MemberAccessOperators?;
 scalar_Variable: ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | exp_ObjCreation | exp_IdxMemberAccess;
 
 exp_InstanceAttributeAccess: exp_InstanceAttributeAccess DOT ID | exp_InstanceAttributeAccessTerm;
-exp_InstanceAttributeAccessTerm: scalar_Variable DOT ID LB list_Expr? RB | scalar_Variable | LB scalar_Variable RB;
+exp_InstanceAttributeAccessTerm: scalar_Variable DOT ID LB list_Expr RB | scalar_Variable | LB scalar_Variable RB;
 
-exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID (LB list_Expr? RB)? | exp_InstanceMethodInvocationTerm;
+exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID (LB list_Expr RB)? | exp_InstanceMethodInvocationTerm;
 exp_InstanceMethodInvocationTerm: exp_11 | exp_InstanceAttributeAccess;
 
 exp_StaticAttributeAccess: ID SCOPE STATIC_ID;
-exp_StaticMethodInvocation: ID SCOPE STATIC_ID LB list_Expr? RB;
+exp_StaticMethodInvocation: ID SCOPE STATIC_ID LB list_Expr RB;
 
 // Object creation
-exp_ObjCreation: NEW ID LB list_Expr? RB | LB exp_ObjCreation RB;
+exp_ObjCreation: NEW ID LB list_Expr RB | LB exp_ObjCreation RB;
 
 // List of expressions
-list_Expr: expr (CM expr)*;
+list_Expr: (expr (CM expr)*)?;
 
 /********************** STATEMENTS **********************/
 
@@ -66,8 +66,7 @@ list_Expr: expr (CM expr)*;
 type_Data: ID | INT | FLOAT | BOOLEAN | STRING | array_Type;
 type_DataArray: INT | FLOAT | BOOLEAN | STRING | array_Type;
 array_Type: ARRAY LSB type_DataArray CM INTLIT RSB;
-seq_ID: (STATIC_ID | ID) (CM (STATIC_ID | ID))*;
-list_Attribute: (STATIC_ID | ID) list_AttributeTerm expr | seq_ID COLON type_Data;
+list_Attribute: (STATIC_ID | ID) list_AttributeTerm expr | (STATIC_ID | ID) (CM (STATIC_ID | ID))* COLON type_Data;
 list_AttributeTerm: CM (STATIC_ID | ID) list_AttributeTerm expr CM | COLON type_Data ASSIGN;
 stmt_AttributeDeclaration: (VAL | VAR)? list_Attribute SM;
 

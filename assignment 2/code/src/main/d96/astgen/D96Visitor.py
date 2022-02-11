@@ -164,11 +164,6 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#seq_ID.
-    def visitSeq_ID(self, ctx:D96Parser.Seq_IDContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by D96Parser#list_Attribute.
     def visitList_Attribute(self, ctx:D96Parser.List_AttributeContext):
         return self.visitChildren(ctx)

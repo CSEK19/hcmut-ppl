@@ -5,7 +5,9 @@ from TestUtils import TestParser
 class ParserSuite(unittest.TestCase):
     def test_201(self):
         input = """
-        Class main{}
+             Class A {
+           Var a : Int;
+       }
         """
         expect = "successful"
         self.assertTrue(TestParser.test(input, expect, 201))
