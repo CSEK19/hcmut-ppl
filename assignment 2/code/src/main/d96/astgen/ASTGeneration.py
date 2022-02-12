@@ -78,12 +78,13 @@ class ASTGeneration(D96Visitor):
             return [], [], self.visit(ctx.type_Data()), []
         else:
             kind, attr_list, attr_value = [], [], []
-            if ctx.ID():
-                kind = kind + [Instance()]
-                attr_list = attr_list + [Id(ctx.ID().getText())]
-            if ctx.STATIC_ID():
-                kind = kind + [Static()]
-                attr_list = attr_list + [Id(ctx.STATIC_ID().getText())]
+            for attr in ctx.getChildren():
+                if attr in ([ctx.ID()] + [ctx.STATIC_ID()]):
+                    attr_list = attr_list + [Id(attr.getText())]
+                    if attr in [ctx.ID()]:
+                        kind = kind + [Instance()]
+                    if attr in [ctx.STATIC_ID()]:
+                        kind = kind + [Static()]
 
             attr_value = [self.visit(ctx.expr())]
             kind_, attr_list_, attr_type, attr_value_ = self.visit(ctx.list_AttributeTerm())
@@ -119,7 +120,18 @@ class ASTGeneration(D96Visitor):
         return self.visit(ctx.array_Type())
 
     def visitArray_Type(self, ctx:D96Parser.Array_TypeContext):
-        size = int(ctx.INTLIT().getText())
+        size = None
+        a = ctx.INTLIT().getText()
+        if ctx.INTLIT():
+            if ctx.INTLIT().getText()[0] == '0':
+                if ctx.INTLIT().getText()[1] in ['b', 'B']:
+                    size = (int(ctx.INTLIT().getText(), 2))
+                if ctx.INTLIT().getText()[1] in ['x', 'X']:
+                    size = (int(ctx.INTLIT().getText(), 16))
+                else:
+                    size = (int(ctx.INTLIT().getText(), 8))
+            else:
+                size = (int(ctx.INTLIT().getText(), 10))
         element_type = self.visit(ctx.type_DataArray())
         return ArrayType(size, element_type)
 
@@ -364,8 +376,9 @@ class ASTGeneration(D96Visitor):
             return [], self.visit(ctx.type_Data()), []
         else:
             attr, attr_type, attr_value = [], [], []
-            if ctx.ID():
-                attr = attr + [Id(ctx.ID().getText())]
+            for element in ctx.getChildren():
+                if element in [ctx.ID()]:
+                    attr = attr + [Id(element.getText())]
 
             attr_value = [self.visit(ctx.expr())]
 
@@ -419,6 +432,7 @@ class ASTGeneration(D96Visitor):
 
     def visitStmt_ForIn(self, ctx:D96Parser.Stmt_ForInContext):
         pass
+        # DO LATER
 
     def visitStmt_If(self, ctx:D96Parser.Stmt_IfContext):
         pass
@@ -426,10 +440,8 @@ class ASTGeneration(D96Visitor):
     def visitStmt_MethodInvocation(self, ctx:D96Parser.Stmt_MethodInvocationContext):
         pass
 
-
     def visitLit_Array(self, ctx:D96Parser.Lit_ArrayContext):
         value = []
-
         for element in ctx.expr():
             value = value + [self.visit(element)]
         return ArrayLiteral(value)
@@ -437,7 +449,7 @@ class ASTGeneration(D96Visitor):
 
     def visitLit_Data(self, ctx:D96Parser.Lit_DataContext):
         if ctx.INTLIT():
-            if ctx.getText() == '0':
+            if ctx.getText()[0] == '0':
                 if ctx.getText()[1] in ['b', 'B']:
                     return IntLiteral(int(ctx.INTLIT().getText(), 2))
                 if ctx.getText()[1] in ['x', 'X']:
