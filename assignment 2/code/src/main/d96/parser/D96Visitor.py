@@ -94,16 +94,6 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_IdxMemberAccess.
-    def visitExp_IdxMemberAccess(self, ctx:D96Parser.Exp_IdxMemberAccessContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#idx_MemberAccessOperators.
-    def visitIdx_MemberAccessOperators(self, ctx:D96Parser.Idx_MemberAccessOperatorsContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by D96Parser#scalar_Variable.
     def visitScalar_Variable(self, ctx:D96Parser.Scalar_VariableContext):
         return self.visitChildren(ctx)

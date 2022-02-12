@@ -94,16 +94,6 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#exp_IdxMemberAccess.
-    def visitExp_IdxMemberAccess(self, ctx:D96Parser.Exp_IdxMemberAccessContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#idx_MemberAccessOperators.
-    def visitIdx_MemberAccessOperators(self, ctx:D96Parser.Idx_MemberAccessOperatorsContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by D96Parser#scalar_Variable.
     def visitScalar_Variable(self, ctx:D96Parser.Scalar_VariableContext):
         return self.visitChildren(ctx)
@@ -161,11 +151,6 @@ class D96Visitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by D96Parser#array_Type.
     def visitArray_Type(self, ctx:D96Parser.Array_TypeContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by D96Parser#seq_ID.
-    def visitSeq_ID(self, ctx:D96Parser.Seq_IDContext):
         return self.visitChildren(ctx)
 
 
@@ -254,11 +239,6 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#stmt_ClassMethod.
-    def visitStmt_ClassMethod(self, ctx:D96Parser.Stmt_ClassMethodContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by D96Parser#stmt_ClassDeclaration.
     def visitStmt_ClassDeclaration(self, ctx:D96Parser.Stmt_ClassDeclarationContext):
         return self.visitChildren(ctx)
@@ -269,13 +249,23 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#class_Construction.
-    def visitClass_Construction(self, ctx:D96Parser.Class_ConstructionContext):
+    # Visit a parse tree produced by D96Parser#stmt_ClassConstruction.
+    def visitStmt_ClassConstruction(self, ctx:D96Parser.Stmt_ClassConstructionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by D96Parser#class_Destruction.
-    def visitClass_Destruction(self, ctx:D96Parser.Class_DestructionContext):
+    # Visit a parse tree produced by D96Parser#stmt_ClassDestruction.
+    def visitStmt_ClassDestruction(self, ctx:D96Parser.Stmt_ClassDestructionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#stmt_ClassMethod.
+    def visitStmt_ClassMethod(self, ctx:D96Parser.Stmt_ClassMethodContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by D96Parser#stmt_ClassBody.
+    def visitStmt_ClassBody(self, ctx:D96Parser.Stmt_ClassBodyContext):
         return self.visitChildren(ctx)
 
 

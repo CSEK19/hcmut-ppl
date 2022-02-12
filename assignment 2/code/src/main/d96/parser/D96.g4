@@ -41,9 +41,7 @@ idx_Operators: LSB expr RSB idx_Operators?;
 
 
 //  Member access
-exp_IdxMemberAccess: LB ID idx_MemberAccessOperators RB;
-idx_MemberAccessOperators: LSB expr RSB idx_MemberAccessOperators?;
-scalar_Variable: ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | exp_ObjCreation | exp_IdxMemberAccess;
+scalar_Variable: ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | exp_ObjCreation;
 
 exp_InstanceAttributeAccess: exp_InstanceAttributeAccess DOT ID | exp_InstanceAttributeAccessTerm;
 exp_InstanceAttributeAccessTerm: scalar_Variable DOT ID LB list_Expr RB | scalar_Variable | LB scalar_Variable RB;
@@ -72,7 +70,7 @@ stmt_AttributeDeclaration: (VAL | VAR)? list_Attribute SM;
 
 
 // Assignment statement
-lhs:  ID | exp_InstanceAttributeAccess | exp_StaticAttributeAccess | exp_Idx;
+lhs:  ID | exp_7 | exp_InstanceAttributeAccess | exp_StaticAttributeAccess | exp_Idx;
 stmt_Assign: lhs ASSIGN expr SM;
 
 // If statement
@@ -82,7 +80,7 @@ stmt_If: IF LB expr RB stmt_Block+ (ELSEIF LB expr RB  stmt_Block+)* (ELSE stmt_
 stmt_ForIn: FOREACH LB ID IN expr DOUBLE_DOT expr (BY expr)? RB stmt_Block ;
 
 // Block statement
-stmt_Block: LCB (list_Stmt) RCB ;
+stmt_Block: LCB list_Stmt RCB ;
 
 // Method Invocation statement
 stmt_MethodInvocation: (exp_InstanceMethodInvocation  | exp_StaticMethodInvocation) SM;
@@ -102,8 +100,7 @@ stmt_MethodVarDeclaration: (VAL | VAR)? list_AttributeMethod SM;
 
 // Final description of statement
 stmt:
-	stmt_MethodVarDeclaration
-	| stmt_Assign
+	stmt_Assign
 	| stmt_If
 	| stmt_ForIn
 	| stmt_Block
@@ -111,23 +108,23 @@ stmt:
 	| stmt_Continue
 	| stmt_Return
 	| stmt_Break
-	| stmt_ClassMethod;
-list_Stmt : stmt*;
+;
+list_Stmt : (stmt_MethodVarDeclaration | stmt)*;
 
 /********************** CLASSES **********************/
 
 
 stmt_ClassDeclaration: CLASS ID (COLON ID)? stmt_ClassBody;
 
-stmt_MethodDeclaration: (STATIC_ID | ID) LB (list_Parameters)? RB stmt_Block;
-stmt_ClassConstruction: CONSTRUCTOR LB (list_Parameters)? RB  stmt_Block;
+stmt_MethodDeclaration: (STATIC_ID | ID) LB list_Parameters RB stmt_Block;
+stmt_ClassConstruction: CONSTRUCTOR LB list_Parameters RB  stmt_Block;
 stmt_ClassDestruction: DESTRUCTOR LB RB stmt_Block;
 stmt_ClassMethod:  stmt_ClassConstruction | stmt_ClassDestruction;
 
 stmt_ClassBody: LCB (stmt_AttributeDeclaration | stmt_MethodDeclaration | stmt_ClassMethod)* RCB;
 
 
-list_Parameters: seq_Parameters (SM seq_Parameters)*;
+list_Parameters: (seq_Parameters (SM seq_Parameters)*)?;
 seq_Parameters: seq_IDParameters COLON type_Data;
 seq_IDParameters: ID (CM ID)*;
 
