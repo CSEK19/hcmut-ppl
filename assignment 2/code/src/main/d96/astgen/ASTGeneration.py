@@ -169,7 +169,6 @@ class ASTGeneration(D96Visitor):
         if ctx.getChildCount() == 1:
             return self.visit(ctx.exp_8())
         else:
-            # TODO?
             idx = []
             for exp_idx in range(len(ctx.expr())):
                 idx = idx + [self.visit(ctx.expr(exp_idx))]
@@ -193,7 +192,14 @@ class ASTGeneration(D96Visitor):
         if ctx.getChildCount() == 1:
             return self.visit(ctx.exp_10())
         else:
-            pass
+            obj = Id(ctx.ID().getText())
+            if ctx.list_Expr():
+                method = Id(ctx.STATIC_ID().getText())
+                param = self.visit(ctx.list_Expr())
+                return CallExpr(obj, method, param)
+            else:
+                fieldname = Id(ctx.STATIC_ID().getText())
+                return FieldAccess(obj, fieldname)
 
     def visitExp_10(self, ctx:D96Parser.Exp_10Context):
         if ctx.getChildCount() == 1:
@@ -433,10 +439,40 @@ class ASTGeneration(D96Visitor):
 
         return If(expr, then_stmt, else_stmt)
 
+    def visitExp_8_MethodInvocation(self, ctx:D96Parser.Exp_8_MethodInvocationContext):
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp_9())
+        else:
+            obj = self.visit(ctx.exp_8_MethodInvocation())
+            if ctx.list_Expr():
+                method = Id(ctx.ID().getText())
+                param = self.visit(ctx.list_Expr())
+                return CallExpr(obj, method, param)
+            else:
+                fieldname = Id(ctx.ID().getText())
+                return FieldAccess(obj, fieldname)
+
+
     def visitStmt_MethodInvocation(self, ctx:D96Parser.Stmt_MethodInvocationContext):
-        obj = self.visit(ctx.exp_9())
-        method = Id(ctx.ID().getText())
-        param = self.visit(ctx.list_Expr())
+        obj = []
+        method = []
+        param = []
+
+        if ctx.exp_8_MethodInvocation():
+            obj = self.visit(ctx.exp_8_MethodInvocation())
+            method = Id(ctx.ID().getText())
+            param = self.visit(ctx.list_Expr())
+
+        if ctx.exp_9():
+            obj = self.visit(ctx.exp_9())
+            method = Id(ctx.ID().getText())
+            param = self.visit(ctx.list_Expr())
+
+        if ctx.exp_10():
+            obj = self.visit(ctx.exp_10())
+            method = Id(ctx.STATIC_ID().getText())
+            param = self.visit(ctx.list_Expr())
+
         return CallStmt(obj, method, param)
 
     def visitType_Data(self, ctx:D96Parser.Type_DataContext):
@@ -458,7 +494,7 @@ class ASTGeneration(D96Visitor):
             if ctx.INTLIT().getText()[0] == '0':
                 if ctx.INTLIT().getText()[1] in ['b', 'B']:
                     size = (int(ctx.INTLIT().getText(), 2))
-                if ctx.INTLIT().getText()[1] in ['x', 'X']:
+                elif ctx.INTLIT().getText()[1] in ['x', 'X']:
                     size = (int(ctx.INTLIT().getText(), 16))
                 else:
                     size = (int(ctx.INTLIT().getText(), 8))

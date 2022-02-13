@@ -199,6 +199,11 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by D96Parser#exp_8_MethodInvocation.
+    def visitExp_8_MethodInvocation(self, ctx:D96Parser.Exp_8_MethodInvocationContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by D96Parser#stmt_Continue.
     def visitStmt_Continue(self, ctx:D96Parser.Stmt_ContinueContext):
         return self.visitChildren(ctx)

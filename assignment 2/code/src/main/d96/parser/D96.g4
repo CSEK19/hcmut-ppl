@@ -70,7 +70,7 @@ stmt_AttributeDeclaration: (VAL | VAR)? list_Attribute SM;
 
 
 // Assignment statement
-lhs:  ID | exp_7 | exp_InstanceAttributeAccess | exp_StaticAttributeAccess | exp_Idx;
+lhs: ID | exp_7;
 stmt_Assign: lhs ASSIGN expr SM;
 
 // If statement
@@ -83,8 +83,8 @@ stmt_ForIn: FOREACH LB ID IN expr DOUBLE_DOT expr (BY expr)? RB stmt_Block ;
 stmt_Block: LCB list_Stmt RCB ;
 
 // Method Invocation statement
-//stmt_MethodInvocation: (exp_InstanceMethodInvocation  | exp_StaticMethodInvocation) SM;
-stmt_MethodInvocation: exp_9 DOT ID LB list_Expr RB SM;
+stmt_MethodInvocation: exp_8_MethodInvocation DOT ID LB list_Expr RB SM | exp_9 DOT ID LB list_Expr RB SM | exp_10 SCOPE STATIC_ID LB list_Expr RB SM;
+exp_8_MethodInvocation: exp_8_MethodInvocation DOT ID (LB list_Expr RB)? | exp_9;
 
 // Continue statement
 stmt_Continue: CONTINUE SM;
