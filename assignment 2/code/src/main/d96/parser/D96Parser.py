@@ -234,14 +234,14 @@ def serializedATN():
         buf.write("\2\u01cb\u01cc\5J&\2\u01ccI\3\2\2\2\u01cd\u01ce\7\63\2")
         buf.write("\2\u01ce\u01cf\5\\/\2\u01cf\u01d0\7\64\2\2\u01d0K\3\2")
         buf.write("\2\2\u01d1\u01d2\5\30\r\2\u01d2\u01d3\7\67\2\2\u01d3\u01d4")
-        buf.write("\7?\2\2\u01d4\u01d5\7/\2\2\u01d5\u01d6\5\\/\2\u01d6\u01d7")
-        buf.write("\7\60\2\2\u01d7\u01d8\7\65\2\2\u01d8M\3\2\2\2\u01d9\u01da")
-        buf.write("\7\5\2\2\u01da\u01db\7\65\2\2\u01dbO\3\2\2\2\u01dc\u01de")
-        buf.write("\7\22\2\2\u01dd\u01df\5\4\3\2\u01de\u01dd\3\2\2\2\u01de")
-        buf.write("\u01df\3\2\2\2\u01df\u01e0\3\2\2\2\u01e0\u01e1\7\65\2")
-        buf.write("\2\u01e1Q\3\2\2\2\u01e2\u01e3\7\4\2\2\u01e3\u01e4\7\65")
-        buf.write("\2\2\u01e4S\3\2\2\2\u01e5\u01e6\7?\2\2\u01e6\u01e7\5V")
-        buf.write(",\2\u01e7\u01e8\5\4\3\2\u01e8\u01f4\3\2\2\2\u01e9\u01ee")
+        buf.write("\7?\2\2\u01d4\u01d5\7/\2\2\u01d5\u01d6\5\64\33\2\u01d6")
+        buf.write("\u01d7\7\60\2\2\u01d7\u01d8\7\65\2\2\u01d8M\3\2\2\2\u01d9")
+        buf.write("\u01da\7\5\2\2\u01da\u01db\7\65\2\2\u01dbO\3\2\2\2\u01dc")
+        buf.write("\u01de\7\22\2\2\u01dd\u01df\5\4\3\2\u01de\u01dd\3\2\2")
+        buf.write("\2\u01de\u01df\3\2\2\2\u01df\u01e0\3\2\2\2\u01e0\u01e1")
+        buf.write("\7\65\2\2\u01e1Q\3\2\2\2\u01e2\u01e3\7\4\2\2\u01e3\u01e4")
+        buf.write("\7\65\2\2\u01e4S\3\2\2\2\u01e5\u01e6\7?\2\2\u01e6\u01e7")
+        buf.write("\5V,\2\u01e7\u01e8\5\4\3\2\u01e8\u01f4\3\2\2\2\u01e9\u01ee")
         buf.write("\7?\2\2\u01ea\u01eb\7\66\2\2\u01eb\u01ed\7?\2\2\u01ec")
         buf.write("\u01ea\3\2\2\2\u01ed\u01f0\3\2\2\2\u01ee\u01ec\3\2\2\2")
         buf.write("\u01ee\u01ef\3\2\2\2\u01ef\u01f1\3\2\2\2\u01f0\u01ee\3")
@@ -3379,8 +3379,8 @@ class D96Parser ( Parser ):
         def LB(self):
             return self.getToken(D96Parser.LB, 0)
 
-        def list_Stmt(self):
-            return self.getTypedRuleContext(D96Parser.List_StmtContext,0)
+        def list_Expr(self):
+            return self.getTypedRuleContext(D96Parser.List_ExprContext,0)
 
 
         def RB(self):
@@ -3416,7 +3416,7 @@ class D96Parser ( Parser ):
             self.state = 466
             self.match(D96Parser.LB)
             self.state = 467
-            self.list_Stmt()
+            self.list_Expr()
             self.state = 468
             self.match(D96Parser.RB)
             self.state = 469

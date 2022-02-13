@@ -95,46 +95,6 @@ class ASTGeneration(D96Visitor):
 
             return kind, attr_list, attr_type, attr_value
 
-    def visitType_Data(self, ctx:D96Parser.Type_DataContext):
-        if ctx.ID():
-            return ClassType(classname=Id(ctx.ID().getText()))
-        if ctx.INT():
-            return IntType()
-        if ctx.FLOAT():
-            return FloatType()
-        if ctx.BOOLEAN():
-            return BoolType()
-        if ctx.STRING():
-            return StringType()
-        return self.visit(ctx.array_Type())
-
-    def visitType_DataArray(self, ctx:D96Parser.Type_DataArrayContext):
-        if ctx.INT():
-            return IntType()
-        if ctx.FLOAT():
-            return FloatType()
-        if ctx.BOOLEAN():
-            return BoolType()
-        if ctx.STRING():
-            return StringType()
-        return self.visit(ctx.array_Type())
-
-    def visitArray_Type(self, ctx:D96Parser.Array_TypeContext):
-        size = None
-        a = ctx.INTLIT().getText()
-        if ctx.INTLIT():
-            if ctx.INTLIT().getText()[0] == '0':
-                if ctx.INTLIT().getText()[1] in ['b', 'B']:
-                    size = (int(ctx.INTLIT().getText(), 2))
-                if ctx.INTLIT().getText()[1] in ['x', 'X']:
-                    size = (int(ctx.INTLIT().getText(), 16))
-                else:
-                    size = (int(ctx.INTLIT().getText(), 8))
-            else:
-                size = (int(ctx.INTLIT().getText(), 10))
-        element_type = self.visit(ctx.type_DataArray())
-        return ArrayType(size, element_type)
-
     def visitExpr(self, ctx:D96Parser.ExprContext):
         return self.visit(ctx.exp_0())
 
@@ -224,7 +184,7 @@ class ASTGeneration(D96Visitor):
             if ctx.list_Expr():
                 method = Id(ctx.ID().getText())
                 param = self.visit(ctx.list_Expr())
-                return CallExpr(obj, method , param)
+                return CallExpr(obj, method, param)
             else:
                 fieldname = Id(ctx.ID().getText())
                 return FieldAccess(obj, fieldname)
@@ -262,15 +222,14 @@ class ASTGeneration(D96Visitor):
         return list_expr
 
     def visitList_Parameters(self, ctx:D96Parser.List_ParametersContext):
-        list_parameter = []
+        list_param = []
         for element in range(len(ctx.seq_Parameters())):
-            list_parameter = list_parameter + self.visit(ctx.seq_Parameters(element))
-        return list_parameter
+            list_param = list_param + self.visit(ctx.seq_Parameters(element))
+        return list_param
 
     def visitSeq_Parameters(self, ctx:D96Parser.Seq_ParametersContext):
         attr_type = self.visit(ctx.type_Data())
         list_attr = self.visit(ctx.seq_IDParameters())
-        a = len(list_attr)
         list_parameter = []
         for idx in range(len(list_attr)):
             list_parameter = list_parameter + [VarDecl(Id(list_attr[idx]), attr_type)]
@@ -432,20 +391,98 @@ class ASTGeneration(D96Visitor):
 
     def visitStmt_ForIn(self, ctx:D96Parser.Stmt_ForInContext):
         pass
-        # DO LATER
 
     def visitStmt_If(self, ctx:D96Parser.Stmt_IfContext):
-        pass
+        expr = None
+        then_stmt = None
+        else_stmt = None
+
+        if not ctx.ELSE():
+            idx_stmt = range(len(ctx.stmt_Block()))
+            for i in reversed(idx_stmt):
+                expr = self.visit(ctx.expr()[i])
+                then_stmt = self.visit(ctx.stmt_Block()[i])
+                else_stmt = If(expr, then_stmt, else_stmt)
+
+            return else_stmt
+
+        if ctx.ELSE():
+            expr = self.visit(ctx.expr()[0])
+            then_stmt = self.visit(ctx.stmt_Block()[0])
+
+            if len(ctx.stmt_Block()) == 2:
+                else_stmt = self.visit(ctx.stmt_Block()[1])
+
+            if len(ctx.stmt_Block()) > 2:
+                idx_stmt = range(len(ctx.stmt_Block()))
+                expr_ = None
+                then_stmt_ = None
+                else_stmt_ = None
+
+                for i in reversed(idx_stmt):
+                    if i == 1:
+                        break
+                    if i == max(idx_stmt):
+                        else_stmt_ = self.visit(ctx.stmt_Block()[i])
+
+                    expr_ = self.visit(ctx.expr()[i - 1])
+                    then_stmt_ = self.visit(ctx.stmt_Block()[i - 1])
+                    else_stmt_ = If(expr_, then_stmt_, else_stmt_)
+
+                else_stmt = else_stmt_
+
+        return If(expr, then_stmt, else_stmt)
 
     def visitStmt_MethodInvocation(self, ctx:D96Parser.Stmt_MethodInvocationContext):
-        pass
+        obj = self.visit(ctx.exp_9())
+        method = Id(ctx.ID().getText())
+        param = self.visit(ctx.list_Expr())
+        return CallStmt(obj, method, param)
+
+    def visitType_Data(self, ctx:D96Parser.Type_DataContext):
+        if ctx.ID():
+            return ClassType(Id(ctx.ID().getText()))
+        if ctx.INT():
+            return IntType()
+        if ctx.FLOAT():
+            return FloatType()
+        if ctx.BOOLEAN():
+            return BoolType()
+        if ctx.STRING():
+            return StringType()
+        return self.visit(ctx.array_Type())
+
+    def visitArray_Type(self, ctx:D96Parser.Array_TypeContext):
+        size = None
+        if ctx.INTLIT():
+            if ctx.INTLIT().getText()[0] == '0':
+                if ctx.INTLIT().getText()[1] in ['b', 'B']:
+                    size = (int(ctx.INTLIT().getText(), 2))
+                if ctx.INTLIT().getText()[1] in ['x', 'X']:
+                    size = (int(ctx.INTLIT().getText(), 16))
+                else:
+                    size = (int(ctx.INTLIT().getText(), 8))
+            else:
+                size = (int(ctx.INTLIT().getText(), 10))
+        element_type = self.visit(ctx.type_DataArray())
+        return ArrayType(size, element_type)
+
+    def visitType_DataArray(self, ctx:D96Parser.Type_DataArrayContext):
+        if ctx.INT():
+            return IntType()
+        if ctx.FLOAT():
+            return FloatType()
+        if ctx.BOOLEAN():
+            return BoolType()
+        if ctx.STRING():
+            return StringType()
+        return self.visit(ctx.array_Type())
 
     def visitLit_Array(self, ctx:D96Parser.Lit_ArrayContext):
         value = []
         for element in ctx.expr():
             value = value + [self.visit(element)]
         return ArrayLiteral(value)
-
 
     def visitLit_Data(self, ctx:D96Parser.Lit_DataContext):
         if ctx.INTLIT():
@@ -468,7 +505,3 @@ class ASTGeneration(D96Visitor):
             return StringLiteral(str(ctx.STRLIT().getText()))
         else:
             return self.visit(ctx.lit_Array())
-
-
-
-

@@ -84,7 +84,7 @@ stmt_Block: LCB list_Stmt RCB ;
 
 // Method Invocation statement
 //stmt_MethodInvocation: (exp_InstanceMethodInvocation  | exp_StaticMethodInvocation) SM;
-stmt_MethodInvocation: exp_9 DOT ID LB list_Stmt RB SM;
+stmt_MethodInvocation: exp_9 DOT ID LB list_Expr RB SM;
 
 // Continue statement
 stmt_Continue: CONTINUE SM;
