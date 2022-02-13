@@ -357,8 +357,8 @@ class ASTGeneration(D96Visitor):
     def visitStmt_MethodDeclaration(self, ctx:D96Parser.Stmt_MethodDeclarationContext):
         kind = None
         name = None
-        param = []
-        body = []
+        param = None
+        body = None
 
         if ctx.ID():
             kind = Instance()
@@ -436,7 +436,6 @@ class ASTGeneration(D96Visitor):
                     else_stmt_ = If(expr_, then_stmt_, else_stmt_)
 
                 else_stmt = else_stmt_
-
         return If(expr, then_stmt, else_stmt)
 
     def visitExp_8_MethodInvocation(self, ctx:D96Parser.Exp_8_MethodInvocationContext):
@@ -451,7 +450,6 @@ class ASTGeneration(D96Visitor):
             else:
                 fieldname = Id(ctx.ID().getText())
                 return FieldAccess(obj, fieldname)
-
 
     def visitStmt_MethodInvocation(self, ctx:D96Parser.Stmt_MethodInvocationContext):
         obj = []
