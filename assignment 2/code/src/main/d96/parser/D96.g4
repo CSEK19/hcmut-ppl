@@ -77,7 +77,7 @@ stmt_Assign: lhs ASSIGN expr SM;
 stmt_If: IF LB expr RB stmt_Block+ (ELSEIF LB expr RB  stmt_Block+)* (ELSE stmt_Block+)?;
 
 // For/In statement
-stmt_ForIn: FOREACH LB ID IN expr DOUBLE_DOT expr (BY expr)? RB stmt_Block ;
+stmt_ForIn: FOREACH LB ID IN expr DOUBLE_DOT expr (BY expr)? RB stmt_Block;
 
 // Block statement
 stmt_Block: LCB list_Stmt RCB ;

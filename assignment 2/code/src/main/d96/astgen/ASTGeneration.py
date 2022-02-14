@@ -267,11 +267,10 @@ class ASTGeneration(D96Visitor):
         return [MethodDecl(Instance(), Id(name), param, body)]
 
     def visitStmt_Block(self, ctx:D96Parser.Stmt_BlockContext):
-        decl = []
-        stmt = []
-        if ctx.getChildCount() != 2:
-                decl, stmt = self.visit(ctx.list_Stmt())
-        return Block(decl, stmt)
+        inst = []
+        if ctx.list_Stmt():
+                inst = inst + self.visit(ctx.list_Stmt())
+        return Block(inst)
 
     def visitStmt(self, ctx:D96Parser.StmtContext):
         if ctx.stmt_Assign():
@@ -292,14 +291,10 @@ class ASTGeneration(D96Visitor):
             return [self.visit(ctx.stmt_Return())]
 
     def visitList_Stmt(self, ctx:D96Parser.List_StmtContext):
-        decl = []
-        stmt = []
+        inst = []
         for element in ctx.getChildren():
-            if element in ctx.stmt_MethodVarDeclaration():
-                decl = decl + self.visit(element)
-            if element in ctx.stmt():
-                stmt = stmt + self.visit(element)
-        return decl, stmt
+            inst = inst + self.visit(element)
+        return inst
 
     def visitStmt_MethodVarDeclaration(self, ctx:D96Parser.Stmt_MethodVarDeclarationContext):
         attr, attr_type, attr_value = self.visit(ctx.list_AttributeMethod())
@@ -396,7 +391,16 @@ class ASTGeneration(D96Visitor):
         return Return(expr)
 
     def visitStmt_ForIn(self, ctx:D96Parser.Stmt_ForInContext):
-        pass
+        expr3 = None
+
+        id = Id(ctx.ID().getText())
+        expr1 = self.visit(ctx.expr()[0])
+        expr2 = self.visit(ctx.expr()[1])
+        loop = self.visit(ctx.stmt_Block())
+        if len(ctx.expr()) > 2:
+            expr3 = self.visit(ctx.expr()[2])
+
+        return For(id, expr1, expr2, loop, expr3)
 
     def visitStmt_If(self, ctx:D96Parser.Stmt_IfContext):
         expr = None

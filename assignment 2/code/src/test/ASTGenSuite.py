@@ -3,9 +3,14 @@ from TestUtils import TestAST
 from AST import *
 
 class ASTGenSuite(unittest.TestCase):
-   def test_300(self):
-       input = '''Class A{foo(){Self::$a = 1;}}'''
-       expect = '''Program([ClassDecl(Id(_j),[MethodDecl(Id(Constructor),Instance,[param(Id(_),ClassType(Id(_))),param(Id(_4m_q_R6r),ClassType(Id(_)))],Block([],[])),AttributeDecl(Static,VarDecl(Id($o),StringType)),AttributeDecl(Static,ConstDecl(Id($3O),ClassType(Id(H)),FieldAccess(Id(_),Id($_))))])])'''
-       self.assertTrue(TestAST.test(input,expect,300))
-
-
+    def test_300(self):
+        """Simple program: int main() {} """
+        input = """
+        Class Program {
+        foo(){
+            Foreach (i In 1 .. 100 By 2) { Out.printInt(i); }
+        }
+        }
+        """
+        expect = 'Program([ClassDecl(Id(Program),[])])'
+        self.assertTrue(TestAST.test(input, expect, 300))
