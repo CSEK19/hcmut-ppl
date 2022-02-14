@@ -7,7 +7,7 @@ class ASTGeneration(D96Visitor):
     def visitProgram(self, ctx: D96Parser.ProgramContext):
         list_class = []
         for class_decl in ctx.stmt_ClassDeclaration():
-            list_class = list_class + [self.visit(class_decl)]
+            list_class = list_class + self.visit(class_decl)
         return Program(list_class)
 
     def visitStmt_ClassDeclaration(self, ctx:D96Parser.Stmt_ClassDeclarationContext):
@@ -16,13 +16,13 @@ class ASTGeneration(D96Visitor):
         if len(ctx.ID()) == 2:
             parent_name = Id(ctx.ID()[1].getText())
         mem_list = self.visit(ctx.stmt_ClassBody())
-        return ClassDecl(class_name, mem_list, parent_name)
+        return [ClassDecl(class_name, mem_list, parent_name)]
 
     def visitStmt_ClassBody(self, ctx:D96Parser.Stmt_ClassBodyContext):
         class_body = []
-        if ctx.getChildCount() != 2:
-            for stmtClass in range(1, ctx.getChildCount() - 1):
-                class_body = class_body + self.visit(ctx.getChild(stmtClass))
+        for element in ctx.getChildren():
+            if element not in ([ctx.LCB()] + [ctx.RCB()]):
+                class_body = class_body + self.visit(element)
         return class_body
 
     def visitStmt_AttributeDeclaration(self, ctx:D96Parser.Stmt_AttributeDeclarationContext):
@@ -266,12 +266,6 @@ class ASTGeneration(D96Visitor):
         body = self.visit(ctx.stmt_Block())
         return [MethodDecl(Instance(), Id(name), param, body)]
 
-    def visitStmt_Block(self, ctx:D96Parser.Stmt_BlockContext):
-        inst = []
-        if ctx.list_Stmt():
-                inst = inst + self.visit(ctx.list_Stmt())
-        return Block(inst)
-
     def visitStmt(self, ctx:D96Parser.StmtContext):
         if ctx.stmt_Assign():
             return [self.visit(ctx.stmt_Assign())]
@@ -295,6 +289,115 @@ class ASTGeneration(D96Visitor):
         for element in ctx.getChildren():
             inst = inst + self.visit(element)
         return inst
+
+    def visitStmt_Assign(self, ctx:D96Parser.Stmt_AssignContext):
+        lhs = self.visit(ctx.lhs())
+        exp = self.visit(ctx.expr())
+        return Assign(lhs, exp)
+
+    def visitStmt_Block(self, ctx:D96Parser.Stmt_BlockContext):
+        inst = []
+        if ctx.list_Stmt():
+                inst = inst + self.visit(ctx.list_Stmt())
+        return Block(inst)
+
+    def visitStmt_Break(self, ctx:D96Parser.Stmt_BreakContext):
+        return Break()
+
+    def visitStmt_Continue(self, ctx:D96Parser.Stmt_ContinueContext):
+        return Continue()
+
+    def visitStmt_Return(self, ctx:D96Parser.Stmt_ReturnContext):
+        expr = None
+        if ctx.expr():
+            expr = self.visit(ctx.expr())
+        return Return(expr)
+
+    def visitStmt_ForIn(self, ctx:D96Parser.Stmt_ForInContext):
+        expr3 = None
+
+        id = Id(ctx.ID().getText())
+        expr1 = self.visit(ctx.expr()[0])
+        expr2 = self.visit(ctx.expr()[1])
+        loop = self.visit(ctx.stmt_Block())
+        if len(ctx.expr()) > 2:
+            expr3 = self.visit(ctx.expr()[2])
+
+        return For(id, expr1, expr2, loop, expr3)
+
+    def visitStmt_If(self, ctx:D96Parser.Stmt_IfContext):
+        expr = None
+        then_stmt = None
+        else_stmt = None
+
+        if not ctx.ELSE():
+            idx_stmt = range(len(ctx.stmt_Block()))
+            for i in reversed(idx_stmt):
+                expr = self.visit(ctx.expr()[i])
+                then_stmt = self.visit(ctx.stmt_Block()[i])
+                else_stmt = If(expr, then_stmt, else_stmt)
+
+            return else_stmt
+
+        if ctx.ELSE():
+            expr = self.visit(ctx.expr()[0])
+            then_stmt = self.visit(ctx.stmt_Block()[0])
+
+            if len(ctx.stmt_Block()) == 2:
+                else_stmt = self.visit(ctx.stmt_Block()[1])
+
+            if len(ctx.stmt_Block()) > 2:
+                idx_stmt = range(len(ctx.stmt_Block()))
+                expr_ = None
+                then_stmt_ = None
+                else_stmt_ = None
+
+                for i in reversed(idx_stmt):
+                    if i == 1:
+                        break
+                    if i == max(idx_stmt):
+                        else_stmt_ = self.visit(ctx.stmt_Block()[i])
+                    expr_ = self.visit(ctx.expr()[i - 1])
+                    then_stmt_ = self.visit(ctx.stmt_Block()[i - 1])
+                    else_stmt_ = If(expr_, then_stmt_, else_stmt_)
+
+                else_stmt = else_stmt_
+        return If(expr, then_stmt, else_stmt)
+
+    def visitExp_8_MethodInvocation(self, ctx:D96Parser.Exp_8_MethodInvocationContext):
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp_9())
+        else:
+            obj = self.visit(ctx.exp_8_MethodInvocation())
+            if ctx.list_Expr():
+                method = Id(ctx.ID().getText())
+                param = self.visit(ctx.list_Expr())
+                return CallExpr(obj, method, param)
+            else:
+                fieldname = Id(ctx.ID().getText())
+                return FieldAccess(obj, fieldname)
+
+    def visitStmt_MethodInvocation(self, ctx:D96Parser.Stmt_MethodInvocationContext):
+        obj = []
+        method = []
+        param = []
+
+        if ctx.exp_8_MethodInvocation():
+            obj = self.visit(ctx.exp_8_MethodInvocation())
+            method = Id(ctx.ID().getText())
+            param = self.visit(ctx.list_Expr())
+
+        if ctx.exp_9():
+            obj = self.visit(ctx.exp_9())
+            method = Id(ctx.ID().getText())
+            param = self.visit(ctx.list_Expr())
+
+        if ctx.exp_10():
+            obj = self.visit(ctx.exp_10())
+            method = Id(ctx.STATIC_ID().getText())
+            param = self.visit(ctx.list_Expr())
+
+        return CallStmt(obj, method, param)
 
     def visitStmt_MethodVarDeclaration(self, ctx:D96Parser.Stmt_MethodVarDeclarationContext):
         attr, attr_type, attr_value = self.visit(ctx.list_AttributeMethod())
@@ -353,7 +456,7 @@ class ASTGeneration(D96Visitor):
         kind = None
         name = None
         param = None
-        body = None
+        body = self.visit(ctx.stmt_Block())
 
         if ctx.ID():
             kind = Instance()
@@ -363,7 +466,6 @@ class ASTGeneration(D96Visitor):
             name = Id(ctx.STATIC_ID().getText())
         if ctx.list_Parameters():
             param = self.visit(ctx.list_Parameters())
-        body = self.visit(ctx.stmt_Block())
 
         return [MethodDecl(kind, name, param, body)]
 
@@ -372,110 +474,6 @@ class ASTGeneration(D96Visitor):
             return Id(ctx.ID().getText())
         if ctx.exp_7():
             return self.visit(ctx.exp_7())
-
-    def visitStmt_Assign(self, ctx:D96Parser.Stmt_AssignContext):
-        lhs = self.visit(ctx.lhs())
-        exp = self.visit(ctx.expr())
-        return Assign(lhs, exp)
-
-    def visitStmt_Break(self, ctx:D96Parser.Stmt_BreakContext):
-        return Break()
-
-    def visitStmt_Continue(self, ctx:D96Parser.Stmt_ContinueContext):
-        return Continue()
-
-    def visitStmt_Return(self, ctx:D96Parser.Stmt_ReturnContext):
-        expr = None
-        if ctx.expr():
-            expr = self.visit(ctx.expr())
-        return Return(expr)
-
-    def visitStmt_ForIn(self, ctx:D96Parser.Stmt_ForInContext):
-        expr3 = None
-
-        id = Id(ctx.ID().getText())
-        expr1 = self.visit(ctx.expr()[0])
-        expr2 = self.visit(ctx.expr()[1])
-        loop = self.visit(ctx.stmt_Block())
-        if len(ctx.expr()) > 2:
-            expr3 = self.visit(ctx.expr()[2])
-
-        return For(id, expr1, expr2, loop, expr3)
-
-    def visitStmt_If(self, ctx:D96Parser.Stmt_IfContext):
-        expr = None
-        then_stmt = None
-        else_stmt = None
-
-        if not ctx.ELSE():
-            idx_stmt = range(len(ctx.stmt_Block()))
-            for i in reversed(idx_stmt):
-                expr = self.visit(ctx.expr()[i])
-                then_stmt = self.visit(ctx.stmt_Block()[i])
-                else_stmt = If(expr, then_stmt, else_stmt)
-
-            return else_stmt
-
-        if ctx.ELSE():
-            expr = self.visit(ctx.expr()[0])
-            then_stmt = self.visit(ctx.stmt_Block()[0])
-
-            if len(ctx.stmt_Block()) == 2:
-                else_stmt = self.visit(ctx.stmt_Block()[1])
-
-            if len(ctx.stmt_Block()) > 2:
-                idx_stmt = range(len(ctx.stmt_Block()))
-                expr_ = None
-                then_stmt_ = None
-                else_stmt_ = None
-
-                for i in reversed(idx_stmt):
-                    if i == 1:
-                        break
-                    if i == max(idx_stmt):
-                        else_stmt_ = self.visit(ctx.stmt_Block()[i])
-
-                    expr_ = self.visit(ctx.expr()[i - 1])
-                    then_stmt_ = self.visit(ctx.stmt_Block()[i - 1])
-                    else_stmt_ = If(expr_, then_stmt_, else_stmt_)
-
-                else_stmt = else_stmt_
-        return If(expr, then_stmt, else_stmt)
-
-    def visitExp_8_MethodInvocation(self, ctx:D96Parser.Exp_8_MethodInvocationContext):
-        if ctx.getChildCount() == 1:
-            return self.visit(ctx.exp_9())
-        else:
-            obj = self.visit(ctx.exp_8_MethodInvocation())
-            if ctx.list_Expr():
-                method = Id(ctx.ID().getText())
-                param = self.visit(ctx.list_Expr())
-                return CallExpr(obj, method, param)
-            else:
-                fieldname = Id(ctx.ID().getText())
-                return FieldAccess(obj, fieldname)
-
-    def visitStmt_MethodInvocation(self, ctx:D96Parser.Stmt_MethodInvocationContext):
-        obj = []
-        method = []
-        param = []
-
-        if ctx.exp_8_MethodInvocation():
-            obj = self.visit(ctx.exp_8_MethodInvocation())
-            method = Id(ctx.ID().getText())
-            param = self.visit(ctx.list_Expr())
-
-        if ctx.exp_9():
-            obj = self.visit(ctx.exp_9())
-            method = Id(ctx.ID().getText())
-            param = self.visit(ctx.list_Expr())
-
-        if ctx.exp_10():
-            obj = self.visit(ctx.exp_10())
-            method = Id(ctx.STATIC_ID().getText())
-            param = self.visit(ctx.list_Expr())
-
-        return CallStmt(obj, method, param)
 
     def visitType_Data(self, ctx:D96Parser.Type_DataContext):
         if ctx.ID():
@@ -534,7 +532,15 @@ class ASTGeneration(D96Visitor):
             else:
                 return IntLiteral(int(ctx.INTLIT().getText(), 10))
         elif ctx.ZERO():
-            return IntLiteral(int(ctx.ZERO().getText()))
+            if len(ctx.getText()) == 1:
+                return IntLiteral(int(ctx.ZERO().getText(), 10))
+            else:
+                if ctx.getText()[1] in ['b', 'B']:
+                    return IntLiteral(int(ctx.ZERO().getText(), 2))
+                if ctx.getText()[1] in ['x', 'X']:
+                    return IntLiteral(int(ctx.ZERO().getText(), 16))
+                else:
+                    return IntLiteral(int(ctx.ZERO().getText(), 8))
         elif ctx.FLOATLIT():
             return FloatLiteral(float(ctx.FLOATLIT().getText()))
         elif ctx.BOOLLIT():
