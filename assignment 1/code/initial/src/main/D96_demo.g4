@@ -1,6 +1,6 @@
 /********************** ID 1952386 **********************/
 
-grammar D96;
+grammar D96_demo;
 
 @lexer::header {
 from lexererr import *
