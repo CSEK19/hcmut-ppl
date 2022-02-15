@@ -516,8 +516,8 @@ class ASTGeneration(D96Visitor):
 
     def visitLit_Array(self, ctx:D96Parser.Lit_ArrayContext):
         value = []
-        for element in ctx.expr():
-            value = value + [self.visit(element)]
+        if ctx.list_Expr():
+            value = value + self.visit(ctx.list_Expr())
         return ArrayLiteral(value)
 
     def visitLit_Data(self, ctx:D96Parser.Lit_DataContext):

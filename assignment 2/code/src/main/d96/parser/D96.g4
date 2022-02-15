@@ -36,24 +36,24 @@ exp_RelationalOperand: LT | LTE | GT | GTE | EQ | NEQ;
 
 
 // Index operators
-exp_Idx: (ID | exp_StaticAttributeAccess | exp_InstanceAttributeAccess) idx_Operators;
-idx_Operators: LSB expr RSB idx_Operators?;
+//exp_Idx: (ID | exp_StaticAttributeAccess | exp_InstanceAttributeAccess) idx_Operators;
+//idx_Operators: LSB expr RSB idx_Operators?;
 
 
 //  Member access
-scalar_Variable: ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | exp_ObjCreation;
-
-exp_InstanceAttributeAccess: exp_InstanceAttributeAccess DOT ID | exp_InstanceAttributeAccessTerm;
-exp_InstanceAttributeAccessTerm: scalar_Variable DOT ID LB list_Expr RB | scalar_Variable | LB scalar_Variable RB;
-
-exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID (LB list_Expr RB)? | exp_InstanceMethodInvocationTerm;
-exp_InstanceMethodInvocationTerm: exp_11 | exp_InstanceAttributeAccess;
-
-exp_StaticAttributeAccess: ID SCOPE STATIC_ID;
-exp_StaticMethodInvocation: ID SCOPE STATIC_ID LB list_Expr RB;
+//scalar_Variable: ID | SELF | exp_StaticAttributeAccess | exp_StaticMethodInvocation | exp_ObjCreation;
+//
+//exp_InstanceAttributeAccess: exp_InstanceAttributeAccess DOT ID | exp_InstanceAttributeAccessTerm;
+//exp_InstanceAttributeAccessTerm: scalar_Variable DOT ID LB list_Expr RB | scalar_Variable | LB scalar_Variable RB;
+//
+//exp_InstanceMethodInvocation: exp_InstanceMethodInvocation DOT ID (LB list_Expr RB)? | exp_InstanceMethodInvocationTerm;
+//exp_InstanceMethodInvocationTerm: exp_11 | exp_InstanceAttributeAccess;
+//
+//exp_StaticAttributeAccess: ID SCOPE STATIC_ID;
+//exp_StaticMethodInvocation: ID SCOPE STATIC_ID LB list_Expr RB;
 
 // Object creation
-exp_ObjCreation: NEW ID LB list_Expr RB | LB exp_ObjCreation RB;
+//exp_ObjCreation: NEW ID LB list_Expr RB | LB exp_ObjCreation RB;
 
 // List of expressions
 list_Expr: (expr (CM expr)*)?;
@@ -131,7 +131,7 @@ seq_IDParameters: ID (CM ID)*;
 
 /********************** RULES **********************/
 
-lit_Array: ARRAY LB (expr (CM expr)*)? RB;
+lit_Array: ARRAY LB list_Expr RB;
 
 lit_Data: ZERO | INTLIT | FLOATLIT | BOOLLIT | STRLIT | lit_Array;
 BOOLLIT: TRUE | FALSE;
