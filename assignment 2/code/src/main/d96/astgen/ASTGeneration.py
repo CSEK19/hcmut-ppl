@@ -255,13 +255,13 @@ class ASTGeneration(D96Visitor):
             return self.visit(ctx.stmt_ClassDestruction())
 
     def visitStmt_ClassConstruction(self, ctx:D96Parser.Stmt_ClassConstructionContext):
-        name = 'Constructor'
+        name = '"Constructor"'
         param = self.visit(ctx.list_Parameters())
         body = self.visit(ctx.stmt_Block())
         return [MethodDecl(Instance(), Id(name), param, body)]
 
     def visitStmt_ClassDestruction(self, ctx:D96Parser.Stmt_ClassDestructionContext):
-        name = 'Destructor'
+        name = '"Destructor"'
         param = []
         body = self.visit(ctx.stmt_Block())
         return [MethodDecl(Instance(), Id(name), param, body)]
