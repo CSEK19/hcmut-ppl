@@ -455,8 +455,22 @@ class ASTGeneration(D96Visitor):
     def visitStmt_MethodDeclaration(self, ctx:D96Parser.Stmt_MethodDeclarationContext):
         kind = None
         name = None
-        param = None
+        param = []
         body = self.visit(ctx.stmt_Block())
+
+        if ctx.list_Parameters():
+            param = self.visit(ctx.list_Parameters())
+
+        if not ctx.STATIC_ID() and ctx.ID().getText() == 'main':
+            class_body = ctx.parentCtx
+            class_decl = class_body.parentCtx
+            class_name = class_decl.ID()[0].getText()
+
+            if class_name == 'Program':
+                if not param:
+                    kind = Static()
+                    name = Id(ctx.ID().getText())
+                    return [MethodDecl(kind, name, param, body)]
 
         if ctx.ID():
             kind = Instance()
@@ -464,8 +478,6 @@ class ASTGeneration(D96Visitor):
         if ctx.STATIC_ID():
             kind = Static()
             name = Id(ctx.STATIC_ID().getText())
-        if ctx.list_Parameters():
-            param = self.visit(ctx.list_Parameters())
 
         return [MethodDecl(kind, name, param, body)]
 
