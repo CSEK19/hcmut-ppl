@@ -71,6 +71,11 @@ class ASTGeneration(D96Visitor):
                     attr_value = attr_value + [None]
 
             attr_type = self.visit(ctx.type_Data())
+            if isinstance(attr_type, ClassType):
+                attr_value.clear()
+                for _ in (ctx.ID() + ctx.STATIC_ID()):
+                    attr_value = attr_value + [NullLiteral()]
+
             return kind, attr_list, attr_type, attr_value
 
     def visitList_AttributeTerm(self, ctx:D96Parser.List_AttributeTermContext):
@@ -429,9 +434,16 @@ class ASTGeneration(D96Visitor):
             return attr, attr_type, attr_value
         else:
             attr_type = self.visit(ctx.type_Data())
+
             for element in ctx.ID():
                 attr = attr + [Id(element.getText())]
                 attr_value = attr_value + [None]
+
+            if isinstance(attr_type, ClassType):
+                attr_value.clear()
+                for _ in ctx.ID():
+                    attr_value = attr_value + [NullLiteral()]
+
             return attr, attr_type, attr_value
 
     def visitList_AttributeMethodTerm(self, ctx:D96Parser.List_AttributeMethodTermContext):
