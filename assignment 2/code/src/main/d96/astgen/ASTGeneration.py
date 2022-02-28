@@ -327,6 +327,8 @@ class ASTGeneration(D96Visitor):
         loop = self.visit(ctx.stmt_Block())
         if len(ctx.expr()) > 2:
             expr3 = self.visit(ctx.expr()[2])
+        else:
+            expr3 = IntLiteral(1)
 
         return For(id, expr1, expr2, loop, expr3)
 

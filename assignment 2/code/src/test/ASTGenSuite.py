@@ -298,7 +298,7 @@ class ASTGenSuite(unittest.TestCase):
             }
         }
         '''
-        expect = 'Program([ClassDecl(Id(Program),[MethodDecl(Id(main),Instance,[param(Id(a),IntType)],Block([For(Id(i),IntLit(1),IntLit(100),IntLit(2),Block([Call(Id(Out),Id(printInt),[Id(i)])])]),For(Id(x),IntLit(5),IntLit(2),Block([Call(Id(Out),Id(printInt),[ArrayCell(Id(arr),[Id(x)])])])])]))])])'
+        expect = 'Program([ClassDecl(Id(Program),[MethodDecl(Id(main),Instance,[param(Id(a),IntType)],Block([For(Id(i),IntLit(1),IntLit(100),IntLit(2),Block([Call(Id(Out),Id(printInt),[Id(i)])])]),For(Id(x),IntLit(5),IntLit(2),IntLit(1),Block([Call(Id(Out),Id(printInt),[ArrayCell(Id(arr),[Id(x)])])])])]))])])'
         self.assertTrue(TestAST.test(input, expect, 327))
 
     def test_328(self):
@@ -620,6 +620,7 @@ class ASTGenSuite(unittest.TestCase):
         input = '''
         Class League_of_Legend{
            Destructor(){
+            Status = 0x123;
             Return;
             Run::$Client.start();
             } 
@@ -627,8 +628,9 @@ class ASTGenSuite(unittest.TestCase):
         
         Class Master:Rank{}
         '''
-        expect = 'Program([ClassDecl(Id(League_of_Legend),[MethodDecl(Id(Destructor),Instance,[],Block([Return(),Call(FieldAccess(Id(Run),Id($Client)),Id(start),[])]))]),ClassDecl(Id(Master),Id(Rank),[])])'
+        expect = 'Program([ClassDecl(Id(League_of_Legend),[MethodDecl(Id(Destructor),Instance,[],Block([AssignStmt(Id(Status),IntLit(291)),Return(),Call(FieldAccess(Id(Run),Id($Client)),Id(start),[])]))]),ClassDecl(Id(Master),Id(Rank),[])])'
         self.assertTrue(TestAST.test(input, expect, 350))
+
 
 
 

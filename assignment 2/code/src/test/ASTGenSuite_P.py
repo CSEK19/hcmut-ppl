@@ -603,6 +603,34 @@ class ASTGenSuite(unittest.TestCase):
         expect = 'Program([ClassDecl(Id(Shape),[MethodDecl(Id($a),Static,[],Block([Break,Continue,Return()]))])])'
         self.assertTrue(TestAST.test(input, expect, 349))
 
+    def test_349(self):
+        input = '''
+        Class Shape{
+            $a(){
+                Break;
+                Continue;
+                Return;
+            }
+        }
+        '''
+        expect = 'Program([ClassDecl(Id(Shape),[MethodDecl(Id($a),Static,[],Block([Break,Continue,Return()]))])])'
+        self.assertTrue(TestAST.test(input, expect, 349))
+
+    def test_350(self):
+        input = '''
+        Class League_of_Legend{
+           Destructor(){
+            Return;
+            Run::$Client.start();
+            } 
+        }
+
+        Class Master:Rank{}
+        '''
+        expect = 'Program([ClassDecl(Id(League_of_Legend),[MethodDecl(Id(Destructor),Instance,[],Block([Return(),Call(FieldAccess(Id(Run),Id($Client)),Id(start),[])]))]),ClassDecl(Id(Master),Id(Rank),[])])'
+        self.assertTrue(TestAST.test(input, expect, 350))
+
+
 
 
 
