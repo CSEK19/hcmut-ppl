@@ -298,7 +298,7 @@ class ASTGenSuite(unittest.TestCase):
             }
         }
         '''
-        expect = 'Program([ClassDecl(Id(Program),[MethodDecl(Id(main),Instance,[param(Id(a),IntType)],Block([For(Id(i),IntLit(1),IntLit(100),IntLit(2),Block([Call(Id(Out),Id(printInt),[Id(i)])])]),For(Id(x),IntLit(5),IntLit(2),Block([Call(Id(Out),Id(printInt),[ArrayCell(Id(arr),[Id(x)])])])])]))])])'
+        expect = 'Program([ClassDecl(Id(Program),[MethodDecl(Id(main),Instance,[param(Id(a),IntType)],Block([For(Id(i),IntLit(1),IntLit(100),IntLit(2),Block([Call(Id(Out),Id(printInt),[Id(i)])])]),For(Id(x),IntLit(5),IntLit(2),IntLit(1),Block([Call(Id(Out),Id(printInt),[ArrayCell(Id(arr),[Id(x)])])])])]))])])'
         self.assertTrue(TestAST.test(input, expect, 327))
 
     def test_328(self):
@@ -619,16 +619,201 @@ class ASTGenSuite(unittest.TestCase):
     def test_350(self):
         input = '''
         Class League_of_Legend{
-           Destructor(){
-            Return;
-            Run::$Client.start();
+            Destructor(){
+                Status = 0x123;
+                Return;
+                Run::$Client.start();
             } 
         }
 
         Class Master:Rank{}
         '''
-        expect = 'Program([ClassDecl(Id(League_of_Legend),[MethodDecl(Id(Destructor),Instance,[],Block([Return(),Call(FieldAccess(Id(Run),Id($Client)),Id(start),[])]))]),ClassDecl(Id(Master),Id(Rank),[])])'
+        expect = 'Program([ClassDecl(Id(League_of_Legend),[MethodDecl(Id(Destructor),Instance,[],Block([AssignStmt(Id(Status),IntLit(291)),Return(),Call(FieldAccess(Id(Run),Id($Client)),Id(start),[])]))]),ClassDecl(Id(Master),Id(Rank),[])])'
         self.assertTrue(TestAST.test(input, expect, 350))
+
+    def test_351(self):
+        input = '''
+        Class Process{
+            main(){
+                If(a == True){
+                    Data = True;
+                    Foreach(idx In 1+1 .. 1*2+3 By CPU.nVidia("RTX 3090"){}
+                }
+            }
+        }
+        '''
+        expect = 'Program([ClassDecl(Id(Process),[MethodDecl(Id(main),Instance,[],Block([If(BinaryOp(==,Id(a),BooleanLit(True)),Block([AssignStmt(Id(Data),BooleanLit(True)),For(Id(idx),BinaryOp(+,IntLit(1),IntLit(1)),BinaryOp(+,BinaryOp(*,IntLit(1),IntLit(2)),IntLit(3)),CallExpr(Id(CPU),Id(nVidia),[StringLit(RTX 3090)]),Block([])])]))]))])])'
+        self.assertTrue(TestAST.test(input, expect, 351))
+
+    def test_352(self):
+        input = '''
+        Class Program{
+            main(){
+                If(FFF == True){
+                    Foreach(idx In 1+1 .. 1*2+3 By CPU.nVidia("RTX 3090"){
+                        Foreach (x In E::$F() .. a.b.c.d By H::$XYZ){}
+                    }
+                }
+            }
+        }                
+        '''
+        expect = 'Program([ClassDecl(Id(Program),[MethodDecl(Id(main),Static,[],Block([If(BinaryOp(==,Id(FFF),BooleanLit(True)),Block([For(Id(idx),BinaryOp(+,IntLit(1),IntLit(1)),BinaryOp(+,BinaryOp(*,IntLit(1),IntLit(2)),IntLit(3)),CallExpr(Id(CPU),Id(nVidia),[StringLit(RTX 3090)]),Block([For(Id(x),CallExpr(Id(E),Id($F),[]),FieldAccess(FieldAccess(FieldAccess(Id(a),Id(b)),Id(c)),Id(d)),FieldAccess(Id(H),Id($XYZ)),Block([])])])])]))]))])])'
+        self.assertTrue(TestAST.test(input, expect, 352))
+
+    def test_353(self):
+        input = '''
+        Class Program : PPL {
+            Val a, b : Int = "Hello", "World";
+            Var c : String = (x ==. y) && (a +. b);
+            Var d : Boolean = (True == False) && (True == True) || True && False;
+            Var e : Boolean = ("Hello" ==. "World") || (a == b);
+        }
+        '''
+        expect = 'Program([ClassDecl(Id(Program),Id(PPL),[AttributeDecl(Instance,ConstDecl(Id(a),IntType,StringLit(Hello))),AttributeDecl(Instance,ConstDecl(Id(b),IntType,StringLit(World))),AttributeDecl(Instance,VarDecl(Id(c),StringType,BinaryOp(&&,BinaryOp(==.,Id(x),Id(y)),BinaryOp(+.,Id(a),Id(b))))),AttributeDecl(Instance,VarDecl(Id(d),BoolType,BinaryOp(&&,BinaryOp(||,BinaryOp(&&,BinaryOp(==,BooleanLit(True),BooleanLit(False)),BinaryOp(==,BooleanLit(True),BooleanLit(True))),BooleanLit(True)),BooleanLit(False)))),AttributeDecl(Instance,VarDecl(Id(e),BoolType,BinaryOp(||,BinaryOp(==.,StringLit(Hello),StringLit(World)),BinaryOp(==,Id(a),Id(b)))))])])'
+        self.assertTrue(TestAST.test(input, expect, 353))
+
+    def test_354(self):
+        input = '''
+        Class Program : PPL {
+            Val a : Array[Int, 3] = Array("A","B","C");
+            Val $b : Int = a[Arr[0]];
+        }        
+        '''
+        expect = 'Program([ClassDecl(Id(Program),Id(PPL),[AttributeDecl(Instance,ConstDecl(Id(a),ArrayType(3,IntType),[StringLit(A),StringLit(B),StringLit(C)])),AttributeDecl(Static,ConstDecl(Id($b),IntType,ArrayCell(Id(a),[ArrayCell(Id(Arr),[IntLit(0)])])))])])'
+        self.assertTrue(TestAST.test(input, expect, 354))
+
+    def test_355(self):
+        input = '''
+        Class Program{
+            Constructor() {}
+            Constructor(str  : String) {}
+            Constructor(arr : Array[Int, 10]) {}
+        }
+        '''
+        expect = 'Program([ClassDecl(Id(Program),[MethodDecl(Id(Constructor),Instance,[],Block([])),MethodDecl(Id(Constructor),Instance,[param(Id(str),StringType)],Block([])),MethodDecl(Id(Constructor),Instance,[param(Id(arr),ArrayType(10,IntType))],Block([]))])])'
+        self.assertTrue(TestAST.test(input, expect, 355))
+
+    def test_356(self):
+        input = '''
+        Class A{
+            Destructor(){}
+        }
+        Class B:A{
+            Destructor(){Return;}
+        }
+        '''
+        expect = 'Program([ClassDecl(Id(A),[MethodDecl(Id(Destructor),Instance,[],Block([]))]),ClassDecl(Id(B),Id(A),[MethodDecl(Id(Destructor),Instance,[],Block([Return()]))])])'
+        self.assertTrue(TestAST.test(input, expect, 356))
+
+    def test_357(self):
+        input = '''
+        Class Program{
+            main(){
+                ABC.function();
+                Self::$func();
+            }
+        }
+        '''
+        expect = 'Program([ClassDecl(Id(Program),[MethodDecl(Id(main),Static,[],Block([Call(Id(ABC),Id(function),[]),Call(Self(),Id($func),[])]))])])'
+        self.assertTrue(TestAST.test(input, expect, 357))
+
+    def test_358(self):
+        input = '''
+        Class Program{
+            main(){
+                (a::$func().arr[1][2]).test();
+            }
+        }
+        '''
+        expect = 'Program([ClassDecl(Id(Program),[MethodDecl(Id(main),Static,[],Block([Call(ArrayCell(FieldAccess(CallExpr(Id(a),Id($func),[]),Id(arr)),[IntLit(1),IntLit(2)]),Id(test),[])]))])])'
+        self.assertTrue(TestAST.test(input, expect, 358))
+
+    def test_359(self):
+        input = '''
+        Class Brand{
+            func(){
+                New Brand().function();
+                a.b.c.d.e.f().g().h.j();
+            }
+        }
+        '''
+        expect = 'Program([ClassDecl(Id(Brand),[MethodDecl(Id(func),Instance,[],Block([Call(NewExpr(Id(Brand),[]),Id(function),[]),Call(FieldAccess(CallExpr(CallExpr(FieldAccess(FieldAccess(FieldAccess(FieldAccess(Id(a),Id(b)),Id(c)),Id(d)),Id(e)),Id(f),[]),Id(g),[]),Id(h)),Id(j),[])]))])])'
+        self.assertTrue(TestAST.test(input, expect, 359))
+
+    def test_360(self):
+        input = '''
+        Class Circle : Shape {
+            Val height : Int = New Obj(1).a[1];
+            Var $width : Float = 0x123456789;
+        }
+        '''
+        expect = ''
+        self.assertTrue(TestAST.test(input, expect, 360))
+
+    def test_36(self):
+        input = '''
+
+        '''
+        expect = ''
+        self.assertTrue(TestAST.test(input, expect, 36))
+
+    def test_36(self):
+        input = '''
+
+        '''
+        expect = ''
+        self.assertTrue(TestAST.test(input, expect, 36))
+
+    def test_36(self):
+        input = '''
+
+        '''
+        expect = ''
+        self.assertTrue(TestAST.test(input, expect, 36))
+
+    def test_36(self):
+        input = '''
+
+        '''
+        expect = ''
+        self.assertTrue(TestAST.test(input, expect, 36))
+
+    def test_36(self):
+        input = '''
+
+        '''
+        expect = ''
+        self.assertTrue(TestAST.test(input, expect, 36))
+
+    def test_36(self):
+        input = '''
+
+        '''
+        expect = ''
+        self.assertTrue(TestAST.test(input, expect, 36))
+
+    def test_36(self):
+        input = '''
+
+        '''
+        expect = ''
+        self.assertTrue(TestAST.test(input, expect, 36))
+
+    def test_36(self):
+        input = '''
+
+        '''
+        expect = ''
+        self.assertTrue(TestAST.test(input, expect, 36))
+
+    def test_36(self):
+        input = '''
+
+        '''
+        expect = ''
+        self.assertTrue(TestAST.test(input, expect, 36))
+
+
 
 
 
