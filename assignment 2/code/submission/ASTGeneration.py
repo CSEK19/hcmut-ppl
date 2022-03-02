@@ -71,6 +71,11 @@ class ASTGeneration(D96Visitor):
                     attr_value = attr_value + [None]
 
             attr_type = self.visit(ctx.type_Data())
+            if isinstance(attr_type, ClassType):
+                attr_value.clear()
+                for _ in (ctx.ID() + ctx.STATIC_ID()):
+                    attr_value = attr_value + [NullLiteral()]
+
             return kind, attr_list, attr_type, attr_value
 
     def visitList_AttributeTerm(self, ctx:D96Parser.List_AttributeTermContext):
@@ -255,13 +260,13 @@ class ASTGeneration(D96Visitor):
             return self.visit(ctx.stmt_ClassDestruction())
 
     def visitStmt_ClassConstruction(self, ctx:D96Parser.Stmt_ClassConstructionContext):
-        name = '"Constructor"'
+        name = "Constructor"
         param = self.visit(ctx.list_Parameters())
         body = self.visit(ctx.stmt_Block())
         return [MethodDecl(Instance(), Id(name), param, body)]
 
     def visitStmt_ClassDestruction(self, ctx:D96Parser.Stmt_ClassDestructionContext):
-        name = '"Destructor"'
+        name = "Destructor"
         param = []
         body = self.visit(ctx.stmt_Block())
         return [MethodDecl(Instance(), Id(name), param, body)]
@@ -322,6 +327,8 @@ class ASTGeneration(D96Visitor):
         loop = self.visit(ctx.stmt_Block())
         if len(ctx.expr()) > 2:
             expr3 = self.visit(ctx.expr()[2])
+        else:
+            expr3 = IntLiteral(1)
 
         return For(id, expr1, expr2, loop, expr3)
 
@@ -429,9 +436,16 @@ class ASTGeneration(D96Visitor):
             return attr, attr_type, attr_value
         else:
             attr_type = self.visit(ctx.type_Data())
+
             for element in ctx.ID():
                 attr = attr + [Id(element.getText())]
                 attr_value = attr_value + [None]
+
+            if isinstance(attr_type, ClassType):
+                attr_value.clear()
+                for _ in ctx.ID():
+                    attr_value = attr_value + [NullLiteral()]
+
             return attr, attr_type, attr_value
 
     def visitList_AttributeMethodTerm(self, ctx:D96Parser.List_AttributeMethodTermContext):
@@ -455,10 +469,22 @@ class ASTGeneration(D96Visitor):
     def visitStmt_MethodDeclaration(self, ctx:D96Parser.Stmt_MethodDeclarationContext):
         kind = None
         name = None
-        param = None
+        param = []
         body = self.visit(ctx.stmt_Block())
 
-        a = ctx.parentCtx
+        if ctx.list_Parameters():
+            param = self.visit(ctx.list_Parameters())
+
+        if not ctx.STATIC_ID() and ctx.ID().getText() == 'main':
+            class_body = ctx.parentCtx
+            class_decl = class_body.parentCtx
+            class_name = class_decl.ID()[0].getText()
+
+            if class_name == 'Program':
+                if not param:
+                    kind = Static()
+                    name = Id(ctx.ID().getText())
+                    return [MethodDecl(kind, name, param, body)]
 
         if ctx.ID():
             kind = Instance()
@@ -466,8 +492,6 @@ class ASTGeneration(D96Visitor):
         if ctx.STATIC_ID():
             kind = Static()
             name = Id(ctx.STATIC_ID().getText())
-        if ctx.list_Parameters():
-            param = self.visit(ctx.list_Parameters())
 
         return [MethodDecl(kind, name, param, body)]
 
@@ -544,6 +568,8 @@ class ASTGeneration(D96Visitor):
                 else:
                     return IntLiteral(int(ctx.ZERO().getText(), 8))
         elif ctx.FLOATLIT():
+            if ctx.getText()[:2] == '.e':
+                return FloatLiteral(float(0))
             return FloatLiteral(float(ctx.FLOATLIT().getText()))
         elif ctx.BOOLLIT():
             return BooleanLiteral(bool(ctx.BOOLLIT().getText() == 'True'))
