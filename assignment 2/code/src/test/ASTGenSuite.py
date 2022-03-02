@@ -1229,7 +1229,7 @@ class ASTGenSuite(unittest.TestCase):
                 detachSIM(){
                     Self.phone_number = Null;
                 }
-            }
+        }
         '''
         expect = 'Program([ClassDecl(Id(iPhone),Id(Apple),[AttributeDecl(Static,ConstDecl(Id($os),StringType,StringLit(iOS))),AttributeDecl(Instance,VarDecl(Id(IMEI),StringType)),AttributeDecl(Static,VarDecl(Id($phone_number),IntType)),AttributeDecl(Static,VarDecl(Id($phone),ArrayType(100,BoolType))),MethodDecl(Id(insertSIM),Instance,[param(Id(sim),ClassType(Id(SIM)))],Block([AssignStmt(FieldAccess(Self(),Id(phone_number)),FieldAccess(Id(SIM),Id(number)))])),MethodDecl(Id(detachSIM),Instance,[],Block([AssignStmt(FieldAccess(Self(),Id(phone_number)),NullLiteral())]))])])'
         self.assertTrue(TestAST.test(input, expect, 395))
@@ -1304,11 +1304,11 @@ class ASTGenSuite(unittest.TestCase):
             Val immutableAttribute: Int = 0;
             Var length, width: Int;
             $getNumOfShape() {
-                Return $numOfShape;
+                Return numOfShape.func();
             }
         }
         
-        CLass Rectangle: Shape {
+        Class Rectangle: Shape {
             getArea() {
                 Return Self.length * Self.width;
             }
@@ -1320,7 +1320,7 @@ class ASTGenSuite(unittest.TestCase):
             }
         }
         '''
-        expect = 'Program([ClassDecl(Id(Shape),[AttributeDecl(Static,ConstDecl(Id($numOfShape),IntType,IntLit(0))),AttributeDecl(Instance,ConstDecl(Id(immutableAttribute),IntType,IntLit(0))),AttributeDecl(Instance,VarDecl(Id(length),IntType)),AttributeDecl(Instance,VarDecl(Id(width),IntType)),MethodDecl(Id($getNumOfShape),Static,[],Block([Return()]))]),ClassDecl(Id(Program),[MethodDecl(Id(main),Static,[],Block([Call(Id(Out),Id(printInt),[FieldAccess(Id(Shape),Id($numOfShape))])]))])])'
+        expect = 'Program([ClassDecl(Id(Shape),[AttributeDecl(Static,ConstDecl(Id($numOfShape),IntType,IntLit(0))),AttributeDecl(Instance,ConstDecl(Id(immutableAttribute),IntType,IntLit(0))),AttributeDecl(Instance,VarDecl(Id(length),IntType)),AttributeDecl(Instance,VarDecl(Id(width),IntType)),MethodDecl(Id($getNumOfShape),Static,[],Block([Return(CallExpr(Id(numOfShape),Id(func),[]))]))]),ClassDecl(Id(Rectangle),Id(Shape),[MethodDecl(Id(getArea),Instance,[],Block([Return(BinaryOp(*,FieldAccess(Self(),Id(length)),FieldAccess(Self(),Id(width))))]))]),ClassDecl(Id(Program),[MethodDecl(Id(main),Static,[],Block([Call(Id(Out),Id(printInt),[FieldAccess(Id(Shape),Id($numOfShape))])]))])])'
         self.assertTrue(TestAST.test(input, expect, 399))
 
     def test_400(self):
