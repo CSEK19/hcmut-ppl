@@ -394,13 +394,13 @@ class ASTGeneration(D96Visitor):
             method = Id(ctx.ID().getText())
             param = self.visit(ctx.list_Expr())
 
-        if ctx.exp_9():
+        elif ctx.exp_9():
             obj = self.visit(ctx.exp_9())
             method = Id(ctx.ID().getText())
             param = self.visit(ctx.list_Expr())
 
-        if ctx.exp_10():
-            obj = self.visit(ctx.exp_10())
+        else:
+            obj = Id(ctx.ID().getText())
             method = Id(ctx.STATIC_ID().getText())
             param = self.visit(ctx.list_Expr())
 
