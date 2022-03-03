@@ -45,7 +45,8 @@ stmt_AttributeDeclaration: (VAL | VAR)? list_Attribute SM;
 
 
 // Assignment statement
-lhs: ID | exp_7;
+lhs: ID |  exp_7_ID;
+exp_7_ID: exp_7_ID (LSB expr RSB)+ | exp_8 DOT ID | exp_9;
 stmt_Assign: lhs ASSIGN expr SM;
 
 // If statement

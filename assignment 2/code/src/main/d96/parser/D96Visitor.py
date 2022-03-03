@@ -124,6 +124,11 @@ class D96Visitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by D96Parser#exp_7_ID.
+    def visitExp_7_ID(self, ctx:D96Parser.Exp_7_IDContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by D96Parser#stmt_Assign.
     def visitStmt_Assign(self, ctx:D96Parser.Stmt_AssignContext):
         return self.visitChildren(ctx)

@@ -16,8 +16,8 @@ def main(argv):
         subprocess.run(["java","-jar",ANTLR_JAR,"-o","../target","-no-listener","-visitor","main/d96/parser/D96.g4"])
     elif argv[0] == 'clean':
         subprocess.run(["rm","-rf",TARGET_DIR + "/*"])
-               
-    elif argv[0] == 'test':     
+
+    elif argv[0] == 'test':
         if not os.path.isdir(TARGET_DIR + "/" + GENERATE_DIR):
             subprocess.run(["java","-jar",ANTLR_JAR,"-o",GENERATE_DIR,"-no-listener","-visitor","main/d96/parser/D96.g4"])
         if not (TARGET_DIR + "/" + GENERATE_DIR) in sys.path:
@@ -33,6 +33,9 @@ def main(argv):
         elif argv[1] == 'ASTGenSuite':
             from ASTGenSuite import ASTGenSuite
             getAndTest(ASTGenSuite)
+            # from ASTGenSuite import printComparison
+            # expect = 'Program([ClassDecl(Id(A),[MethodDecl(Id(Destructor),Instance,[],Block([Return(),Call(FieldAccess(Id(_9),Id($g3k)),Id(m),[])]))]),ClassDecl(Id(A1),Id(A),[]),ClassDecl(Id(A2),Id(A),D[MethodDecl(Id(func_1),Instance,[],Block([AssignStmt(Id(Name),StringLit(BKU))])),MethodDecl(Id(func_2),Instance,[],Block([AssignStmt(Id(Slogan),StringLit(vjp pro no 1))]))])])'
+            # printComparison(400, expect)
         elif argv[1] == 'CheckerSuite':
             from CheckerSuite import CheckerSuite
             getAndTest(CheckerSuite)
@@ -46,7 +49,7 @@ def main(argv):
 
 
 
-def getAndTest(cls): 
+def getAndTest(cls):
     suite = unittest.makeSuite(cls)
     test(suite)
 

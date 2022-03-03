@@ -6,8 +6,17 @@ from AST import *
 class ASTGenSuite(unittest.TestCase):
     # def test_300(self):
     #     input = '''
-    #     Class Program {
-    #     main(){}
+    #             Class iPhone:Apple{
+    #             Val $os: String = "iOS";
+    #             Var IMEI: String;
+    #             Var $phone_number: Int;
+    #             Var $phone: Array[Boolean, 100];
+    #             insertSIM(sim: SIM){
+    #                 Self.phone_number = SIM.number;
+    #             }
+    #             detachSIM(){
+    #                 Self.phone_number = Null;
+    #             }
     #     }
     #     '''
     #     expect = 'Program([ClassDecl(Id(A),[])])'
@@ -1348,11 +1357,24 @@ class ASTGenSuite(unittest.TestCase):
 
 
 
-
-
-
-
-
-
-
-
+def printComparison(number: int, expected: str):
+    solution_path = "C:/Users/Admin/Desktop/P/BK/212/Principles of Programming Languages/Assignment/ppl/assignment 2/code/src/test/solutions/" + str(number) + ".txt"
+    print(solution_path)
+    f = open(solution_path, "r")
+    solution = f.read()
+    f.close()
+    print(44 * '-' + ' COMPARASION RESULT: ' + str(solution == expected).upper() + ' ' + 44 * '-')
+    if (solution != expected):
+        length = len(solution) if len(solution) < len(expected) else len(expected)
+        position = 0
+        for idx in range(length):
+            if solution[idx] == expected[idx]:
+                position += 1
+            else:
+                break
+        print('* * * * * CHARACTER ' + str(position) + ' ' + solution[position] + ' * * * * *')
+        print(50 * '-' + ' SOLUTION: ' + str(len(solution)) + ' ' + 50 * '-')
+        print(solution[:position + 1])
+        print(50 * '-' + ' EXPECTED: ' + str(len(expected)) + ' ' + 50 * '-')
+        print(expected[:position + 1])
+    return

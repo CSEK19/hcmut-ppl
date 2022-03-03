@@ -319,7 +319,7 @@ class ASTGeneration(D96Visitor):
         return Return(expr)
 
     def visitStmt_ForIn(self, ctx:D96Parser.Stmt_ForInContext):
-        expr3 = None
+        expr3 = IntLiteral(1)
 
         id = Id(ctx.ID().getText())
         expr1 = self.visit(ctx.expr()[0])
@@ -327,8 +327,6 @@ class ASTGeneration(D96Visitor):
         loop = self.visit(ctx.stmt_Block())
         if len(ctx.expr()) > 2:
             expr3 = self.visit(ctx.expr()[2])
-        else:
-            expr3 = IntLiteral(1)
 
         return For(id, expr1, expr2, loop, expr3)
 
@@ -496,10 +494,25 @@ class ASTGeneration(D96Visitor):
         return [MethodDecl(kind, name, param, body)]
 
     def visitLhs(self, ctx:D96Parser.LhsContext):
+        if ctx.exp_7_ID():
+            return self.visit(ctx.exp_7_ID())
         if ctx.ID():
             return Id(ctx.ID().getText())
-        if ctx.exp_7():
-            return self.visit(ctx.exp_7())
+
+    def visitExp_7_ID(self, ctx:D96Parser.Exp_7_IDContext):
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp_9())
+        else:
+            if ctx.exp_7_ID():
+                idx = []
+                for exp_idx in range(len(ctx.expr())):
+                    idx = idx + [self.visit(ctx.expr(exp_idx))]
+                arr = self.visit(ctx.exp_7_ID())
+                return ArrayCell(arr, idx)
+            if ctx.exp_8():
+                obj = self.visit(ctx.exp_8())
+                fieldname = Id(ctx.ID().getText())
+                return FieldAccess(obj, fieldname)
 
     def visitType_Data(self, ctx:D96Parser.Type_DataContext):
         if ctx.ID():

@@ -6,8 +6,17 @@ from AST import *
 class ASTGenSuite(unittest.TestCase):
     # def test_300(self):
     #     input = '''
-    #     Class Program {
-    #     main(){}
+    #             Class iPhone:Apple{
+    #             Val $os: String = "iOS";
+    #             Var IMEI: String;
+    #             Var $phone_number: Int;
+    #             Var $phone: Array[Boolean, 100];
+    #             insertSIM(sim: SIM){
+    #                 Self.phone_number = SIM.number;
+    #             }
+    #             detachSIM(){
+    #                 Self.phone_number = Null;
+    #             }
     #     }
     #     '''
     #     expect = 'Program([ClassDecl(Id(A),[])])'
@@ -1344,15 +1353,3 @@ class ASTGenSuite(unittest.TestCase):
         '''
         expect = 'Program([ClassDecl(Id(A),[MethodDecl(Id(Destructor),Instance,[],Block([Return(),Call(FieldAccess(Id(_9),Id($g3k)),Id(m),[])]))]),ClassDecl(Id(A1),Id(A),[]),ClassDecl(Id(A2),Id(A),[MethodDecl(Id(func_1),Instance,[],Block([AssignStmt(Id(Name),StringLit(BKU))])),MethodDecl(Id(func_2),Instance,[],Block([AssignStmt(Id(Slogan),StringLit(vjp pro no 1))]))])])'
         self.assertTrue(TestAST.test(input, expect, 400))
-
-
-
-
-
-
-
-
-
-
-
-
