@@ -1254,7 +1254,7 @@ class ASTGenSuite(unittest.TestCase):
             }
         }
         '''
-        expect = 'Program([ClassDecl(Id(Smart),Id(Home),[AttributeDecl(Static,ConstDecl(Id($Camera),ClassType(Id(Module)),NullLiteral())),MethodDecl(Id(detect),Instance,[param(Id(Camera),ClassType(Id(Module)))],Block([If(BinaryOp(==,CallExpr(Self(),Id(detect),[]),BooleanLit(True)),Block([Return(BooleanLit(True))]))]))])])'
+        expect = 'Program([ClassDecl(Id(Smart),Id(Home),[AttributeDecl(Static,ConstDecl(Id($Camera),ClassType(Id(Module)),None)),MethodDecl(Id(detect),Instance,[param(Id(Camera),ClassType(Id(Module)))],Block([If(BinaryOp(==,CallExpr(Self(),Id(detect),[]),BooleanLit(True)),Block([Return(BooleanLit(True))]))]))])])'
         self.assertTrue(TestAST.test(input, expect, 396))
 
     def test_397(self):
@@ -1275,7 +1275,7 @@ class ASTGenSuite(unittest.TestCase):
             }
         }
         '''
-        expect = 'Program([ClassDecl(Id(Smart),Id(Home),[AttributeDecl(Static,ConstDecl(Id($Camera),ClassType(Id(Module)),NullLiteral())),MethodDecl(Id(detect),Instance,[param(Id(Camera),ClassType(Id(Module)))],Block([If(BinaryOp(==,CallExpr(Self(),Id(detect),[]),BooleanLit(True)),Block([Return(BooleanLit(True))]),Block([Return(BooleanLit(False))])),Break])),MethodDecl(Id(func),Instance,[],Block([Call(Self(),Id(DoSth),[])]))])])'
+        expect = 'Program([ClassDecl(Id(Smart),Id(Home),[AttributeDecl(Static,ConstDecl(Id($Camera),ClassType(Id(Module)),None)),MethodDecl(Id(detect),Instance,[param(Id(Camera),ClassType(Id(Module)))],Block([If(BinaryOp(==,CallExpr(Self(),Id(detect),[]),BooleanLit(True)),Block([Return(BooleanLit(True))]),Block([Return(BooleanLit(False))])),Break])),MethodDecl(Id(func),Instance,[],Block([Call(Self(),Id(DoSth),[])]))])])'
         self.assertTrue(TestAST.test(input, expect, 397))
 
     def test_398(self):
@@ -1303,7 +1303,7 @@ class ASTGenSuite(unittest.TestCase):
             }
         }
         '''
-        expect = 'Program([ClassDecl(Id(Smart),Id(Home),[AttributeDecl(Static,ConstDecl(Id($Camera),ClassType(Id(Module)),NullLiteral())),MethodDecl(Id(detect),Instance,[param(Id(Camera),ClassType(Id(Module)))],Block([If(BinaryOp(==,CallExpr(Self(),Id(detect),[]),BooleanLit(True)),Block([Return(BooleanLit(True))]),Block([Return(BooleanLit(False))])),Break])),MethodDecl(Id(func),Instance,[],Block([Call(Self(),Id(DoSth),[]),For(Id(i),Id(Device),IntLit(0),IntLit(291),Block([])]),For(Id(i),CallExpr(Id(Device),Id(ABC),[]),IntLit(0),IntLit(1),Block([])]),If(IntLit(1),Block([]),If(IntLit(2),Block([]),Block([]))),AssignStmt(Id(lhs),StringLit(Hello World)),Block([Block([Block([Block([Block([Block([Block([Block([Block([Block([])])])])])])])])])])]))])])'
+        expect = 'Program([ClassDecl(Id(Smart),Id(Home),[AttributeDecl(Static,ConstDecl(Id($Camera),ClassType(Id(Module)),None)),MethodDecl(Id(detect),Instance,[param(Id(Camera),ClassType(Id(Module)))],Block([If(BinaryOp(==,CallExpr(Self(),Id(detect),[]),BooleanLit(True)),Block([Return(BooleanLit(True))]),Block([Return(BooleanLit(False))])),Break])),MethodDecl(Id(func),Instance,[],Block([Call(Self(),Id(DoSth),[]),For(Id(i),Id(Device),IntLit(0),IntLit(291),Block([])]),For(Id(i),CallExpr(Id(Device),Id(ABC),[]),IntLit(0),IntLit(1),Block([])]),If(IntLit(1),Block([]),If(IntLit(2),Block([]),Block([]))),AssignStmt(Id(lhs),StringLit(Hello World)),Block([Block([Block([Block([Block([Block([Block([Block([Block([Block([])])])])])])])])])])]))])])'
         self.assertTrue(TestAST.test(input, expect, 398))
 
     def test_399(self):

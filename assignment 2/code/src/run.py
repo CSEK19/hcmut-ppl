@@ -34,8 +34,8 @@ def main(argv):
             from ASTGenSuite import ASTGenSuite
             getAndTest(ASTGenSuite)
             # from ASTGenSuite import printComparison
-            # expect = 'Program([ClassDecl(Id(A),[MethodDecl(Id(Destructor),Instance,[],Block([Return(),Call(FieldAccess(Id(_9),Id($g3k)),Id(m),[])]))]),ClassDecl(Id(A1),Id(A),[]),ClassDecl(Id(A2),Id(A),D[MethodDecl(Id(func_1),Instance,[],Block([AssignStmt(Id(Name),StringLit(BKU))])),MethodDecl(Id(func_2),Instance,[],Block([AssignStmt(Id(Slogan),StringLit(vjp pro no 1))]))])])'
-            # printComparison(400, expect)
+            # expect = 'Program([ClassDecl(Id(Smart),Id(Home),[AttributeDecl(Static,ConstDecl(Id($Camera),ClassType(Id(Module)),NullLiteral())),MethodDecl(Id(detect),Instance,[param(Id(Camera),ClassType(Id(Module)))],Block([If(BinaryOp(==,CallExpr(Self(),Id(detect),[]),BooleanLit(True)),Block([Return(BooleanLit(True))]),Block([Return(BooleanLit(False))])),Break])),MethodDecl(Id(func),Instance,[],Block([Call(Self(),Id(DoSth),[]),For(Id(i),Id(Device),IntLit(0),IntLit(291),Block([])]),For(Id(i),CallExpr(Id(Device),Id(ABC),[]),IntLit(0),IntLit(1),Block([])]),If(IntLit(1),Block([]),If(IntLit(2),Block([]),Block([]))),AssignStmt(Id(lhs),StringLit(Hello World)),Block([Block([Block([Block([Block([Block([Block([Block([Block([Block([])])])])])])])])])])]))])])'
+            # printComparison(398, expect)
         elif argv[1] == 'CheckerSuite':
             from CheckerSuite import CheckerSuite
             getAndTest(CheckerSuite)

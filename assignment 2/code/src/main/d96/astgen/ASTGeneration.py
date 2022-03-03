@@ -71,7 +71,9 @@ class ASTGeneration(D96Visitor):
                     attr_value = attr_value + [None]
 
             attr_type = self.visit(ctx.type_Data())
-            if isinstance(attr_type, ClassType):
+
+            attr_stmt = ctx.parentCtx
+            if isinstance(attr_type, ClassType) and attr_stmt.getText()[:3] == 'Var':
                 attr_value.clear()
                 for _ in (ctx.ID() + ctx.STATIC_ID()):
                     attr_value = attr_value + [NullLiteral()]
@@ -439,7 +441,8 @@ class ASTGeneration(D96Visitor):
                 attr = attr + [Id(element.getText())]
                 attr_value = attr_value + [None]
 
-            if isinstance(attr_type, ClassType):
+            attr_stmt = ctx.parentCtx
+            if isinstance(attr_type, ClassType) and attr_stmt.getText()[:3] == 'Var':
                 attr_value.clear()
                 for _ in ctx.ID():
                     attr_value = attr_value + [NullLiteral()]
