@@ -58,7 +58,7 @@ stmt_ForIn: FOREACH LB ID IN expr DOUBLE_DOT expr (BY expr)? RB stmt_Block;
 stmt_Block: LCB list_Stmt RCB ;
 
 // Method Invocation statement
-stmt_MethodInvocation: exp_8_MethodInvocation DOT ID LB list_Expr RB SM | exp_9 DOT ID LB list_Expr RB SM | exp_10 SCOPE STATIC_ID LB list_Expr RB SM;
+stmt_MethodInvocation: exp_8_MethodInvocation DOT ID LB list_Expr RB SM | exp_9 DOT ID LB list_Expr RB SM | ID SCOPE STATIC_ID LB list_Expr RB SM;
 exp_8_MethodInvocation: exp_8_MethodInvocation DOT ID (LB list_Expr RB)? | exp_9;
 
 // Continue statement

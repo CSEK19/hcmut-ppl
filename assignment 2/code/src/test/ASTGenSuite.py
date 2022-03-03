@@ -612,7 +612,7 @@ class ASTGenSuite(unittest.TestCase):
                 Run::$Client.start();
             } 
         }
-        
+
         Class Master:Rank{}
         '''
         expect = 'Program([ClassDecl(Id(League_of_Legend),[MethodDecl(Id(Destructor),Instance,[],Block([AssignStmt(Id(Status),IntLit(291)),Return(),Call(FieldAccess(Id(Run),Id($Client)),Id(start),[])]))]),ClassDecl(Id(Master),Id(Rank),[])])'
@@ -697,11 +697,11 @@ class ASTGenSuite(unittest.TestCase):
         Class Program{
             main(){
                 ABC.function();
-                Self::$func();
+                ABC::$func();
             }
         }
         '''
-        expect = 'Program([ClassDecl(Id(Program),[MethodDecl(Id(main),Static,[],Block([Call(Id(ABC),Id(function),[]),Call(Self(),Id($func),[])]))])])'
+        expect = 'Program([ClassDecl(Id(Program),[MethodDecl(Id(main),Static,[],Block([Call(Id(ABC),Id(function),[]),Call(Id(ABC),Id($func),[])]))])])'
         self.assertTrue(TestAST.test(input, expect, 357))
 
     def test_358(self):
@@ -947,11 +947,11 @@ class ASTGenSuite(unittest.TestCase):
     def test_377(self):
         input = '''
         Class A{}
-        
+
         Class B{
             Val $_ : Float;
             }
-        
+
         Class F6_{
             Val $P_X_, $_, $91 : String;
         }
@@ -1011,7 +1011,7 @@ class ASTGenSuite(unittest.TestCase):
             Var weight: Float = 0.0;
             Var smart: Boolean = False;
         }
-        
+
         Class Router:Device{
             start(){
                     Return Self.status();
@@ -1027,11 +1027,11 @@ class ASTGenSuite(unittest.TestCase):
             start(){
                     Return Self.status();
             }
-            
+
             status(){
                 Continue;
             }
-            
+
              $Refresh(){
                 Foreach(i In _::$quantity .. 0 By -1){}
             }
@@ -1068,13 +1068,13 @@ class ASTGenSuite(unittest.TestCase):
         Class Clock:Computer{
             func(){
                 Foreach(i In real_time .. 0 By 1){
-                    Self::$DoSth();
+                    ABC::$DoSth();
                     Continue;
                 }
             }
         }
         '''
-        expect = 'Program([ClassDecl(Id(Clock),Id(Computer),[MethodDecl(Id(func),Instance,[],Block([For(Id(i),Id(real_time),IntLit(0),IntLit(1),Block([Call(Self(),Id($DoSth),[]),Continue])])]))])])'
+        expect = 'Program([ClassDecl(Id(Clock),Id(Computer),[MethodDecl(Id(func),Instance,[],Block([For(Id(i),Id(real_time),IntLit(0),IntLit(1),Block([Call(Id(ABC),Id($DoSth),[]),Continue])])]))])])'
         self.assertTrue(TestAST.test(input, expect, 386))
 
     def test_387(self):
@@ -1208,7 +1208,7 @@ class ASTGenSuite(unittest.TestCase):
             $foo() {
                 Self.A = Array(1, 02312 + a, a * b);
                 a[1.3412e-3][(i - j)][0x10] = c[i][k] + b[1][(j+1)][(k - 1412)][123];
-                
+
                 Self.System.Out(a.a);
             }
         }
@@ -1307,13 +1307,13 @@ class ASTGenSuite(unittest.TestCase):
                 Return numOfShape.func();
             }
         }
-        
+
         Class Rectangle: Shape {
             getArea() {
                 Return Self.length * Self.width;
             }
         }
-        
+
         Class Program {
             main() {
             Out.printInt(Shape::$numOfShape);
@@ -1330,9 +1330,9 @@ class ASTGenSuite(unittest.TestCase):
             Return;_9::$g3k.m();
             } 
         }
-        
+
         Class A1:A{}
-        
+
         Class A2:A{
            func_1(){
                 Name = "BKU";
@@ -1344,7 +1344,6 @@ class ASTGenSuite(unittest.TestCase):
         '''
         expect = 'Program([ClassDecl(Id(A),[MethodDecl(Id(Destructor),Instance,[],Block([Return(),Call(FieldAccess(Id(_9),Id($g3k)),Id(m),[])]))]),ClassDecl(Id(A1),Id(A),[]),ClassDecl(Id(A2),Id(A),[MethodDecl(Id(func_1),Instance,[],Block([AssignStmt(Id(Name),StringLit(BKU))])),MethodDecl(Id(func_2),Instance,[],Block([AssignStmt(Id(Slogan),StringLit(vjp pro no 1))]))])])'
         self.assertTrue(TestAST.test(input, expect, 400))
-
 
 
 

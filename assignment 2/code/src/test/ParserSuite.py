@@ -1068,26 +1068,31 @@ Class Shape2 {
         self.assertTrue(TestParser.test(input, expect, 298))
 
     def test_299(self):
-        input = '''Class Lzzzzz{Destructor(){Return;_9::$g3k.m();} }Class classA1provip123:z{}'''
-        expect = 'successful'
+        """More complex program"""
+        input = """
+    Class Shape {
+        foo(){
+            a::$b=2;
+            a::$e();
+            a::$c::$d=2;
+        } 
+    }
+    """
+        expect = "Error on line 6 col 17: ::"
         self.assertTrue(TestParser.test(input, expect, 299))
 
     def test_300(self):
-        input = '''
-        Class Lzzzzz{Destructor(){Return;_9::$g3k.m();} }Class classA1provip123:z{}
-        Class a{
-            foo(){
-                a = "Tao noi cho lam cai test case nay met vai loz luon";
-            }
-        }
+        """More complex program"""
+        input = """
+    Class Shape {
         foo(){
-                a = "26 am roi, vay ma chang duoc 
-                     Sam mua do tet
-                     ma chi co
-                     sap mat lam test
-                     :<<"
-            }'''
-        expect = 'Error on line 8 col 8: foo'
+            a::$b=2;
+            a::$e();
+            a::$c()::$d=2;
+        } 
+    }
+    """
+        expect = "Error on line 6 col 19: ::"
         self.assertTrue(TestParser.test(input, expect, 300))
 
 
