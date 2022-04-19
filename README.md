@@ -7,3 +7,6 @@
 
 # Assignment 2 - AST Generation
 - 31/01 - 06/03
+
+# Assignment 3 - Static Checker
+- 19/04 - 10/05
