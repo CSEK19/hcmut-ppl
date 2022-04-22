@@ -1,0 +1,6 @@
+Class a{
+                    Var a:Int = 1;
+                    Val b:Int = "Hello";
+                    Var a:Int;
+                    }
+                    

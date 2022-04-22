@@ -1,1 +1,5 @@
-Program(List(FuncDecl(Id(main),List(),IntType,Block(List(),List(CallExpr(Id(foo),List()))))))
+Class A{
+    Var b:Int;
+    a(){}
+    a(){}
+}

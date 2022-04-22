@@ -24,4 +24,19 @@ class ASTGenSuite(unittest.TestCase):
         }"""
         expect = str(Program([FuncDecl(Id("main"),[],IntType(),Block([],[CallExpr(Id("getIntLn"),[])]))]))
         self.assertTrue(TestAST.test(input,expect,302))
+
+    def test_303(self):
+        input = """Class a{
+                    b(){
+                        Var a:int = 1;
+                        {
+                            Var a:int = 1;
+                            Var b:int = 1;
+                            Var b:int = 1;
+                        }
+                    }
+                    }
+        """
+        expect = ""
+        self.assertTrue(TestAST.test(input, expect, 303))
    

@@ -1,3 +1,2 @@
-int main () {
-            putIntLn();
-        }
+Class a{}
+        Class a{}
