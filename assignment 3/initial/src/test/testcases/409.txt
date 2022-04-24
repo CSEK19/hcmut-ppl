@@ -1,0 +1,10 @@
+Class abc{
+                    b(){
+                        Var a:int = 1;
+                        {
+                            Var a:int = 1;
+                            Var b:int = 1;
+                            Val b:int = 1;
+                        }
+                    }
+                    }

@@ -3,72 +3,19 @@ from TestUtils import TestChecker
 from AST import *
 
 class CheckerSuite(unittest.TestCase):
-    # def test_undeclared_function(self):
-    #     """Simple program: int main() {} """
-    #     input = """int main() {foo();}"""
-    #     expect = "Undeclared Function: foo"
-    #     self.assertTrue(TestChecker.test(input,expect,400))
-    #
-    # def test_diff_numofparam_stmt(self):
-    #     """More complex program"""
-    #     input = """int main () {
-    #         putIntLn();
-    #     }"""
-    #     expect = "Type Mismatch In Statement: CallExpr(Id(putIntLn),List())"
-    #     self.assertTrue(TestChecker.test(input,expect,401))
-    #
-    # def test_diff_numofparam_expr(self):
-    #     """More complex program"""
-    #     input = """int main () {
-    #         putIntLn(getInt(4));
-    #     }"""
-    #     expect = "Type Mismatch In Expression: CallExpr(Id(getInt),List(IntLiteral(4)))"
-    #     self.assertTrue(TestChecker.test(input,expect,402))
-    #
-    # def test_undeclared_function_use_ast(self):
-    #     """Simple program: int main() {} """
-    #     input = Program([FuncDecl(Id("main"),[],IntType(),Block([],[
-    #         CallExpr(Id("foo"),[])]))])
-    #     expect = "Undeclared Function: foo"
-    #     self.assertTrue(TestChecker.test(input,expect,403))
-    #
-    # def test_diff_numofparam_expr_use_ast(self):
-    #     """More complex program"""
-    #     input = Program([
-    #             FuncDecl(Id("main"),[],IntType(),Block([],[
-    #                 CallExpr(Id("putIntLn"),[
-    #                     CallExpr(Id("getInt"),[IntLiteral(4)])
-    #                     ])]))])
-    #     expect = "Type Mismatch In Expression: CallExpr(Id(getInt),List(IntLiteral(4)))"
-    #     self.assertTrue(TestChecker.test(input,expect,404))
-    #
-    # def test_diff_numofparam_stmt_use_ast(self):
-    #     """More complex program"""
-    #     input = Program([
-    #             FuncDecl(Id("main"),[],IntType(),Block([],[
-    #                 CallExpr(Id("putIntLn"),[])]))])
-    #     expect = "Type Mismatch In Statement: CallExpr(Id(putIntLn),List())"
-    #     self.assertTrue(TestChecker.test(input,expect,405))
-
-    def test_399(self):
-        """Simple program: int main() {} """
-        input = """Class a{
-                    Var a:Int = 1;
-                    Val b:Int = "Hello";
-                    Var a:Int;
-                    }
-                    """
-        expect = "Redeclared Attribute: a"
-        self.assertTrue(TestChecker.test(input,expect,399))
-
     def test_400(self):
         """Simple program: int main() {} """
-        input = """Class a{
+        input = """
+                    Class X{
+                        Var a:Int;
+                        Var b:Int;
+                        Var c:Int;
+                    }
+                    Class Y{
                     Var a:Int;
                     Var a:Int;
                     }
-                    Class b{}
-                    Class c{}
+                    Class Z{}
                     Class d{}"""
         expect = "Redeclared Attribute: a"
         self.assertTrue(TestChecker.test(input,expect,400))
@@ -88,9 +35,8 @@ class CheckerSuite(unittest.TestCase):
 
     def test_403(self):
         """Simple program: int main() {} """
-        input = """Class A{
-    Var b:Int;
-    a(){}
+        input = """Class a{
+    Var a:Int;
     a(){}
 }"""
         expect = "Redeclared Method: a"
@@ -137,3 +83,45 @@ class CheckerSuite(unittest.TestCase):
                     }"""
         expect = "Redeclared Variable: a"
         self.assertTrue(TestChecker.test(input,expect,407))
+
+    def test_408(self):
+        """Simple program: int main() {} """
+        input = """Class a{
+                    b(){
+                        Var a:int = 1;
+                        {
+                            Var a:int = 1;
+                            Var b:int = 1;
+                            Var b:int = 1;
+                        }
+                    }
+                    }"""
+        expect = "Redeclared Variable: b"
+        self.assertTrue(TestChecker.test(input,expect,408))
+
+    def test_409(self):
+        """Simple program: int main() {} """
+        input = """Class abc{
+                    b(){
+                        Var a:int = 1;
+                        {
+                            Var a:int = 1;
+                            Var b:int = 1;
+                            Val b:int = 1;
+                        }
+                    }
+                    }"""
+        expect = "Redeclared Constant: b"
+        self.assertTrue(TestChecker.test(input,expect,409))
+
+    def test_410(self):
+        """Simple program: int main() {} """
+        input = """Class a{
+                    b(){
+                        Var b:Int = 1;
+                        Var c:Int = 1;
+                        a=1;
+                    }
+                    }"""
+        expect = "Undeclared Identifier: a"
+        self.assertTrue(TestChecker.test(input,expect,410))

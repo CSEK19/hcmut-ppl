@@ -2,21 +2,26 @@
 """
  * @author nhphung
 """
-from AST import * 
+from AST import *
 from Visitor import *
 from Utils import Utils
 from StaticError import *
 
+class CType:
+    pass
+
 class MType:
-    def __init__(self,partype,rettype):
+    def __init__(self, partype, rettype):
         self.partype = partype
         self.rettype = rettype
 
 class Symbol:
-    def __init__(self,name,mtype,value = None):
+    def __init__(self, name, mtype, value = None, kind = None, scope = None):
         self.name = name
         self.mtype = mtype
         self.value = value
+        self.kind = kind
+        self.scope = scope
 
 class StaticChecker(BaseVisitor,Utils):
 
@@ -24,109 +29,136 @@ class StaticChecker(BaseVisitor,Utils):
     Symbol("getInt",MType([],IntType())),
     Symbol("putIntLn",MType([IntType()],VoidType()))
     ]
-            
-    
+
+
     def __init__(self,ast):
         self.ast = ast
 
- 
-    
+
+
     def check(self):
-        return self.visit(self.ast,StaticChecker.global_envi)
+        #return self.visit(self.ast,StaticChecker.global_envi)
+        return self.visit(self.ast, [])
+
 
     def visitProgram(self, ast:Program, c):
-        program_context = {}
-        c.append(program_context)
-        a = c
-        for decl in ast.decl:
-            self.visit(decl, c)
-        # return [self.visit(x,c) for x in ast.decl]
+        for class_decl in ast.decl:
+            self.visit(class_decl, c)
+        return
 
     def visitClassDecl(self, ast:ClassDecl, c):
-        program_contex = c[-1]
-        if ast.classname.name in program_contex.keys():
-            raise Redeclared(Class(), ast.classname.name)
-        else:
-            program_contex[ast.classname.name] = {}
-            for element in ast.memlist:
-                self.visit(element, program_contex[ast.classname.name])
+        for class_name in c:
+            if type(class_name.mtype) is CType:
+                self.visit(ast.classname, ([class_name], Class()))
+        c.append(Symbol(ast.classname.name, CType(), None))
+        lower_scope = len(c)
+        for mem in ast.memlist:
+            self.visit(mem, (c, lower_scope))
+        return
 
-    def visitMethodDecl(self, ast:MethodDecl, c):
-        class_context = c
-        m_kind = ast.kind
+    def visitId(self, ast:Id, c):
+        if c[1] == 'CHECK_UNDECLARED':
+            lst_class = []
+            for id_name in c[0]:
+                if type(id_name.mtype) is CType:
+                    lst_class.append(id_name)
+            last_class = lst_class[-1]
 
-        m_name = ast.name.name
-        if m_name in class_context.keys():
-            raise Redeclared(Method(), m_name)
+            lower_scope = c[0].index(last_class) + 1
+            lst_ids = c[0][lower_scope:]
+            lst_ids_name = []
+            for element in lst_ids:
+                lst_ids_name.append(element.name)
 
-        m_param = []
-        for element in ast.param:
-            m_param.append(self.visit(element,(m_param,'PARAMS')))
+            if ast not in lst_ids_name:
+                raise Undeclared(c[2], ast.name)
 
-        m_body = self.visit(ast.body,(c, m_param))
-        class_context[m_name] = [m_kind, m_name, m_param, m_body]
+        for element in c[0]:
+            if element.name == ast.name:
+                if ast.name == 'ef':
+                    print(ast.name)
+                raise Redeclared(c[1], ast.name)
+
+        return ast.name
 
 
-    def visitAttributeDecl(self, ast, c):
-        class_context = c
-        atr_kind = ast.kind
+    def visitMethodDecl(self, ast:MethodDecl, c_scope):
+        c, lower_scope = c_scope
+        m_name = self.visit(ast.name, (c[lower_scope:], Method()))
+        m_type = MType(None, None)
+        c.append(Symbol(m_name, m_type))
+
+        lower_scope = len(c)
+        for param in ast.param:
+            self.visit(param, (c, lower_scope, 'PARAM'))
+
+        self.visit(ast.body, (c, lower_scope))
+        return
+
+    def visitAttributeDecl(self, ast, c_scope):
+        c, lower_scope = c_scope
+        # attr_name, attr_type, attr_value, attr_kind = None
 
         if type(ast.decl) is VarDecl:
-            atr_name = ast.decl.variable.name
-            atr_type = ast.decl.varType
-            atr_value = ast.decl.varInit
+            attr_name = self.visit(ast.decl.variable, (c[lower_scope:], Attribute()))
+            attr_type = ast.decl.varType
+            attr_value = ast.decl.varInit
         else:
-            atr_name = ast.decl.constant.name
-            atr_type = ast.decl.constType
-            atr_value = ast.decl.value
+            attr_name = self.visit(ast.decl.constant, (c[lower_scope:], Attribute()))
+            attr_type = ast.decl.constType
+            attr_value = ast.decl.value
+        attr_kind = ast.kind
 
-        if atr_name in class_context.keys():
-            raise Redeclared(Attribute(), atr_name)
+        c.append(Symbol(attr_name, attr_type, attr_value, attr_kind))
+        return
+
+
+
+    def visitVarDecl(self, ast:VarDecl, c_scope_inst):
+        c, lower_scope, inst = c_scope_inst
+        # var_name, var_type, var_value, var_kind = None
+        if inst == 'PARAM':
+            var_name = self.visit(ast.variable, (c[lower_scope:], Parameter()))
         else:
-            class_context[atr_name] = [atr_type, atr_kind, atr_name, atr_value]
+            var_name = self.visit(ast.variable, (c[lower_scope:], Variable()))
+        var_type = ast.varType
+        var_value = ast.varInit
+        var_kind = Instance()
+        c.append(Symbol(var_name, var_type, var_value, var_kind))
 
-    def visitVarDecl(self, ast:VarDecl, c):
-        if c[1] == 'PARAMS':
-            for element in c[0]:
-                if ast.variable.name in element[2]:
-                    raise Redeclared(Parameter(), ast.variable.name)
+        return
 
-            # if ast.variable.name in [x[2] for x in c[0]]:
-            #     raise Redeclared(Parameter(), ast.variable.name)
 
-            return [ast.varType, Instance(), ast.variable.name, ast.varInit]
-        elif c[1] == 'INST':
-            for element in c[2]:
-                if ast.variable.name in element[2]:
-                    raise Redeclared(Variable(), ast.variable.name)
 
-            for element in c[3]:
-                if ast.variable.name in element['information'][2]:
-                    raise Redeclared(Variable(), ast.variable.name)
+    def visitConstDecl(self,ast:ConstDecl, c_scope_inst):
+        c, lower_scope, inst = c_scope_inst
+        # var_name, var_type, var_value, var_kind = None
+        var_name = self.visit(ast.constant, (c[lower_scope:], Constant()))
+        var_type = ast.constType
+        var_value = ast.value
+        var_kind = Instance()
+        c.append(Symbol(var_name, var_type, var_value, var_kind))
+        return
 
-            # if ast.variable.name in [x[2] for x in c[2]] + [x['information'][2] for x in c[3]]:
-            #     raise Redeclared(Variable(), ast.variable.name)
-            return {'instruction_ast': ast, 'information': [ast.varType, Instance(), ast.variable.name, ast.varInit]}
 
-    def visitConstDecl(self,ast:ConstDecl, c):
-        if c[1] == 'INST':
-            for element in c[2]:
-                if ast.constant.name in element[2]:
-                    raise Redeclared(Constant(), ast.constant.name)
-            for element in c[3]:
-                if ast.constant.name in element['information'][2]:
-                    raise Redeclared(Constant(), ast.constant.name)
-            # if ast.constant.name in [x[2] for x in c[2]] + [x['information'][2] for x in c[3]]:
-            #     raise Redeclared(Constant(), ast.constant.name)
-            return {'instruction_ast': ast, 'information': [ast.constType, Instance(), ast.constant.name, ast.value]}
+    def visitBlock(self, ast:Block, c_scope):
+        c, lower_scope = c_scope
+        for instructor in ast.inst:
+            if type(instructor) in [VarDecl, ConstDecl]:
+                self.visit(instructor, (c, lower_scope, 'INST'))
+            elif type(instructor) in [Block]:
+                self.visit(instructor, (c, len(c)))
+            elif type(instructor) in [Assign]:
+                self.visit(instructor, (c, lower_scope))
+        return
 
-    def visitBlock(self, ast:Block, c):
-        b_param = c[1]
-        b_body = []
-        for inst in ast.inst:
-            if isinstance(inst,(VarDecl, ConstDecl)):
-                b_body = b_body + [self.visit(inst, (c,'INST',b_param, b_body))]
-        return b_body
+    def visitAssign(self, ast: Assign, c_scope):
+        c, lower_scope = c_scope
+        if type(ast.lhs) == Id:
+            self.visit(ast.lhs, (c, 'CHECK_UNDECLARED', Identifier()))
+
+
+
 
 
 

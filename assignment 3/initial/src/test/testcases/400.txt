@@ -1,7 +1,12 @@
-Class a{
+
+                    Class X{
+                        Var a:Int;
+                        Var b:Int;
+                        Var c:Int;
+                    }
+                    Class Y{
                     Var a:Int;
                     Var a:Int;
                     }
-                    Class b{}
-                    Class c{}
+                    Class Z{}
                     Class d{}
