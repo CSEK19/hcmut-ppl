@@ -39,4 +39,15 @@ class ASTGenSuite(unittest.TestCase):
         """
         expect = ""
         self.assertTrue(TestAST.test(input, expect, 303))
+
+    def test_304(self):
+        input = """Class Program{
+        main(){}
+            Var myVar:String = "Hello World";
+            Var myVar:Int;
+        
+        }
+        """
+        expect = ""
+        self.assertTrue(TestAST.test(input, expect, 304))
    

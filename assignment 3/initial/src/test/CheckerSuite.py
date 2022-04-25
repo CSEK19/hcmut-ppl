@@ -3,22 +3,24 @@ from TestUtils import TestChecker
 from AST import *
 
 class CheckerSuite(unittest.TestCase):
+
     def test_400(self):
         """Simple program: int main() {} """
         input = """
-                    Class X{
+                    Class c{
                         Var a:Int;
                         Var b:Int;
                         Var c:Int;
                     }
-                    Class Y{
+                    Class a{
                     Var a:Int;
                     Var a:Int;
                     }
-                    Class Z{}
+                    Class b{}
                     Class d{}"""
         expect = "Redeclared Attribute: a"
         self.assertTrue(TestChecker.test(input,expect,400))
+
     def test_401(self):
         """Simple program: int main() {} """
         input = """Class a{}
@@ -28,7 +30,7 @@ class CheckerSuite(unittest.TestCase):
     def test_402(self):
         """Simple program: int main() {} """
         input = """Class a{
-                    a(a:int;a:tring){}
+                    a(a:Int;a:String){}
                     }"""
         expect = "Redeclared Parameter: a"
         self.assertTrue(TestChecker.test(input,expect,402))
@@ -46,8 +48,8 @@ class CheckerSuite(unittest.TestCase):
         """Simple program: int main() {} """
         input = """Class a{
                     b(){
-                        Var a:int;
-                        Var a:int;
+                        Var a:Int;
+                        Var a:Int;
                     }
                     }"""
         expect = "Redeclared Variable: a"
@@ -57,8 +59,8 @@ class CheckerSuite(unittest.TestCase):
         """Simple program: int main() {} """
         input = """Class a{
                     b(){
-                        Val a:int = 1;
-                        Val a:int = 1;
+                        Val a:Int = 1;
+                        Val a:Int = 1;
                     }
                     }"""
         expect = "Redeclared Constant: a"
@@ -67,8 +69,8 @@ class CheckerSuite(unittest.TestCase):
     def test_406(self):
         """Simple program: int main() {} """
         input = """Class a{
-                    b(a:int){
-                        Val a:int = 1;
+                    b(a:Int){
+                        Val a:Int = 1;
                     }
                     }"""
         expect = "Redeclared Constant: a"
@@ -77,8 +79,8 @@ class CheckerSuite(unittest.TestCase):
     def test_407(self):
         """Simple program: int main() {} """
         input = """Class a{
-                    b(a:int){
-                        Var a:int = 1;
+                    b(a:Int){
+                        Var a:Int = 1;
                     }
                     }"""
         expect = "Redeclared Variable: a"
@@ -88,11 +90,11 @@ class CheckerSuite(unittest.TestCase):
         """Simple program: int main() {} """
         input = """Class a{
                     b(){
-                        Var a:int = 1;
+                        Var a:Int = 1;
                         {
-                            Var a:int = 1;
-                            Var b:int = 1;
-                            Var b:int = 1;
+                            Var a:Int = 1;
+                            Var b:Int = 1;
+                            Var b:Int = 1;
                         }
                     }
                     }"""
@@ -101,19 +103,18 @@ class CheckerSuite(unittest.TestCase):
 
     def test_409(self):
         """Simple program: int main() {} """
-        input = """Class abc{
+        input = """Class a{
                     b(){
-                        Var a:int = 1;
+                        Var a:Int = 1;
                         {
-                            Var a:int = 1;
-                            Var b:int = 1;
-                            Val b:int = 1;
+                            Var a:Int = 1;
+                            Var b:Int = 1;
+                            Val b:Int = 1;
                         }
                     }
                     }"""
         expect = "Redeclared Constant: b"
         self.assertTrue(TestChecker.test(input,expect,409))
-
     def test_410(self):
         """Simple program: int main() {} """
         input = """Class a{
@@ -125,3 +126,79 @@ class CheckerSuite(unittest.TestCase):
                     }"""
         expect = "Undeclared Identifier: a"
         self.assertTrue(TestChecker.test(input,expect,410))
+
+    def test_411(self):
+        """Simple program: int main() {} """
+        input = """
+                    Class B{}
+                    Class A{
+                    b(){
+                        Var b:Int = 1;
+                        Var c:A;
+                        Var a:C;
+                    }
+                    }"""
+        expect = "Undeclared Class: C"
+        self.assertTrue(TestChecker.test(input,expect,411))
+
+    def test_412(self):
+        """Simple program: int main() {} """
+        input = """
+                    Class B{
+                        Var b:Int = 1;
+                    }
+                    Class A{
+                    b(){
+                        Var b:Int = 1;
+                        Var c:B;
+                    }
+                    }
+                    Class D{
+                    b(){
+                        Var b:Int = 1;
+                        Var c:B;
+                        c.b = 1;
+                        c.c = 1;
+                    }
+                    }"""
+        expect = "Undeclared Attribute: c"
+        self.assertTrue(TestChecker.test(input,expect,412))
+
+    def test_413(self):
+        """Simple program: int main() {} """
+        input = """
+                    Class B{
+                        Var b:Int = 1;
+                        c(){}
+                    }
+                    Class A{
+                    b(){
+                        Var b:Int = 1;
+                        Var c:B;
+                        c.b = 1;
+                        c.c = 1;
+                    }
+                    }"""
+        expect = "Undeclared Attribute: c"
+        self.assertTrue(TestChecker.test(input, expect, 413))
+
+    def test_414(self):
+        """Simple program: int main() {} """
+        input = """
+                    Class B{
+                        Var b:Int = 1;
+                        c(){}
+                    }
+                    Class A{
+                    b(){
+                        Var b:Int = 1;
+                        Var c:B;
+                        c.b = 1;
+                        c.c();
+                        c.d();
+                    }
+                    }"""
+        expect = "Undeclared Method: d"
+        self.assertTrue(TestChecker.test(input, expect, 414))
+
+
