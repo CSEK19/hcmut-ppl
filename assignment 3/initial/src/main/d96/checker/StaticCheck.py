@@ -30,6 +30,8 @@ class Symbol:
         self.is_constant = is_constant
         self.is_stmt = is_stmt
 
+c_program = []
+
 class StaticChecker(BaseVisitor,Utils):
 
     global_envi = [
@@ -46,13 +48,17 @@ class StaticChecker(BaseVisitor,Utils):
 
 
     def check(self):
+        global c_program
+        c_program = []
         #return self.visit(self.ast,StaticChecker.global_envi)
-        return self.visit(self.ast, [])
+        return self.visit(self.ast, c_program)
 
 
     def visitProgram(self, ast:Program, c):
+        global c_program
         for class_decl in ast.decl:
             self.visit(class_decl, c)
+        c_program = c.copy()
         return
 
     def visitClassDecl(self, ast:ClassDecl, c):
@@ -549,16 +555,17 @@ class StaticChecker(BaseVisitor,Utils):
             if isinstance(element.mtype, (CType, MType)):
                 raise MustInLoop(ast)
 
-    # TODO!
     def visitIf(self, ast:If, c):
-        if isinstance(c, tuple):
-            c, scope = c
         new_if = Symbol('STMT_IF', mtype=None, is_stmt='IF')
         c.append(new_if)
         upper_scope = len(c)
         self.visit(ast.expr, c)
         self.visit(ast.thenStmt, (c, upper_scope))
-        self.visit(ast.elseStmt, (c, upper_scope)) if ast.elseStmt is not None else None
+        if ast.elseStmt is not None and not isinstance(ast.elseStmt, If):
+            upper_scope = len(c)
+            self.visit(ast.elseStmt, (c,upper_scope))
+        elif ast.elseStmt is not None and isinstance(ast.elseStmt, If):
+            self.visit(ast.elseStmt, c)
         new_if.scope = (upper_scope, len(c))
 
     def visitContinue(self, ast: Continue, c):
