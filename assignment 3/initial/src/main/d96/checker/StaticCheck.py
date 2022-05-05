@@ -829,7 +829,7 @@ def checkNoEntryPoint(c_global):
     if not isinstance(main_method.mtype.rettype, VoidType):
         return False
 
-    if not isinstance(main_method.kind, Instance):
+    if isinstance(main_method.kind, Instance):
         return False
 
     return True

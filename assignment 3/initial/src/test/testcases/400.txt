@@ -1,0 +1,5 @@
+
+        Class A{foo(){}}
+        ClassB:A{foo(x: Int){}}
+        Class Program{$main(){}}
+        
