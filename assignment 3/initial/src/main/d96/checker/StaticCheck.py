@@ -51,8 +51,10 @@ class StaticChecker(BaseVisitor,Utils):
         global c_program
         c_program = []
         #return self.visit(self.ast,StaticChecker.global_envi)
-        return self.visit(self.ast, c_program)
-
+        self.visit(self.ast, c_program)
+        flag = checkNoEntryPoint(c_program)
+        if not flag:
+            raise NoEntryPoint()
 
     def visitProgram(self, ast:Program, c):
         global c_program
@@ -84,8 +86,6 @@ class StaticChecker(BaseVisitor,Utils):
 
         return
 
-
-
     def visitId(self, ast:Id, c):
         if not isinstance(c, tuple):
             obj = []
@@ -94,7 +94,7 @@ class StaticChecker(BaseVisitor,Utils):
                     obj = element
                     break
                 elif isinstance(element.mtype, (CType, MType)) or element.is_stmt == 'BLOCK':
-                    raise Undeclared(Variable(), ast.name)
+                    raise Undeclared(Identifier(), ast.name)
 
             if obj:
                 return obj.mtype
@@ -133,6 +133,10 @@ class StaticChecker(BaseVisitor,Utils):
                     obj = element
                     break
 
+            if not obj:
+                raise Undeclared(c[2], ast.name)
+
+
             obj_class = []
             for class_name in c[0]:
                 if type(class_name.mtype) is CType and class_name.name == obj.mtype.classname.name:
@@ -149,6 +153,9 @@ class StaticChecker(BaseVisitor,Utils):
                 if element.name == c[3] and type(element.mtype) != MType:
                     obj = element
                     break
+
+            if not obj:
+                raise Undeclared(c[2], ast.name)
 
             obj_class = []
             for class_name in c[0]:
@@ -170,10 +177,25 @@ class StaticChecker(BaseVisitor,Utils):
             if obj.is_constant:
                 raise CannotAssignToConstant(c[2])
 
+        elif inst == 'CHECK_ILLEGAL_MEMBER_ACCESS':
+            for element in reversed(c[0]):
+                if element.name == ast.name:
+                    return 'VAR'
+                elif isinstance(element.mtype, CType) or element.is_stmt == 'BLOCK':
+                    for class_name in c[0]:
+                        if ast.name == class_name.name and isinstance(class_name.mtype, CType):
+                            return 'CLASS'
+            raise Undeclared(Identifier(), ast.name)
+
+
+
+
+
         else:
             for element in c[0]:
                 if element.name == ast.name:
                     raise Redeclared(c[1], ast.name)
+
 
         return ast.name
 
@@ -382,22 +404,34 @@ class StaticChecker(BaseVisitor,Utils):
     def visitCallStmt(self, ast:CallStmt, c_scope):
         c, lower_scope = c_scope
         if type(ast.obj) == Id:
-            self.visit(ast.method, (c, 'CHECK_UNDECLARED_METHOD', Method(), ast.obj.name))
-
+            obj_type = self.visit(ast.obj, (c, 'CHECK_ILLEGAL_MEMBER_ACCESS', ast))
             obj = []
-            for element in c:
-                if element.name == ast.obj.name and type(element.mtype) != MType:
-                    obj = element
-                    break
-
-            if type(obj.mtype) != ClassType:
-                raise TypeMismatchInStatement(ast)
-
             obj_class = []
-            for element in c:
-                if element.name == obj.mtype.classname.name and type(element.mtype) == CType:
-                    obj_class = element
-                    break
+
+            if obj_type == 'VAR':
+                if ast.method.name[0] == '$':
+                    raise IllegalMemberAccess(ast)
+                self.visit(ast.method, (c, 'CHECK_UNDECLARED_METHOD', Method(), ast.obj.name))
+
+                for element in c:
+                    if element.name == ast.obj.name and type(element.mtype) != MType:
+                        obj = element
+
+                if type(obj.mtype) != ClassType:
+                    raise TypeMismatchInStatement(ast)
+
+                for element in c:
+                    if element.name == obj.mtype.classname.name and type(element.mtype) == CType:
+                        obj_class = element
+                        break
+
+            elif obj_type == 'CLASS':
+                if ast.method.name[0] != '$':
+                    raise IllegalMemberAccess(ast)
+                for element in c:
+                    if element.name == ast.obj.name and type(element.mtype) == CType:
+                        obj_class = element
+                        break
 
             lst_obj_class_method = getAllMemberClass(c, obj_class.name, is_attribute=False)
             obj_method = []
@@ -431,20 +465,33 @@ class StaticChecker(BaseVisitor,Utils):
 
     def visitCallExpr(self, ast:CallExpr, c):
         if type(ast.obj) == Id:
+            obj_type = self.visit(ast.obj, (c, 'CHECK_ILLEGAL_MEMBER_ACCESS', ast))
             obj = []
-            for element in c:
-                if element.name == ast.obj.name:
-                    obj = element
-                    break
-
-            if type(obj.mtype) != ClassType:
-                raise TypeMismatchInExpression(ast)
-
             obj_class = []
-            for element in c:
-                if type(element.mtype) == CType and element.name == obj.mtype.classname.name:
-                    obj_class = element
-                    break
+
+            if obj_type == 'VAR':
+                if ast.method.name[0] == '$':
+                    raise IllegalMemberAccess(ast)
+
+                for element in c:
+                    if element.name == ast.obj.name:
+                        obj = element
+
+                if type(obj.mtype) != ClassType:
+                    raise TypeMismatchInExpression(ast)
+
+                for element in c:
+                    if type(element.mtype) == CType and element.name == obj.mtype.classname.name:
+                        obj_class = element
+                        break
+
+            elif obj_type == 'CLASS':
+                if ast.method.name[0] != '$':
+                    raise IllegalMemberAccess(ast)
+                for element in c:
+                    if element.name == ast.obj.name and type(element.mtype) == CType:
+                        obj_class = element
+                        break
 
             upper_scope, lower_scope = obj_class.scope
             obj_method = []
@@ -485,20 +532,34 @@ class StaticChecker(BaseVisitor,Utils):
 
     def visitFieldAccess(self, ast:FieldAccess, c):
         if type(ast.obj) == Id:
+            obj_type = self.visit(ast.obj, (c, 'CHECK_ILLEGAL_MEMBER_ACCESS', ast))
             obj = []
-            for element in c:
-                if ast.obj.name == element.name and type(element.mtype) != MType:
-                    obj = element
-                    break
-
-            if type(obj.mtype) != ClassType:
-                raise TypeMismatchInExpression(ast)
-
             obj_class = []
-            for element in c:
-                if element.name == obj.mtype.classname.name and type(element.mtype) == CType:
-                    obj_class = element
-                    break
+
+            if obj_type == 'VAR':
+                if ast.fieldname.name[0] == '$':
+                    raise IllegalMemberAccess(ast)
+
+                for element in c:
+                    if ast.obj.name == element.name and type(element.mtype) != MType:
+                        obj = element
+
+                if type(obj.mtype) != ClassType:
+                    raise TypeMismatchInExpression(ast)
+
+                for element in c:
+                    if element.name == obj.mtype.classname.name and type(element.mtype) == CType:
+                        obj_class = element
+                        break
+
+            elif obj_type == 'CLASS':
+                if ast.fieldname.name[0] != '$':
+                    raise IllegalMemberAccess(ast)
+
+                for element in c:
+                    if element.name == ast.obj.name and type(element.mtype) == CType:
+                        obj_class = element
+                        break
 
             lst_class_member = getAllMemberClass(c, obj_class.name, is_attribute=True)
             lst_same_name_obj = []
@@ -541,7 +602,9 @@ class StaticChecker(BaseVisitor,Utils):
         upper_scope = len(c)
         if not (checkType(expr1, IntType(), c) and checkType(expr2, IntType(), c)):
             raise TypeMismatchInStatement(ast)
-        expr3 = self.visit(ast.expr3, c) if ast.expr3 is not None else None
+        expr3 = None
+        if ast.expr3 is not None:
+            expr3 = self.visit(ast.expr3, c)
         self.visit(ast.loop, (c, upper_scope))
         new_for.scope = (upper_scope, len(c))
 
@@ -554,6 +617,8 @@ class StaticChecker(BaseVisitor,Utils):
                     break
             if isinstance(element.mtype, (CType, MType)):
                 raise MustInLoop(ast)
+
+        return
 
     def visitIf(self, ast:If, c):
         new_if = Symbol('STMT_IF', mtype=None, is_stmt='IF')
@@ -568,6 +633,8 @@ class StaticChecker(BaseVisitor,Utils):
             self.visit(ast.elseStmt, c)
         new_if.scope = (upper_scope, len(c))
 
+        return
+
     def visitContinue(self, ast: Continue, c):
         for element in reversed(c):
             if element.is_stmt == 'FOR':
@@ -575,6 +642,8 @@ class StaticChecker(BaseVisitor,Utils):
                     break
             if isinstance(element.mtype, (CType, MType)):
                 raise MustInLoop(ast)
+
+        return
 
     # def visitFuncDecl(self, ast, c):
     #     return list(map(lambda x: self.visit(x,(c,True)),ast.body.stmt))
@@ -616,6 +685,16 @@ class StaticChecker(BaseVisitor,Utils):
 
     def visitNewExpr(self, ast:NewExpr, c):
         return ClassType(Id(ast.classname.name))
+
+    def visitArrayLiteral(self, ast:ArrayLiteral, c):
+        if len(ast.value) == 0:
+            return ArrayType()
+        first_element_type = self.visit(ast.value[0], c)
+        for element in ast.value[1:]:
+            if type(self.visit(element, c)) is not type(first_element_type):
+                raise IllegalArrayLiteral(ast)
+
+        return ArrayType(first_element_type, len(ast.value))
 
 
 # ------------------------------- SUPPORT FUNCTION ------------------------------- #
@@ -716,7 +795,44 @@ def checkIllegalConstantExpression(ast:Expr, c):
         return False
     return False
 
+def checkNoEntryPoint(c_global):
+    class_program = []
+    for element in c_global:
+        if element.name == 'Program' and isinstance(element.mtype, CType):
+            class_program = element
+            break
 
+    if not class_program:
+        return False
+
+    upper_scope, lower_scope = class_program.scope
+    class_program_method = []
+    for element in c_global[upper_scope:lower_scope]:
+        if isinstance(element.mtype, MType) and element.class_member is True:
+            class_program_method.append(element)
+
+    if not class_program_method:
+        return False
+
+    main_method = []
+    for element in class_program_method:
+        if element.name == '$main':
+            main_method = element
+            break
+
+    if not main_method:
+        return False
+
+    if len(main_method.mtype.partype) != 0:
+        return False
+
+    if not isinstance(main_method.mtype.rettype, VoidType):
+        return False
+
+    if not isinstance(main_method.kind, Instance):
+        return False
+
+    return True
 
 
 
