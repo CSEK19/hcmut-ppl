@@ -9,7 +9,6 @@ from StaticError import *
 
 
 class CType:
-    # Type ID of class
     pass
 
 class MType:
@@ -187,10 +186,6 @@ class StaticChecker(BaseVisitor,Utils):
                             return 'CLASS'
             raise Undeclared(Identifier(), ast.name)
 
-
-
-
-
         else:
             for element in c[0]:
                 if element.name == ast.name:
@@ -215,7 +210,6 @@ class StaticChecker(BaseVisitor,Utils):
         for element in c:
             if type(element.mtype) == MType and element.name == ast.name.name:
                 new_method = element
-                break
 
         new_method.scope = (lower_scope, len(c))
         for element in ast.param:
@@ -237,6 +231,18 @@ class StaticChecker(BaseVisitor,Utils):
             attr_type = ast.decl.constType
             attr_value = ast.decl.value
         attr_kind = ast.kind
+
+        if type(attr_type) is ClassType:
+            inst = "CHECK_UNDECLARED_CLASS"
+            self.visit(attr_type.classname, (c, inst, Class(), attr_type.classname.name))
+
+        if not ((attr_value is None) or (isinstance(attr_value, NullLiteral))):
+            rhs_type = self.visit(attr_value, c)
+            flag = checkType(attr_type, rhs_type, c)
+            if not flag:
+                raise TypeMismatchInStatement(ast)
+
+
 
         c.append(Symbol(attr_name, attr_type, attr_value, attr_kind, class_member=True))
         return
@@ -345,6 +351,7 @@ class StaticChecker(BaseVisitor,Utils):
         if not flag:
             raise TypeMismatchInStatement(ast)
 
+        return
 
     def visitUnaryOp(self, ast:UnaryOp, c):
         op = ast.op
@@ -403,23 +410,22 @@ class StaticChecker(BaseVisitor,Utils):
 
     def visitCallStmt(self, ast:CallStmt, c_scope):
         c, lower_scope = c_scope
+        obj = []
+        obj_method = []
+        obj_class = []
+
         if type(ast.obj) == Id:
             obj_type = self.visit(ast.obj, (c, 'CHECK_ILLEGAL_MEMBER_ACCESS', ast))
-            obj = []
-            obj_class = []
 
             if obj_type == 'VAR':
                 if ast.method.name[0] == '$':
                     raise IllegalMemberAccess(ast)
                 self.visit(ast.method, (c, 'CHECK_UNDECLARED_METHOD', Method(), ast.obj.name))
-
                 for element in c:
                     if element.name == ast.obj.name and type(element.mtype) != MType:
                         obj = element
-
                 if type(obj.mtype) != ClassType:
                     raise TypeMismatchInStatement(ast)
-
                 for element in c:
                     if element.name == obj.mtype.classname.name and type(element.mtype) == CType:
                         obj_class = element
@@ -434,57 +440,61 @@ class StaticChecker(BaseVisitor,Utils):
                         break
 
             lst_obj_class_method = getAllMemberClass(c, obj_class.name, is_attribute=False)
-            obj_method = []
             for element in lst_obj_class_method:
                 if element.name == ast.method.name:
                     obj_method = element
 
-            if type(obj_method.mtype.rettype) is not VoidType:
-                raise TypeMismatchInStatement(ast)
+        elif type(ast.obj) in (CallExpr, FieldAccess):
+            obj_type = self.visit(ast.obj, c)
+            for element in c:
+                if element.name == obj_type.classname.name and isinstance(element.mtype, CType):
+                    obj_class = element
+                    break
+            upper_scope, lower_scope = obj_class.scope
+            for element in c[upper_scope:lower_scope]:
+                if element.name == ast.method.name and isinstance(element.mtype, MType):
+                    obj_method = element
+                    break
 
-            lst_param_type_call = []
-            for element in ast.param:
-                lst_param_type_call.append(type(self.visit(element, c)))
+        if not obj_method:
+            raise Undeclared(Method(), ast.method.name)
 
-            lst_obj_method_param_type = []
-            for element in obj_method.mtype.partype:
-                lst_obj_method_param_type.append(type(element))
+        if type(obj_method.mtype.rettype) is not VoidType:
+            raise TypeMismatchInStatement(ast)
 
-            if len(lst_param_type_call) != len(lst_obj_method_param_type):
-                raise TypeMismatchInStatement(ast)
+        lst_expr_param = []
+        for element in ast.param:
+            lst_expr_param.append(type(self.visit(element, c)))
 
-            for (param_type_call, param_type_method) in zip(lst_param_type_call, lst_obj_method_param_type):
-                if param_type_method is FloatType:
-                    if param_type_call not in [IntType, FloatType]:
-                        raise TypeMismatchInStatement(ast)
-                else:
-                    if param_type_call != param_type_method:
-                        raise TypeMismatchInStatement(ast)
+        lst_obj_param = []
+        for element in obj_method.mtype.partype:
+            lst_obj_param.append(type(element))
 
-            return obj_method.mtype.rettype
+        flag = checkParamEqual(lst_expr_param, lst_obj_param)
+        if not flag:
+            raise TypeMismatchInStatement(ast)
+        return obj_method.mtype.rettype
 
     def visitCallExpr(self, ast:CallExpr, c):
+        obj = []
+        obj_method = []
+        obj_class = []
+
         if type(ast.obj) == Id:
             obj_type = self.visit(ast.obj, (c, 'CHECK_ILLEGAL_MEMBER_ACCESS', ast))
-            obj = []
-            obj_class = []
 
             if obj_type == 'VAR':
                 if ast.method.name[0] == '$':
                     raise IllegalMemberAccess(ast)
-
                 for element in c:
                     if element.name == ast.obj.name:
                         obj = element
-
                 if type(obj.mtype) != ClassType:
                     raise TypeMismatchInExpression(ast)
-
                 for element in c:
                     if type(element.mtype) == CType and element.name == obj.mtype.classname.name:
                         obj_class = element
                         break
-
             elif obj_type == 'CLASS':
                 if ast.method.name[0] != '$':
                     raise IllegalMemberAccess(ast)
@@ -493,53 +503,69 @@ class StaticChecker(BaseVisitor,Utils):
                         obj_class = element
                         break
 
-            upper_scope, lower_scope = obj_class.scope
-            obj_method = []
-            for element in c[upper_scope:lower_scope]:
-                if element.name == ast.method.name and type(element.mtype) == MType:
-                    obj_method = element
+        elif type(ast.obj) == SelfLiteral:
+            for element in c:
+                if type(element.mtype) == CType:
+                    obj_class.append(element)
+            obj_class = obj_class[-1]
+
+        elif type(ast.obj) in (FieldAccess, CallExpr):
+            obj_class_type = self.visit(ast.obj, c)
+            for element in c:
+                if element.name == obj_class_type.classname.name and isinstance(element.mtype, CType):
+                    obj_class = element
                     break
 
-            if type(obj_method.mtype.rettype) is VoidType:
-                raise TypeMismatchInExpression(ast)
+        if not obj_class:
+            raise Undeclared(ClassType(), )
 
-            lst_param_type_call = []
-            for element in ast.param:
-                lst_param_type_call.append(type(self.visit(element, c)))
+        if obj_class.scope:
+            upper_scope, lower_scope = obj_class.scope
+            for element in c[upper_scope:lower_scope]:
+                if element.class_member and element.name == ast.method.name and type(element.mtype) == MType:
+                    obj_method = element
+                    break
+        else:
+            upper_scope = c.index(obj_class) + 1
+            for element in c[upper_scope:]:
+                if element.class_member and element.name == ast.method.name and type(element.mtype) == MType:
+                    obj_method = element
 
-            lst_obj_method_param_type = []
-            for element in obj_method.mtype.partype:
-                lst_obj_method_param_type.append(type(element))
+        if not obj_method:
+            raise Undeclared(Method(), ast.method.name)
 
-            if len(lst_param_type_call) != len(lst_obj_method_param_type):
-                raise TypeMismatchInExpression(ast)
+        if type(obj_method.mtype.rettype) is VoidType:
+            raise TypeMismatchInExpression(ast)
 
-            for (param_type_call, param_type_method) in zip(lst_param_type_call, lst_obj_method_param_type):
-                if param_type_method is FloatType:
-                    if param_type_call not in [IntType, FloatType]:
-                        raise TypeMismatchInExpression(ast)
-                else:
-                    if param_type_call != param_type_method:
-                        raise TypeMismatchInExpression(ast)
+        lst_expr_param = []
+        for element in ast.param:
+            lst_expr_param.append(type(self.visit(element, c)))
 
-            return obj_method.mtype.rettype
+        lst_obj_param = []
+        for element in obj_method.mtype.partype:
+            lst_obj_param.append(type(element))
+
+        flag = checkParamEqual(lst_expr_param, lst_obj_param)
+        if not flag:
+            raise TypeMismatchInExpression(ast)
+
+        return obj_method.mtype.rettype
+
 
     def visitReturn(self, ast:Return, c):
         new_return_type = self.visit(ast.expr, c)
         self.return_type_stack.append(new_return_type)
-
         return
 
     def visitFieldAccess(self, ast:FieldAccess, c):
+        obj = []
+        obj_class = []
         if type(ast.obj) == Id:
             obj_type = self.visit(ast.obj, (c, 'CHECK_ILLEGAL_MEMBER_ACCESS', ast))
-            obj = []
-            obj_class = []
 
             if obj_type == 'VAR':
                 if ast.fieldname.name[0] == '$':
                     raise IllegalMemberAccess(ast)
-
                 for element in c:
                     if ast.obj.name == element.name and type(element.mtype) != MType:
                         obj = element
@@ -572,7 +598,6 @@ class StaticChecker(BaseVisitor,Utils):
             return lst_same_name_obj[-1].mtype
 
         elif type(ast.obj) == SelfLiteral:
-            obj_class = []
             for element in c:
                 if type(element.mtype) == CType:
                     obj_class.append(element)
@@ -593,6 +618,44 @@ class StaticChecker(BaseVisitor,Utils):
                 return obj.mtype
             else:
                 raise Undeclared(Attribute(), ast.fieldname.name)
+
+        elif type(ast.obj) in (CallExpr, FieldAccess):
+            obj_type = self.visit(ast.obj, c)
+
+            if isinstance(obj_type, ClassType):
+                for element in c:
+                    if element.name == obj_type.classname.name and type(element.mtype) == CType:
+                        obj_class = element
+
+            lst_class_member = getAllMemberClass(c, obj_class.name, is_attribute=True)
+            lst_same_name_obj = []
+            for element in lst_class_member:
+                if ast.fieldname.name == element.name:
+                    lst_same_name_obj.append(element)
+            if len(lst_same_name_obj) == 0:
+                raise Undeclared(Attribute(), ast.fieldname.name)
+
+            return lst_same_name_obj[-1].mtype
+
+        # elif type(ast.obj) == CallExpr:
+        #     obj_type = self.visit(ast.obj, c)
+        #
+        #     for element in c:
+        #         if element.name == obj_type.classname.name and isinstance(element.mtype, CType):
+        #             obj_class = element
+        #             break
+        #
+        #     upper_scope, lower_scope = obj_class.scope
+        #     for element in c[upper_scope:lower_scope]:
+        #         if element.name == ast.fieldname.name:
+        #             obj = element
+        #
+        #     if not obj:
+        #         raise Undeclared(Attribute(), ast.fieldname.name)
+        #
+        #     return obj.mtype
+
+
 
     def visitFor(self, ast:For, c):
         new_for = Symbol('STMT_FOR', mtype=None, is_stmt='FOR')
@@ -645,29 +708,6 @@ class StaticChecker(BaseVisitor,Utils):
 
         return
 
-    # def visitFuncDecl(self, ast, c):
-    #     return list(map(lambda x: self.visit(x,(c,True)),ast.body.stmt))
-    #
-    #
-    #
-    # def visitCallExpr(self, ast, c):
-    #     at = [self.visit(x,(c[0],False)) for x in ast.param]
-    #
-    #     res = self.lookup(ast.method.name,c[0],lambda x: x.name)
-    #     if res is None or not type(res.mtype) is MType:
-    #         raise Undeclared(Function(),ast.method.name)
-    #     elif len(res.mtype.partype) != len(at):
-    #         if c[1]:
-    #             raise TypeMismatchInStatement(ast)
-    #         else:
-    #             raise TypeMismatchInExpression(ast)
-    #     else:
-    #         return res.mtype.rettype
-    #
-    # def visitIntLiteral(self,ast, c):
-    #     return IntType()
-
-
     def visitIntLiteral(self, ast:IntLiteral, c):
         return IntType()
 
@@ -684,6 +724,40 @@ class StaticChecker(BaseVisitor,Utils):
         return NullLiteral()
 
     def visitNewExpr(self, ast:NewExpr, c):
+        obj_class = []
+        obj_constructor = []
+        for element in c:
+            if element.name == ast.classname.name and isinstance(element.mtype, CType):
+                obj_class = element
+                break
+
+        if not obj_class:
+            raise Undeclared(ClassType(), ast.classname.name)
+
+        upper_scope, lower_scope = obj_class.scope
+        for element in c[upper_scope:lower_scope]:
+            if element.name == 'Constructor' and isinstance(element.mtype, MType):
+                obj_constructor = element
+                break
+
+        if not obj_constructor:
+            return ClassType(Id(ast.classname.name))
+
+        if type(obj_constructor.mtype.rettype) is not VoidType:
+            raise TypeMismatchInExpression(ast)
+
+        lst_expr_param = []
+        for element in ast.param:
+            lst_expr_param.append(type(self.visit(element, c)))
+
+        lst_obj_param = []
+        for element in obj_constructor.mtype.partype:
+            lst_obj_param.append(type(element))
+
+        flag = checkParamEqual(lst_expr_param, lst_obj_param)
+        if not flag:
+            raise TypeMismatchInExpression(ast)
+
         return ClassType(Id(ast.classname.name))
 
     def visitArrayLiteral(self, ast:ArrayLiteral, c):
@@ -770,15 +844,13 @@ def checkType(lhs_type, rhs_type, c):
     else:
         return False
 
-
-
 def checkIllegalConstantExpression(ast:Expr, c):
     if type(ast) in [BinaryOp, UnaryOp]:
         if type(ast) is BinaryOp:
             return checkIllegalConstantExpression(ast.left, c) and checkIllegalConstantExpression(ast.right, c)
         else:
             return checkIllegalConstantExpression(ast.body, c)
-    elif type(ast) in [CallExpr, FieldAccess]:
+    elif type(ast) in [CallExpr]:
         return checkIllegalConstantExpression(ast.obj, c)
     elif type(ast) in [Id]:
         obj = []
@@ -793,7 +865,45 @@ def checkIllegalConstantExpression(ast:Expr, c):
         return True
     elif type(ast) is None:
         return False
+    elif type(ast) is FieldAccess:
+        obj = []
+        obj_class = []
+        obj_class_name = []
+        for element in c:
+            if element.name == ast.obj.fieldname.name and isinstance(element.mtype, ClassType):
+                obj_class_name = element.mtype.classname.name
+                break
+
+        for element in c:
+            if element.name == obj_class_name and isinstance(element.mtype, CType):
+                obj_class = element
+                break
+
+        upper_scope, lower_scope = obj_class.scope
+        for element in c[upper_scope:lower_scope]:
+            if element.name == ast.fieldname.name:
+                obj = element
+                break
+        if not obj.is_constant:
+            return False
+        else:
+            return True
+
     return False
+
+def checkParamEqual(lst_expr_param, lst_obj_param):
+    if len(lst_expr_param) != len(lst_obj_param):
+        return False
+
+    for (expr_param, method_param) in zip(lst_expr_param, lst_obj_param):
+        if method_param is FloatType:
+            if expr_param not in [IntType, FloatType]:
+                return False
+        else:
+            if method_param != expr_param:
+                return False
+
+    return True
 
 def checkNoEntryPoint(c_global):
     class_program = []
@@ -833,6 +943,8 @@ def checkNoEntryPoint(c_global):
         return False
 
     return True
+
+
 
 
 
