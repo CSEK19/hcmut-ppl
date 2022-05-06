@@ -94,7 +94,6 @@ class StaticChecker(BaseVisitor,Utils):
                     break
                 elif isinstance(element.mtype, (CType, MType)) or element.is_stmt == 'BLOCK':
                     raise Undeclared(Identifier(), ast.name)
-
             if obj:
                 return obj.mtype
             else:
@@ -185,6 +184,20 @@ class StaticChecker(BaseVisitor,Utils):
                         if ast.name == class_name.name and isinstance(class_name.mtype, CType):
                             return 'CLASS'
             raise Undeclared(Identifier(), ast.name)
+
+        elif inst == 'CHECK_RETURN_IDENTIFIER':
+            obj = []
+            for element in reversed(c[0]):
+                if element.name == ast.name:
+                    obj = element
+                    break
+                elif isinstance(element.mtype, (CType, MType)):
+                    raise Undeclared(Identifier(), ast.name)
+            if obj:
+                return obj.mtype
+            else:
+                raise Undeclared(Variable(), ast.name)
+
 
         else:
             for element in c[0]:
@@ -553,7 +566,10 @@ class StaticChecker(BaseVisitor,Utils):
 
 
     def visitReturn(self, ast:Return, c):
-        new_return_type = self.visit(ast.expr, c)
+        if type(ast.expr) == Id:
+            new_return_type = self.visit(ast.expr, (c, 'CHECK_RETURN_IDENTIFIER'))
+        else:
+            new_return_type = self.visit(ast.expr, c)
         self.return_type_stack.append(new_return_type)
         return
 
@@ -619,7 +635,7 @@ class StaticChecker(BaseVisitor,Utils):
             else:
                 raise Undeclared(Attribute(), ast.fieldname.name)
 
-        elif type(ast.obj) in (CallExpr, FieldAccess):
+        elif type(ast.obj) in (CallExpr, FieldAccess, NewExpr):
             obj_type = self.visit(ast.obj, c)
 
             if isinstance(obj_type, ClassType):
@@ -943,8 +959,6 @@ def checkNoEntryPoint(c_global):
         return False
 
     return True
-
-
 
 
 
