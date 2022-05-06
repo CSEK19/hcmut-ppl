@@ -211,7 +211,7 @@ class StaticChecker(BaseVisitor,Utils):
         c, lower_scope = c_scope
         m_name = self.visit(ast.name, (c[lower_scope:], Method()))
         m_type = MType([], None)
-        c.append(Symbol(m_name, m_type, class_member=True))
+        c.append(Symbol(m_name, m_type, kind=ast.kind, class_member=True))
 
         lower_scope = len(c)
         for param in ast.param:
