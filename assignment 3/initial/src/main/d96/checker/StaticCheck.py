@@ -11,10 +11,12 @@ from StaticError import *
 class CType:
     pass
 
+
 class MType:
     def __init__(self, partype, rettype):
         self.partype = partype
         self.rettype = rettype
+
 
 class Symbol:
     def __init__(self, name, mtype, value=None, kind=None, scope=None, class_member=None,
@@ -29,27 +31,22 @@ class Symbol:
         self.is_constant = is_constant
         self.is_stmt = is_stmt
 
+
 c_program = []
+
 
 class StaticChecker(BaseVisitor,Utils):
 
-    global_envi = [
-    Symbol("getInt",MType([],IntType())),
-    Symbol("putIntLn",MType([IntType()],VoidType()))
-    ]
+    global_envi = [Symbol("getInt",MType([],IntType())),Symbol("putIntLn",MType([IntType()],VoidType()))]
 
     return_type_stack = []
-
 
     def __init__(self,ast):
         self.ast = ast
 
-
-
     def check(self):
         global c_program
         c_program = []
-        #return self.visit(self.ast,StaticChecker.global_envi)
         self.visit(self.ast, c_program)
         flag = checkNoEntryPoint(c_program)
         if not flag:
@@ -134,7 +131,6 @@ class StaticChecker(BaseVisitor,Utils):
             if not obj:
                 raise Undeclared(c[2], ast.name)
 
-
             obj_class = []
             for class_name in c[0]:
                 if type(class_name.mtype) is CType and class_name.name == obj.mtype.classname.name:
@@ -198,12 +194,10 @@ class StaticChecker(BaseVisitor,Utils):
             else:
                 raise Undeclared(Variable(), ast.name)
 
-
         else:
             for element in c[0]:
                 if element.name == ast.name:
                     raise Redeclared(c[1], ast.name)
-
 
         return ast.name
 
@@ -255,8 +249,6 @@ class StaticChecker(BaseVisitor,Utils):
             if not flag:
                 raise TypeMismatchInStatement(ast)
 
-
-
         c.append(Symbol(attr_name, attr_type, attr_value, attr_kind, class_member=True))
         return
 
@@ -274,12 +266,23 @@ class StaticChecker(BaseVisitor,Utils):
             inst = "CHECK_UNDECLARED_CLASS"
             self.visit(ast.varType.classname, (c, inst, Class(), var_type.classname.name))
 
+        #     for element in var_value.value:
+        #         if len(element.value) > max_ele:
+        #             max_ele = len(element.value)
+        #     for element in var_value.value:
+        #         if len(element.value) != max_ele:
+        #             raise IllegalArrayLiteral(ast)
+
         if not ((var_value is None) or (isinstance(var_value, NullLiteral))):
-            rhs_type = self.visit(ast.varInit, c)
+            rhs_type = self.visit(var_value, c)
             flag = checkType(ast.varType, rhs_type, c)
             if not flag:
                 raise TypeMismatchInStatement(ast)
 
+            if type(rhs_type) == ArrayType:
+                flag_array = checkArrayType(ast.varType, rhs_type, c)
+                if not flag_array:
+                    raise TypeMismatchInStatement(ast)
 
         c.append(Symbol(var_name, var_type, var_value, var_kind, is_constant=False))
 
@@ -291,16 +294,16 @@ class StaticChecker(BaseVisitor,Utils):
         var_type = ast.constType
         var_value = ast.value
         var_kind = Instance()
-
-        if not ((var_value is None) or (isinstance(var_value, NullLiteral))):
-            rhs_type = self.visit(var_value, c)
-            flag = checkType(ast.constType, rhs_type, c)
-            if not flag:
-                raise TypeMismatchInConstant(ast)
+        rhs_type = self.visit(var_value, c)
 
         flag = checkIllegalConstantExpression(var_value, c)
         if not flag:
             raise IllegalConstantExpression(var_value)
+
+        if not ((var_value is None) or (isinstance(var_value, NullLiteral))):
+            flag = checkType(var_type, rhs_type, c)
+            if not flag:
+                raise TypeMismatchInConstant(ast)
 
         c.append(Symbol(var_name, var_type, var_value, var_kind, is_constant=True))
         return
@@ -334,6 +337,7 @@ class StaticChecker(BaseVisitor,Utils):
 
     def visitAssign(self, ast:Assign, c_scope):
         c, lower_scope = c_scope
+        element = []
         lhs_type = None
         if type(ast.lhs) == Id:
             self.visit(ast.lhs, (c, 'CHECK_UNDECLARED_IDENTIFIER', Identifier()))
@@ -355,14 +359,21 @@ class StaticChecker(BaseVisitor,Utils):
                 for idx in ast.lhs.idx:
                     if not(isinstance(idx, IntLiteral)):
                         raise TypeMismatchInExpression(ast.lhs)
-                    for element in c:
-                        if element.name == ast.lhs.arr.name:
-                            lhs_type = element.mtype.eleType
+                for element in c:
+                    if element.name == ast.lhs.arr.name:
+                        lhs_type = element.mtype.eleType
 
         rhs_type = self.visit(ast.exp, c)
         flag = checkType(lhs_type, rhs_type, c)
         if not flag:
             raise TypeMismatchInStatement(ast)
+
+        if element and type(element.mtype) == ArrayType and type(ast.exp) == ArrayLiteral:
+            if element.mtype.size != len(ast.exp.value):
+                raise TypeMismatchInStatement(ast)
+            flag_array = checkArrayType(element.mtype, rhs_type, c)
+            if not flag_array:
+                raise TypeMismatchInStatement(ast)
 
         return
 
@@ -529,9 +540,6 @@ class StaticChecker(BaseVisitor,Utils):
                     obj_class = element
                     break
 
-        if not obj_class:
-            raise Undeclared(ClassType(), )
-
         if obj_class.scope:
             upper_scope, lower_scope = obj_class.scope
             for element in c[upper_scope:lower_scope]:
@@ -563,7 +571,6 @@ class StaticChecker(BaseVisitor,Utils):
             raise TypeMismatchInExpression(ast)
 
         return obj_method.mtype.rettype
-
 
     def visitReturn(self, ast:Return, c):
         if type(ast.expr) == Id:
@@ -653,26 +660,6 @@ class StaticChecker(BaseVisitor,Utils):
 
             return lst_same_name_obj[-1].mtype
 
-        # elif type(ast.obj) == CallExpr:
-        #     obj_type = self.visit(ast.obj, c)
-        #
-        #     for element in c:
-        #         if element.name == obj_type.classname.name and isinstance(element.mtype, CType):
-        #             obj_class = element
-        #             break
-        #
-        #     upper_scope, lower_scope = obj_class.scope
-        #     for element in c[upper_scope:lower_scope]:
-        #         if element.name == ast.fieldname.name:
-        #             obj = element
-        #
-        #     if not obj:
-        #         raise Undeclared(Attribute(), ast.fieldname.name)
-        #
-        #     return obj.mtype
-
-
-
     def visitFor(self, ast:For, c):
         new_for = Symbol('STMT_FOR', mtype=None, is_stmt='FOR')
         c.append(new_for)
@@ -747,14 +734,17 @@ class StaticChecker(BaseVisitor,Utils):
                 obj_class = element
                 break
 
-        if not obj_class:
-            raise Undeclared(ClassType(), ast.classname.name)
-
-        upper_scope, lower_scope = obj_class.scope
-        for element in c[upper_scope:lower_scope]:
-            if element.name == 'Constructor' and isinstance(element.mtype, MType):
-                obj_constructor = element
-                break
+        if obj_class.scope:
+            upper_scope, lower_scope = obj_class.scope
+            for element in c[upper_scope:lower_scope]:
+                if element.name == 'Constructor' and isinstance(element.mtype, MType):
+                    obj_constructor = element
+                    break
+        else:
+            upper_scope = c.index(obj_class) + 1
+            for element in c[upper_scope:]:
+                if element.name == 'Constructor' and isinstance(element.mtype, MType):
+                    obj_constructor = element
 
         if not obj_constructor:
             return ClassType(Id(ast.classname.name))
@@ -784,7 +774,13 @@ class StaticChecker(BaseVisitor,Utils):
             if type(self.visit(element, c)) is not type(first_element_type):
                 raise IllegalArrayLiteral(ast)
 
-        return ArrayType(first_element_type, len(ast.value))
+        if type(ast.value[0]) == ArrayLiteral:
+            max_ele = len(ast.value[0].value)
+            for element in ast.value[1:]:
+                if len(element.value) != max_ele:
+                    raise IllegalArrayLiteral(ast)
+
+        return ArrayType(len(ast.value), first_element_type)
 
 
 # ------------------------------- SUPPORT FUNCTION ------------------------------- #
@@ -813,6 +809,7 @@ def getAllMemberClassID(c, class_name, is_attribute):
     else:
         return lst_member
 
+
 # Use for program
 def getAllMemberClass(c, class_name, is_attribute):
     obj_class = []
@@ -837,6 +834,7 @@ def getAllMemberClass(c, class_name, is_attribute):
     else:
         return lst_member
 
+
 def checkType(lhs_type, rhs_type, c):
     if type(lhs_type) is FloatType:
         if type(rhs_type) in [IntType, FloatType]:
@@ -860,6 +858,17 @@ def checkType(lhs_type, rhs_type, c):
     else:
         return False
 
+
+def checkArrayType(lhs_type, rhs_type, c):
+    if type(lhs_type) is not ArrayType or type(rhs_type) is not ArrayType:
+        return False
+    else:
+        if type(lhs_type.eleType) is ArrayType and type(rhs_type.eleType) is ArrayType:
+            return checkArrayType(lhs_type.eleType, rhs_type.eleType, c)
+        else:
+            return type(lhs_type.eleType) == type(rhs_type.eleType)
+
+
 def checkIllegalConstantExpression(ast:Expr, c):
     if type(ast) in [BinaryOp, UnaryOp]:
         if type(ast) is BinaryOp:
@@ -867,6 +876,8 @@ def checkIllegalConstantExpression(ast:Expr, c):
         else:
             return checkIllegalConstantExpression(ast.body, c)
     elif type(ast) in [CallExpr]:
+        if ast.method:
+            return False
         return checkIllegalConstantExpression(ast.obj, c)
     elif type(ast) in [Id]:
         obj = []
@@ -907,6 +918,7 @@ def checkIllegalConstantExpression(ast:Expr, c):
 
     return False
 
+
 def checkParamEqual(lst_expr_param, lst_obj_param):
     if len(lst_expr_param) != len(lst_obj_param):
         return False
@@ -920,6 +932,7 @@ def checkParamEqual(lst_expr_param, lst_obj_param):
                 return False
 
     return True
+
 
 def checkNoEntryPoint(c_global):
     class_program = []
@@ -959,6 +972,3 @@ def checkNoEntryPoint(c_global):
         return False
 
     return True
-
-
-
