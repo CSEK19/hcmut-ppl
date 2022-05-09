@@ -1,4 +1,3 @@
-
 """
  * @author nhphung
 """
@@ -249,7 +248,12 @@ class StaticChecker(BaseVisitor,Utils):
             if not flag:
                 raise TypeMismatchInStatement(ast)
 
-        c.append(Symbol(attr_name, attr_type, attr_value, attr_kind, class_member=True))
+
+        if type(ast.decl) is VarDecl:
+            c.append(Symbol(attr_name, attr_type, attr_value, attr_kind, class_member=True))
+        else:
+            c.append(Symbol(attr_name, attr_type, attr_value, attr_kind, class_member=True, is_constant=True))
+
         return
 
     def visitVarDecl(self, ast:VarDecl, c_scope_inst):
@@ -337,19 +341,42 @@ class StaticChecker(BaseVisitor,Utils):
 
     def visitAssign(self, ast:Assign, c_scope):
         c, lower_scope = c_scope
-        element = []
+        this_obj = []
         lhs_type = None
         if type(ast.lhs) == Id:
             self.visit(ast.lhs, (c, 'CHECK_UNDECLARED_IDENTIFIER', Identifier()))
             self.visit(ast.lhs, (c, 'CHECK_CONSTANT_ASSIGN', ast))
             for element in c:
                 if element.name == ast.lhs.name:
+                    this_obj = element
                     lhs_type = element.mtype
 
         elif type(ast.lhs) == FieldAccess:
             if type(ast.lhs.obj) == Id:
                 self.visit(ast.lhs.fieldname, (c, 'CHECK_UNDECLARED_ATTRIBUTE', Attribute(), ast.lhs.obj.name))
                 lhs_type = self.visit(ast.lhs, c)
+                obj_type = self.visit(ast.lhs.obj, c)
+                obj_class = []
+                for element in c:
+                    if element.name == obj_type.classname.name and type(element.mtype) == CType:
+                        obj_class = element
+                        break
+                upper_scope, lower_scope = obj_class.scope
+                for element in c[upper_scope:lower_scope]:
+                    if element.name == ast.lhs.fieldname.name and element.class_member:
+                        this_obj = element
+                        break
+
+            elif type(ast.lhs.obj) == SelfLiteral:
+                obj_class = []
+                for element in c:
+                    if type(element.mtype) == CType:
+                        obj_class = element
+                upper_scope = c.index(obj_class) + 1
+                for element in c[upper_scope:]:
+                    if element.name == ast.lhs.fieldname.name and element.class_member:
+                        this_obj = element
+                        break
 
         elif type(ast.lhs) == ArrayCell:
             if type(ast.lhs.arr) == Id:
@@ -362,18 +389,23 @@ class StaticChecker(BaseVisitor,Utils):
                 for element in c:
                     if element.name == ast.lhs.arr.name:
                         lhs_type = element.mtype.eleType
+                        this_obj = element
 
         rhs_type = self.visit(ast.exp, c)
-        flag = checkType(lhs_type, rhs_type, c)
-        if not flag:
-            raise TypeMismatchInStatement(ast)
 
-        if element and type(element.mtype) == ArrayType and type(ast.exp) == ArrayLiteral:
-            if element.mtype.size != len(ast.exp.value):
-                raise TypeMismatchInStatement(ast)
-            flag_array = checkArrayType(element.mtype, rhs_type, c)
-            if not flag_array:
-                raise TypeMismatchInStatement(ast)
+        if this_obj:
+            if this_obj.is_constant:
+                raise CannotAssignToConstant(ast)
+            if type(this_obj.mtype) == ArrayType and type(ast.exp) == ArrayLiteral:
+                if this_obj.mtype.size != len(ast.exp.value):
+                    raise TypeMismatchInStatement(ast)
+                flag_array = checkArrayType(this_obj.mtype, rhs_type, c)
+                if not flag_array:
+                    raise TypeMismatchInStatement(ast)
+
+        flag = checkType(lhs_type, rhs_type, c)
+        if not flag and type(ast.lhs) is not ArrayCell:
+            raise TypeMismatchInStatement(ast)
 
         return
 
@@ -866,6 +898,8 @@ def checkArrayType(lhs_type, rhs_type, c):
         if type(lhs_type.eleType) is ArrayType and type(rhs_type.eleType) is ArrayType:
             return checkArrayType(lhs_type.eleType, rhs_type.eleType, c)
         else:
+            if type(lhs_type.eleType) is ArrayType and type(rhs_type.eleType) is not ArrayType:
+                return checkArrayType(lhs_type.eleType, rhs_type, c)
             return type(lhs_type.eleType) == type(rhs_type.eleType)
 
 
@@ -899,6 +933,8 @@ def checkIllegalConstantExpression(ast:Expr, c):
         for element in c:
             if element.name == ast.obj.fieldname.name and isinstance(element.mtype, ClassType):
                 obj_class_name = element.mtype.classname.name
+                if not element.is_constant:
+                    return False
                 break
 
         for element in c:
