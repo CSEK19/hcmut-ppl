@@ -1,7 +1,0 @@
-
-            Class A {
-
-                Var A : Array[String, 5] = Array("Hello");
-
-            }
-        

@@ -1,6 +1,0 @@
-
-            Class A {
-                Var a: Int;
-                Val arr: Array[Int,2] = Array(1,Self.a);
-            }
-        

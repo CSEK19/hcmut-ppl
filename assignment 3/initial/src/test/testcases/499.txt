@@ -1,7 +1,0 @@
-
-                Class A {
-                      Var foo: Int = 1;
-                      foo() {
-                      }
-                }
-            

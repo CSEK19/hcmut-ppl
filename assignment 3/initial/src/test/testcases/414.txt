@@ -1,7 +1,0 @@
-
-            Class Program {
-               Var a: Int = 5;
-               Var b: Int = a + 1;
-               main(){}
-            }
-        
