@@ -1,0 +1,12 @@
+
+            Class A {
+                foo() {
+                    Var a: Int = 2;
+                }
+            }
+            Class B {
+                func() {
+                    count.foo();
+                }
+            }
+        

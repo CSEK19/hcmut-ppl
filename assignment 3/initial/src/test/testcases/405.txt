@@ -1,0 +1,7 @@
+
+            Class Triangle {
+                main(){
+                    Var Triangle : String;
+                }
+            }
+        

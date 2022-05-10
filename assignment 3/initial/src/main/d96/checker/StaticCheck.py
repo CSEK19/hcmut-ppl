@@ -282,10 +282,6 @@ class StaticChecker(BaseVisitor,Utils):
 
     def visitVarDecl(self, ast:VarDecl, c_scope_inst):
         c, lower_scope, inst = c_scope_inst
-        if inst == 'PARAM_DECL':
-            var_name = self.visit(ast.variable, (c[lower_scope:], Parameter()))
-        else:
-            var_name = self.visit(ast.variable, (c[lower_scope:], Variable()))
         var_type = ast.varType
         var_value = ast.varInit
         var_kind = Instance()
@@ -312,6 +308,12 @@ class StaticChecker(BaseVisitor,Utils):
                 flag_array = checkArrayType(ast.varType, rhs_type, c)
                 if not flag_array:
                     raise TypeMismatchInStatement(ast)
+
+        if inst == 'PARAM_DECL':
+            var_name = self.visit(ast.variable, (c[lower_scope:], Parameter()))
+        else:
+            var_name = self.visit(ast.variable, (c[lower_scope:], Variable()))
+
 
         c.append(Symbol(var_name, var_type, var_value, var_kind, is_constant=False))
 
@@ -372,15 +374,8 @@ class StaticChecker(BaseVisitor,Utils):
         lhs_type = None
         rhs_type = None
 
-        if type(ast.lhs) == Id:
-            self.visit(ast.lhs, (c, 'CHECK_UNDECLARED_IDENTIFIER', Identifier()))
-            self.visit(ast.lhs, (c, 'CHECK_CONSTANT_ASSIGN', ast))
-            for element in c:
-                if element.name == ast.lhs.name:
-                    this_obj = element
-                    lhs_type = element.mtype
 
-        elif type(ast.lhs) == FieldAccess:
+        if type(ast.lhs) == FieldAccess:
             if type(ast.lhs.obj) == Id:
                 self.visit(ast.lhs.fieldname, (c, 'CHECK_UNDECLARED_ATTRIBUTE', Attribute(), ast.lhs.obj.name))
                 lhs_type = self.visit(ast.lhs, c)
@@ -420,6 +415,16 @@ class StaticChecker(BaseVisitor,Utils):
                     if element.name == ast.lhs.arr.name:
                         lhs_type = element.mtype.eleType
                         this_obj = element
+
+        elif type(ast.lhs) == Id:
+            rhs_type = self.visit(ast.exp, c)
+
+            self.visit(ast.lhs, (c, 'CHECK_UNDECLARED_IDENTIFIER', Identifier()))
+            self.visit(ast.lhs, (c, 'CHECK_CONSTANT_ASSIGN', ast))
+            for element in c:
+                if element.name == ast.lhs.name:
+                    this_obj = element
+                    lhs_type = element.mtype
 
         if not rhs_type:
             rhs_type = self.visit(ast.exp, c)

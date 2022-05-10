@@ -1,0 +1,6 @@
+
+            Class A {
+                Var a: Int;
+                Val b: Int = 1+Self.a;
+            }
+        

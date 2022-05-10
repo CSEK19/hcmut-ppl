@@ -1,0 +1,11 @@
+
+            Class A {
+
+                goo(){Return 1;}
+
+                foo(){
+
+                    Var x : Int = Self.goo; 
+                }
+            }
+        
