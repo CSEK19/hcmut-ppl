@@ -40,6 +40,8 @@ class StaticChecker(BaseVisitor,Utils):
 
     return_type_stack = []
 
+    array_flag = False
+
     def __init__(self,ast):
         self.ast = ast
 
@@ -97,20 +99,11 @@ class StaticChecker(BaseVisitor,Utils):
 
         inst = c[1]
         if inst == 'CHECK_UNDECLARED_IDENTIFIER':
-            lst_class = []
-            for id_name in c[0]:
-                if type(id_name.mtype) is CType:
-                    lst_class.append(id_name)
-            obj_class = lst_class[-1]
-
-            lower_scope = c[0].index(obj_class) + 1
-            lst_ids = c[0][lower_scope:]
-            lst_ids_name = []
-            for element in lst_ids:
-                lst_ids_name.append(element.name)
-
-            if ast.name not in lst_ids_name:
-                raise Undeclared(c[2], ast.name)
+            for element in reversed(c[0]):
+                if element.name == ast.name:
+                    return ast.name
+                elif isinstance(element.mtype, CType) or element.is_stmt == 'BLOCK':
+                    raise Undeclared(Identifier(), ast.name)
 
         elif inst == 'CHECK_UNDECLARED_CLASS':
             lst_class = []
@@ -172,7 +165,7 @@ class StaticChecker(BaseVisitor,Utils):
 
         elif inst == 'CHECK_ILLEGAL_MEMBER_ACCESS':
             for element in reversed(c[0]):
-                if element.name == ast.name:
+                if element.name == ast.name and type(element.mtype) == ClassType:
                     return 'VAR'
                 elif isinstance(element.mtype, CType) or element.is_stmt == 'BLOCK':
                     for class_name in c[0]:
@@ -180,7 +173,7 @@ class StaticChecker(BaseVisitor,Utils):
                             return 'CLASS'
             raise Undeclared(Identifier(), ast.name)
 
-        elif inst == 'CHECK_RETURN_IDENTIFIER':
+        elif inst == 'CHECK_RETURN_IDENTIFIER' or inst == 'CHECK_CONSTRUCTOR_PARAM':
             obj = []
             for element in reversed(c[0]):
                 if element.name == ast.name:
@@ -193,6 +186,11 @@ class StaticChecker(BaseVisitor,Utils):
             else:
                 raise Undeclared(Variable(), ast.name)
 
+        elif inst == 'CHECK_REDECLARED_METHOD':
+            for element in c[0]:
+                if element.name == ast.name and type(element.mtype) == MType:
+                    raise Redeclared(c[2], ast.name)
+
         else:
             for element in c[0]:
                 if element.name == ast.name:
@@ -202,7 +200,7 @@ class StaticChecker(BaseVisitor,Utils):
 
     def visitMethodDecl(self, ast:MethodDecl, c_scope):
         c, lower_scope = c_scope
-        m_name = self.visit(ast.name, (c[lower_scope:], Method()))
+        m_name = self.visit(ast.name, (c[lower_scope:], 'CHECK_REDECLARED_METHOD', Method()))
         m_type = MType([], None)
         c.append(Symbol(m_name, m_type, kind=ast.kind, class_member=True))
 
@@ -236,18 +234,44 @@ class StaticChecker(BaseVisitor,Utils):
             attr_name = self.visit(ast.decl.constant, (c[lower_scope:], Attribute()))
             attr_type = ast.decl.constType
             attr_value = ast.decl.value
+
+            flag = checkIllegalConstantExpression(attr_value, c)
+            if not flag:
+                raise IllegalConstantExpression(attr_value)
+
         attr_kind = ast.kind
 
         if type(attr_type) is ClassType:
             inst = "CHECK_UNDECLARED_CLASS"
             self.visit(attr_type.classname, (c, inst, Class(), attr_type.classname.name))
 
-        if not ((attr_value is None) or (isinstance(attr_value, NullLiteral))):
-            rhs_type = self.visit(attr_value, c)
-            flag = checkType(attr_type, rhs_type, c)
-            if not flag:
-                raise TypeMismatchInStatement(ast)
 
+        if not ((attr_value is None) or (isinstance(attr_value, NullLiteral))):
+            if type(attr_type) is ArrayType:
+                self.array_flag = True
+            rhs_type = self.visit(attr_value, c)
+
+            if type(attr_type) is ArrayType and not self.array_flag:
+                raise IllegalArrayLiteral(attr_value)
+
+            flag = checkType(attr_type, rhs_type, c)
+            if not flag and type(ast.decl) == VarDecl:
+                raise TypeMismatchInStatement(ast.decl)
+            if not flag and type(ast.decl) == ConstDecl:
+                raise TypeMismatchInConstant(ast.decl)
+
+            if type(rhs_type) == ClassType:
+                last_class = list(filter(lambda x: x.name == rhs_type.classname.name, c))[-1]
+                if last_class.parent_class_name == attr_type.classname.name and rhs_type.classname.name == last_class.name:
+                    if type(ast.decl) == VarDecl:
+                        raise TypeMismatchInStatement(ast.decl)
+                    else:
+                        raise TypeMismatchInConstant(ast.decl)
+
+            if str(attr_type) != str(rhs_type) and type(ast.decl) == VarDecl:
+                raise TypeMismatchInStatement(ast.decl)
+            elif str(attr_type) != str(rhs_type) and type(ast.decl) == VarDecl:
+                raise TypeMismatchInConstant(ast.decl)
 
         if type(ast.decl) is VarDecl:
             c.append(Symbol(attr_name, attr_type, attr_value, attr_kind, class_member=True))
@@ -270,18 +294,19 @@ class StaticChecker(BaseVisitor,Utils):
             inst = "CHECK_UNDECLARED_CLASS"
             self.visit(ast.varType.classname, (c, inst, Class(), var_type.classname.name))
 
-        #     for element in var_value.value:
-        #         if len(element.value) > max_ele:
-        #             max_ele = len(element.value)
-        #     for element in var_value.value:
-        #         if len(element.value) != max_ele:
-        #             raise IllegalArrayLiteral(ast)
-
         if not ((var_value is None) or (isinstance(var_value, NullLiteral))):
+            if type(var_type) is ArrayType:
+                self.array_flag = True
+
             rhs_type = self.visit(var_value, c)
+
+            if type(var_type) is ArrayType and not self.array_flag:
+                raise IllegalArrayLiteral(var_value)
+
             flag = checkType(ast.varType, rhs_type, c)
             if not flag:
                 raise TypeMismatchInStatement(ast)
+
 
             if type(rhs_type) == ArrayType:
                 flag_array = checkArrayType(ast.varType, rhs_type, c)
@@ -342,7 +367,11 @@ class StaticChecker(BaseVisitor,Utils):
     def visitAssign(self, ast:Assign, c_scope):
         c, lower_scope = c_scope
         this_obj = []
+        obj_class = []
+
         lhs_type = None
+        rhs_type = None
+
         if type(ast.lhs) == Id:
             self.visit(ast.lhs, (c, 'CHECK_UNDECLARED_IDENTIFIER', Identifier()))
             self.visit(ast.lhs, (c, 'CHECK_CONSTANT_ASSIGN', ast))
@@ -356,7 +385,6 @@ class StaticChecker(BaseVisitor,Utils):
                 self.visit(ast.lhs.fieldname, (c, 'CHECK_UNDECLARED_ATTRIBUTE', Attribute(), ast.lhs.obj.name))
                 lhs_type = self.visit(ast.lhs, c)
                 obj_type = self.visit(ast.lhs.obj, c)
-                obj_class = []
                 for element in c:
                     if element.name == obj_type.classname.name and type(element.mtype) == CType:
                         obj_class = element
@@ -376,7 +404,9 @@ class StaticChecker(BaseVisitor,Utils):
                 for element in c[upper_scope:]:
                     if element.name == ast.lhs.fieldname.name and element.class_member:
                         this_obj = element
+                        lhs_type = this_obj.mtype
                         break
+                rhs_type = self.visit(ast.exp, (c, 'CHECK_CONSTRUCTOR_PARAM'))
 
         elif type(ast.lhs) == ArrayCell:
             if type(ast.lhs.arr) == Id:
@@ -391,17 +421,40 @@ class StaticChecker(BaseVisitor,Utils):
                         lhs_type = element.mtype.eleType
                         this_obj = element
 
-        rhs_type = self.visit(ast.exp, c)
+        if not rhs_type:
+            rhs_type = self.visit(ast.exp, c)
+
+        if type(ast.exp) == NewExpr:
+            for element in c:
+                if element.name == this_obj.mtype.classname.name and type(element.mtype) == CType:
+                    obj_class = element
+                    break
+            for element in c:
+                if element.name == rhs_type.classname.name and type(element.mtype) == CType and \
+                        element.parent_class_name == obj_class.name:
+                    raise TypeMismatchInStatement(ast)
 
         if this_obj:
             if this_obj.is_constant:
                 raise CannotAssignToConstant(ast)
+
+            if type(ast.lhs) == ArrayCell:
+                str_mtype = str(element.mtype)
+                array_dimension = str_mtype.count('Array')
+                if array_dimension < len(ast.lhs.idx):
+                    raise TypeMismatchInExpression(ast.lhs)
+
             if type(this_obj.mtype) == ArrayType and type(ast.exp) == ArrayLiteral:
                 if this_obj.mtype.size != len(ast.exp.value):
                     raise TypeMismatchInStatement(ast)
+
+                if not rhs_type:
+                    raise IllegalArrayLiteral(ast.exp)
+
                 flag_array = checkArrayType(this_obj.mtype, rhs_type, c)
                 if not flag_array:
                     raise TypeMismatchInStatement(ast)
+
 
         flag = checkType(lhs_type, rhs_type, c)
         if not flag and type(ast.lhs) is not ArrayCell:
@@ -766,6 +819,9 @@ class StaticChecker(BaseVisitor,Utils):
                 obj_class = element
                 break
 
+        if not obj_class:
+            raise Undeclared('Class', ast.classname.name)
+
         if obj_class.scope:
             upper_scope, lower_scope = obj_class.scope
             for element in c[upper_scope:lower_scope]:
@@ -801,16 +857,19 @@ class StaticChecker(BaseVisitor,Utils):
     def visitArrayLiteral(self, ast:ArrayLiteral, c):
         if len(ast.value) == 0:
             return ArrayType()
+
         first_element_type = self.visit(ast.value[0], c)
         for element in ast.value[1:]:
             if type(self.visit(element, c)) is not type(first_element_type):
-                raise IllegalArrayLiteral(ast)
+                self.array_flag = False
+                return
 
         if type(ast.value[0]) == ArrayLiteral:
             max_ele = len(ast.value[0].value)
             for element in ast.value[1:]:
                 if len(element.value) != max_ele:
-                    raise IllegalArrayLiteral(ast)
+                    self.array_flag = False
+                    return
 
         return ArrayType(len(ast.value), first_element_type)
 
@@ -827,14 +886,26 @@ def getAllMemberClassID(c, class_name, is_attribute):
 
     lst_member = []
     upper_scope, lower_scope = obj_class.scope
-    if is_attribute:
-        for element in c[0][upper_scope:lower_scope]:
-            if element.class_member and type(element.mtype) != MType:
-                lst_member.append(element.name)
+    if obj_class.scope:
+        upper_scope, lower_scope = obj_class.scope
+        if is_attribute:
+            for element in c[0][upper_scope:lower_scope]:
+                if element.class_member and type(element.mtype) != MType:
+                    lst_member.append(element.name)
+        else:
+            for element in c[0][upper_scope:lower_scope]:
+                if element.class_member and type(element.mtype) == MType:
+                    lst_member.append(element.name)
     else:
-        for element in c[0][upper_scope:lower_scope]:
-            if element.class_member and type(element.mtype) == MType:
-                lst_member.append(element.name)
+        upper_scope = c.index(obj_class) + 1
+        if is_attribute:
+            for element in c[upper_scope:]:
+                if element.class_member and type(element.mtype) != MType:
+                    lst_member.append(element.name)
+        else:
+            for element in c[0][upper_scope:]:
+                if element.class_member and type(element.mtype) == MType:
+                    lst_member.append(element.name)
 
     if obj_class.parent_class_name:
         return lst_member + getAllMemberClassID(c, obj_class.parent_class_name, is_attribute)
@@ -851,15 +922,26 @@ def getAllMemberClass(c, class_name, is_attribute):
             break
 
     lst_member = []
-    upper_scope, lower_scope = obj_class.scope
-    if is_attribute:
-        for element in c[upper_scope:lower_scope]:
-            if element.class_member and type(element.mtype) != MType:
-                lst_member.append(element)
+    if obj_class.scope:
+        upper_scope, lower_scope = obj_class.scope
+        if is_attribute:
+            for element in c[upper_scope:lower_scope]:
+                if element.class_member and type(element.mtype) != MType:
+                    lst_member.append(element)
+        else:
+            for element in c[upper_scope:lower_scope]:
+                if element.class_member and type(element.mtype) == MType:
+                    lst_member.append(element)
     else:
-        for element in c[upper_scope:lower_scope]:
-            if element.class_member and type(element.mtype) == MType:
-                lst_member.append(element)
+        upper_scope = c.index(obj_class) + 1
+        if is_attribute:
+            for element in c[upper_scope:]:
+                if element.class_member and type(element.mtype) != MType:
+                    lst_member.append(element)
+        else:
+            for element in c[upper_scope:]:
+                if element.class_member and type(element.mtype) == MType:
+                    lst_member.append(element)
 
     if obj_class.parent_class_name:
         return lst_member + getAllMemberClass(c, obj_class.parent_class_name, is_attribute)
@@ -930,27 +1012,40 @@ def checkIllegalConstantExpression(ast:Expr, c):
         obj = []
         obj_class = []
         obj_class_name = []
-        for element in c:
-            if element.name == ast.obj.fieldname.name and isinstance(element.mtype, ClassType):
-                obj_class_name = element.mtype.classname.name
-                if not element.is_constant:
-                    return False
-                break
 
-        for element in c:
-            if element.name == obj_class_name and isinstance(element.mtype, CType):
-                obj_class = element
-                break
-
-        upper_scope, lower_scope = obj_class.scope
-        for element in c[upper_scope:lower_scope]:
-            if element.name == ast.fieldname.name:
-                obj = element
-                break
-        if not obj.is_constant:
-            return False
+        if type(ast.obj) == SelfLiteral:
+            for element in c:
+                if type(element.mtype) == CType:
+                    obj_class = element
+            upper_scoper = c.index(obj_class) + 1
+            for element in c[upper_scoper:]:
+                if element.name == ast.fieldname.name:
+                    if not element.is_constant:
+                        return False
+                    else:
+                        return True
         else:
-            return True
+            for element in c:
+                if element.name == ast.obj.fieldname.name and isinstance(element.mtype, ClassType):
+                    obj_class_name = element.mtype.classname.name
+                    if not element.is_constant:
+                        return False
+                    break
+
+            for element in c:
+                if element.name == obj_class_name and isinstance(element.mtype, CType):
+                    obj_class = element
+                    break
+
+            upper_scope, lower_scope = obj_class.scope
+            for element in c[upper_scope:lower_scope]:
+                if element.name == ast.fieldname.name:
+                    obj = element
+                    break
+            if not obj.is_constant:
+                return False
+            else:
+                return True
 
     return False
 
@@ -1008,3 +1103,4 @@ def checkNoEntryPoint(c_global):
         return False
 
     return True
+
