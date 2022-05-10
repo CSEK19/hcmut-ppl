@@ -254,11 +254,16 @@ class StaticChecker(BaseVisitor,Utils):
             if type(attr_type) is ArrayType and not self.array_flag:
                 raise IllegalArrayLiteral(attr_value)
 
-            flag = checkType(attr_type, rhs_type, c)
-            if not flag and type(ast.decl) == VarDecl:
-                raise TypeMismatchInStatement(ast.decl)
-            if not flag and type(ast.decl) == ConstDecl:
-                raise TypeMismatchInConstant(ast.decl)
+            flag_type = checkType(attr_type, rhs_type, c)
+            flag_id = checkIdentifierAttributeDecl(attr_value, c)
+
+            if type(ast.decl) == VarDecl:
+                if not flag_id or not flag_type:
+                    raise TypeMismatchInStatement(ast.decl)
+            elif type(ast.decl) == ConstDecl:
+                if not flag_id or not flag_type:
+                    raise TypeMismatchInConstant(ast.decl)
+
 
             if type(rhs_type) == ClassType:
                 last_class = list(filter(lambda x: x.name == rhs_type.classname.name, c))[-1]
@@ -1051,6 +1056,33 @@ def checkIllegalConstantExpression(ast:Expr, c):
                 return False
             else:
                 return True
+
+    return False
+
+
+def checkIdentifierAttributeDecl(ast:Expr, c):
+    if type(ast) in [BinaryOp, UnaryOp]:
+        if type(ast) is BinaryOp:
+            return checkIdentifierAttributeDecl(ast.left, c) and checkIdentifierAttributeDecl(ast.right, c)
+        else:
+            return checkIdentifierAttributeDecl(ast.body, c)
+    elif type(ast) in [Id]:
+        raise Undeclared(Identifier(), ast.name)
+
+    elif type(ast) is FieldAccess:
+        obj_class = []
+
+        if type(ast.obj) == SelfLiteral:
+            for element in c:
+                if type(element.mtype) == CType:
+                    obj_class = element
+            upper_scoper = c.index(obj_class) + 1
+            for element in c[upper_scoper:]:
+                if element.name == ast.fieldname.name:
+                    return True
+
+    elif type(ast) in [IntLiteral, FloatLiteral, StringLiteral, BooleanLiteral, ArrayLiteral, NewExpr, SelfLiteral]:
+        return True
 
     return False
 
