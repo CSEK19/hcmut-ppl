@@ -19,7 +19,7 @@ class MType:
 
 class Symbol:
     def __init__(self, name, mtype, value=None, kind=None, scope=None, class_member=None,
-                 parent_class_name=None, is_constant=False, is_stmt=None, in_method_name=None):
+                 parent_class_name=None, is_constant=False, is_stmt=None):
         self.name = name
         self.mtype = mtype
         self.value = value
@@ -47,7 +47,6 @@ class StaticChecker(BaseVisitor,Utils):
 
     def check(self):
         global c_program
-
         c_program = []
         self.visit(self.ast, c_program)
         flag = checkNoEntryPoint(c_program)
