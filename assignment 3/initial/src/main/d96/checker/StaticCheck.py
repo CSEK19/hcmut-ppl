@@ -40,7 +40,7 @@ class StaticChecker(BaseVisitor,Utils):
 
     global_envi = [Symbol("getInt",MType([],IntType())),Symbol("putIntLn",MType([IntType()],VoidType()))]
 
-    array_flag = False
+    array_flag = True
 
     def __init__(self,ast):
         self.ast = ast
@@ -90,7 +90,7 @@ class StaticChecker(BaseVisitor,Utils):
                 if element.name == ast.name:
                     obj = element
                     break
-                elif isinstance(element.mtype, (CType, MType)) or element.is_stmt == 'BLOCK':
+                elif isinstance(element.mtype, (CType, MType)):
                     raise Undeclared(Identifier(), ast.name)
             if obj:
                 return obj.mtype
@@ -102,7 +102,7 @@ class StaticChecker(BaseVisitor,Utils):
             for element in reversed(c[0]):
                 if element.name == ast.name:
                     return ast.name
-                elif isinstance(element.mtype, CType) or element.is_stmt == 'BLOCK':
+                elif isinstance(element.mtype, (CType, MType)):
                     raise Undeclared(Identifier(), ast.name)
 
         elif inst == 'CHECK_UNDECLARED_CLASS':
@@ -124,10 +124,16 @@ class StaticChecker(BaseVisitor,Utils):
                 raise Undeclared(c[2], ast.name)
 
             obj_class = []
-            for class_name in c[0]:
-                if type(class_name.mtype) is CType and class_name.name == obj.mtype.classname.name:
-                    obj_class = class_name
-                    break
+            if type(obj.mtype) == ClassType:
+                for element in c[0]:
+                    if type(element.mtype) is CType and element.name == obj.mtype.classname.name:
+                        obj_class = element
+                        break
+
+                if not obj_class:
+                    raise Undeclared(c[2], ast.name)
+            else:
+                obj_class = obj
 
             lst_class_member = getAllMemberClassID(c, obj_class.name, is_attribute=True)
 
@@ -277,15 +283,22 @@ class StaticChecker(BaseVisitor,Utils):
             flag_id = checkIdentifierAttributeDecl(attr_value, c)
 
             if type(ast.decl) == VarDecl:
-                if not (flag_id and flag_type and str(attr_type) == str(rhs_type)):
+                if not (flag_id and flag_type):
                     raise TypeMismatchInStatement(ast.decl)
+                if type(attr_type) == ArrayType:
+                    if not checkArrayType(attr_type, rhs_type, c):
+                        raise TypeMismatchInStatement(ast.decl)
             elif type(ast.decl) == ConstDecl:
-                if not (flag_id and flag_type and str(attr_type) == str(rhs_type)):
+                if not (flag_id and flag_type):
                     raise TypeMismatchInConstant(ast.decl)
+                if type(attr_type) == ArrayType:
+                    if not checkArrayType(attr_type, rhs_type, c):
+                        raise TypeMismatchInConstant(ast.decl)
 
             if type(rhs_type) == ClassType:
                 last_class = list(filter(lambda x: x.name == rhs_type.classname.name, c))[-1]
-                if last_class.parent_class_name == attr_type.classname.name and rhs_type.classname.name == last_class.name:
+                if last_class.parent_class_name == attr_type.classname.name and\
+                        rhs_type.classname.name == last_class.name:
                     if type(ast.decl) == VarDecl:
                         raise TypeMismatchInStatement(ast.decl)
                     else:
@@ -341,10 +354,16 @@ class StaticChecker(BaseVisitor,Utils):
         var_type = ast.constType
         var_value = ast.value
         var_kind = Instance()
+
+        if not var_value:
+            raise IllegalConstantExpression(None)
         rhs_type = self.visit(var_value, c)
 
-        flag = checkIllegalConstantExpression(var_value, c)
-        if not flag:
+        if type(var_type) is ArrayType and not self.array_flag:
+            raise IllegalArrayLiteral(var_value)
+
+        flag_const = checkIllegalConstantExpression(var_value, c)
+        if not flag_const:
             raise IllegalConstantExpression(var_value)
 
         if not ((var_value is None) or (isinstance(var_value, NullLiteral))):
@@ -395,18 +414,35 @@ class StaticChecker(BaseVisitor,Utils):
             if type(ast.lhs.obj) == Id:
                 self.visit(ast.lhs.fieldname, (c, 'CHECK_UNDECLARED_ATTRIBUTE', Attribute(), ast.lhs.obj.name))
                 lhs_type = self.visit(ast.lhs, c)
-                obj_type = self.visit(ast.lhs.obj, c)
+                obj_type = []
                 for element in c:
-                    if element.name == obj_type.classname.name and type(element.mtype) == CType:
-                        obj_class = element
-                        break
-                upper_scope, lower_scope = obj_class.scope
-                for element in c[upper_scope:lower_scope]:
-                    if element.name == ast.lhs.fieldname.name and element.class_member:
-                        this_obj = element
-                        break
+                    if element.name == ast.lhs.obj.name and isinstance(element.mtype, (CType, ClassType)):
+                        obj_type = element
+                if type(obj_type) == ClassType:
+                    for element in c:
+                        if element.name == obj_type.mtype.classname.name and type(element.mtype) == CType:
+                            obj_class = element
+                            break
+                else:
+                    obj_class = obj_type
+
+                if obj_class.scope:
+                    upper_scope, lower_scope = obj_class.scope
+                    for element in c[upper_scope:lower_scope]:
+                        if element.name == ast.lhs.fieldname.name and element.class_member:
+                            this_obj = element
+                            break
+                else:
+                    upper_scope = c.index(obj_class) + 1
+                    for element in c[upper_scope:]:
+                        if element.name == ast.lhs.fieldname.name and element.class_member:
+                            this_obj = element
+                            break
 
             elif type(ast.lhs.obj) == SelfLiteral:
+                if not checkSelfStaticMethod(ast.lhs, c):
+                    raise IllegalMemberAccess(ast.lhs)
+
                 obj_class = []
                 for element in c:
                     if type(element.mtype) == CType:
@@ -422,11 +458,19 @@ class StaticChecker(BaseVisitor,Utils):
         elif type(ast.lhs) == ArrayCell:
             if type(ast.lhs.arr) == Id:
                 for element in c:
-                    if element.name == ast.lhs.arr.name and type(element.mtype) != ArrayType:
-                        raise TypeMismatchInExpression(ast.lhs)
+                    if element.name == ast.lhs.arr.name:
+                        if type(element.mtype) != ArrayType:
+                            raise TypeMismatchInExpression(ast.lhs)
+                        else:
+                            break
+
                 for idx in ast.lhs.idx:
                     if not(isinstance(idx, IntLiteral)):
-                        raise TypeMismatchInExpression(ast.lhs)
+                        if isinstance(idx, Id):
+                            self.visit(idx, (c, 'CHECK_UNDECLARED_IDENTIFIER', Identifier()))
+                        else:
+                            raise TypeMismatchInExpression(ast.lhs)
+
                 for element in c:
                     if element.name == ast.lhs.arr.name:
                         lhs_type = element.mtype.eleType
@@ -460,7 +504,7 @@ class StaticChecker(BaseVisitor,Utils):
                 raise CannotAssignToConstant(ast)
 
             if type(ast.lhs) == ArrayCell:
-                str_mtype = str(element.mtype)
+                str_mtype = str(this_obj.mtype)
                 array_dimension = str_mtype.count('Array')
                 if array_dimension < len(ast.lhs.idx):
                     raise TypeMismatchInExpression(ast.lhs)
@@ -521,14 +565,11 @@ class StaticChecker(BaseVisitor,Utils):
             return BoolType()
 
         elif op in ['==', '!=']:
-            if (isinstance(left, IntType) and not isinstance(right, IntType)) or \
-                    (not isinstance(left, IntType) and isinstance(right, IntType)):
+            if (isinstance(left, IntType) and isinstance(right, IntType)) or \
+                    (isinstance(left, BoolType) and isinstance(right, BoolType)):
+                return BoolType()
+            else:
                 raise TypeMismatchInExpression(ast)
-            elif (isinstance(left, BoolType) and not isinstance(right, BoolType)) or \
-                        (not isinstance(left, BoolType) and isinstance(right, BoolType)):
-                raise TypeMismatchInExpression(ast)
-            return BoolType()
-
         elif op in ['<', '>', '<=', '>=']:
             if isinstance(left, (IntType, FloatType)) is False or isinstance(right, (IntType, FloatType)) is False:
                 raise TypeMismatchInExpression(ast)
@@ -581,16 +622,15 @@ class StaticChecker(BaseVisitor,Utils):
                     obj_method = element
 
         elif type(ast.obj) == SelfLiteral:
-            obj_method_inside = []
+            if not checkSelfStaticMethod(ast, c):
+                raise IllegalMemberAccess(ast)
+
             for element in reversed(c):
-                if type(element.mtype) == MType:
-                    obj_method_inside = element
+                if element.name == ast.method.name and type(element.mtype) == MType and element.class_member:
+                    obj_method = element
                     break
                 elif type(element.mtype) == CType:
                     break
-
-            if obj_method_inside and isinstance(obj_method_inside.kind, Static):
-                raise IllegalMemberAccess(ast)
 
         elif type(ast.obj) in (CallExpr, FieldAccess):
             obj_type = self.visit(ast.obj, c)
@@ -654,21 +694,13 @@ class StaticChecker(BaseVisitor,Utils):
                         break
 
         elif type(ast.obj) == SelfLiteral:
+            if not checkSelfStaticMethod(ast, c):
+                raise IllegalMemberAccess(ast)
+
             for element in c:
                 if type(element.mtype) == CType:
                     obj_class.append(element)
             obj_class = obj_class[-1]
-
-            obj_method_inside = []
-            for element in reversed(c):
-                if type(element.mtype) == MType:
-                    obj_method_inside = element
-                    break
-                elif type(element.mtype) == CType:
-                    break
-
-            if obj_method_inside and isinstance(obj_method_inside.kind, Static):
-                raise IllegalMemberAccess(ast)
 
         elif type(ast.obj) in (FieldAccess, CallExpr):
             obj_class_type = self.visit(ast.obj, c)
@@ -784,6 +816,17 @@ class StaticChecker(BaseVisitor,Utils):
             return lst_same_name_obj[-1].mtype
 
         elif type(ast.obj) == SelfLiteral:
+            obj_method_inside = []
+            for element in reversed(c):
+                if type(element.mtype) == MType:
+                    obj_method_inside = element
+                    break
+                elif type(element.mtype) == CType:
+                    break
+
+            if obj_method_inside and isinstance(obj_method_inside.kind, Static):
+                raise IllegalMemberAccess(ast)
+
             for element in c:
                 if type(element.mtype) == CType:
                     obj_class.append(element)
@@ -832,7 +875,7 @@ class StaticChecker(BaseVisitor,Utils):
         for element in reversed(c):
             if element.name == ast.id.name and not isinstance(element.mtype, (CType, MType)):
                 obj = element
-            elif element.is_stmt == 'BLOCK' or isinstance(element.mtype, (CType, MType)):
+            elif isinstance(element.mtype, (CType, MType)):
                 break
 
         if obj.is_constant:
@@ -964,6 +1007,20 @@ class StaticChecker(BaseVisitor,Utils):
 
         return ArrayType(len(ast.value), first_element_type)
 
+    def visitArrayCell(self, ast:ArrayCell, c):
+        type_arr = self.visit(ast.arr, c)
+        if not isinstance(type_arr, ArrayType):
+            raise TypeMismatchInExpression(ast)
+
+        for idx in ast.idx:
+            if not isinstance(self.visit(idx, c), IntType):
+                raise TypeMismatchInExpression(ast)
+            if 'eleType' not in dir(type_arr):
+                raise TypeMismatchInExpression(ast)
+            type_arr = type_arr.eleType
+
+        return type_arr
+
 
 # ------------------------------- HELPER FUNCTION ------------------------------- #
 
@@ -976,7 +1033,6 @@ def getAllMemberClassID(c, class_name, is_attribute):
             break
 
     lst_member = []
-    upper_scope, lower_scope = obj_class.scope
     if obj_class.scope:
         upper_scope, lower_scope = obj_class.scope
         if is_attribute:
@@ -988,9 +1044,9 @@ def getAllMemberClassID(c, class_name, is_attribute):
                 if element.class_member and type(element.mtype) == MType:
                     lst_member.append(element.name)
     else:
-        upper_scope = c.index(obj_class) + 1
+        upper_scope = c[0].index(obj_class) + 1
         if is_attribute:
-            for element in c[upper_scope:]:
+            for element in c[0][upper_scope:]:
                 if element.class_member and type(element.mtype) != MType:
                     lst_member.append(element.name)
         else:
@@ -1067,7 +1123,10 @@ def checkArrayType(lhs_type, rhs_type, c):
         else:
             if type(lhs_type.eleType) is ArrayType and type(rhs_type.eleType) is not ArrayType:
                 return checkArrayType(lhs_type.eleType, rhs_type, c)
-            return type(lhs_type.eleType) == type(rhs_type.eleType)
+            if type(lhs_type.eleType) == type(rhs_type.eleType):
+                return lhs_type.size == rhs_type.size
+            else:
+                return False
 
 
 def checkIllegalConstantExpression(ast:Expr, c):
@@ -1261,6 +1320,21 @@ def checkNoEntryPoint(c_global):
     if not isinstance(main_method.mtype.rettype, VoidType):
         return False
     if isinstance(main_method.kind, Instance):
+        return False
+
+    return True
+
+
+def checkSelfStaticMethod(ast, c):
+    obj_method_inside = []
+    for element in reversed(c):
+        if type(element.mtype) == MType:
+            obj_method_inside = element
+            break
+        elif type(element.mtype) == CType:
+            break
+
+    if obj_method_inside and isinstance(obj_method_inside.kind, Static):
         return False
 
     return True

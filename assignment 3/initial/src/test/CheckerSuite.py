@@ -4,17 +4,14 @@ from AST import *
 
 
 class CheckerSuite(unittest.TestCase):
-    def test_429(self):
+    def test_420(self):
         input = """
-                Class ProgramA {
-                    main(){
-                        Return 1;
-                        Return 2;
-                        Return 3;
-                    }
-                }
-            """
-
-        expect = "Type Mismatch In Statement: Return(IntLit(1))"
-        self.assertTrue(TestChecker.test(input, expect, 429))
-
+                        Class C{
+                            e(){
+                                Var a:Int = 2;
+                                Var b:Array[Int,5];
+                                b[1.2]=1;
+                            }
+                        }"""
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),[FloatLit(1.2)])"
+        self.assertTrue(TestChecker.test(input, expect, 420))
