@@ -4,12 +4,17 @@ from AST import *
 
 
 class CheckerSuite(unittest.TestCase):
-    def test_423(self):
+    def test_429(self):
         input = """
-                        Class C{
-                            e(){
-                                Return;
-                            }
-                        }"""
-        expect = "Type Mismatch In Expression: BinaryOp(||,StringLit(abc),IntLit(1))"
-        self.assertTrue(TestChecker.test(input, expect, 423))
+                Class ProgramA {
+                    main(){
+                        Return 1;
+                        Return 2;
+                        Return 3;
+                    }
+                }
+            """
+
+        expect = "Type Mismatch In Statement: Return(IntLit(1))"
+        self.assertTrue(TestChecker.test(input, expect, 429))
+
