@@ -260,11 +260,9 @@ class StaticChecker(BaseVisitor,Utils):
             attr_name = self.visit(ast.decl.constant, (c[lower_scope:], Attribute()))
             attr_type = ast.decl.constType
             attr_value = ast.decl.value
-
             flag = checkIllegalConstantExpression(attr_value, c)
             if not flag:
                 raise IllegalConstantExpression(attr_value)
-
         attr_kind = ast.kind
 
         if type(attr_type) is ClassType:
@@ -1135,6 +1133,42 @@ def checkIllegalConstantExpression(ast:Expr, c):
             return checkIllegalConstantExpression(ast.left, c) and checkIllegalConstantExpression(ast.right, c)
         else:
             return checkIllegalConstantExpression(ast.body, c)
+    elif type(ast) is ArrayCell:
+        for idx in ast.idx:
+            flag = checkIllegalConstantExpression(idx, c)
+            if not flag:
+                raise IllegalConstantExpression(ast)
+
+        if type(ast.arr) is not Id:
+            return checkIllegalConstantExpression(ast.arr, c)
+        obj_arr = []
+
+        for element in reversed(c):
+            if element.name == ast.arr.name and type(element.mtype) == ArrayType:
+                obj_arr = element
+
+        if not obj_arr:
+            return False
+
+        if len(ast.idx) == 1:
+            obj_arr_value = obj_arr.value.value
+            if type(ast.idx[0]) == Id:
+                return True
+
+            obj_type = obj_arr_value[ast.idx[0].value]
+            obj = []
+            if type(obj_type) in [IntLiteral, FloatLiteral, StringLiteral, BooleanLiteral, ArrayLiteral, NewExpr,
+                                  SelfLiteral]:
+                return True
+            else:
+                for element in reversed(c):
+                    if element.name == obj_type.name:
+                        obj = element
+
+            if obj.is_constant:
+                return True
+            else:
+                raise IllegalConstantExpression(ast)
 
     elif type(ast) in [CallExpr]:
         if type(ast.obj) == SelfLiteral:
@@ -1156,6 +1190,10 @@ def checkIllegalConstantExpression(ast:Expr, c):
         for element in c:
             if element.name == ast.name:
                 obj = element
+
+        if not obj:
+            return False
+
         if not obj.is_constant:
             return False
         else:
@@ -1234,6 +1272,9 @@ def checkIdentifierAttributeDecl(ast:Expr, c):
             return checkIdentifierAttributeDecl(ast.left, c) and checkIdentifierAttributeDecl(ast.right, c)
         else:
             return checkIdentifierAttributeDecl(ast.body, c)
+
+    elif type(ast) is ArrayCell:
+        return True
 
     elif type(ast) in [Id]:
         raise Undeclared(Identifier(), ast.name)
