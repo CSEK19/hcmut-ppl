@@ -261,6 +261,10 @@ class StaticChecker(BaseVisitor):
         else:
             new_method.mtype.rettype = VoidType()
             new_method.is_constant = False
+
+        return_type_stack = []
+        is_constant_stack = []
+
         return
 
     def visitAttributeDecl(self, ast, c_scope):
@@ -779,6 +783,11 @@ class StaticChecker(BaseVisitor):
             is_constant, new_return_type = self.visit(ast.expr, (c, 'CHECK_RETURN_IDENTIFIER'))
         else:
             new_return_type = self.visit(ast.expr, c)
+
+        if return_type_stack:
+            if type(new_return_type) != type(return_type_stack[0]):
+                raise TypeMismatchInStatement(ast)
+
         return_type_stack.append(new_return_type)
         is_constant_stack.append(is_constant)
 

@@ -227,7 +227,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 416))
 
     def test_417(self):
-        input = """ 
+        input = """
         Class X{
             Var x:Int = 1;
             z(){}
@@ -796,7 +796,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 452))
 
     def test_453(self):
-        input = """         
+        input = """
                         Class Clock{
                         func(){
                             counter.run();
@@ -810,7 +810,7 @@ class CheckerSuite(unittest.TestCase):
                         Class Y{
                             Var $y:Int = 5;
                             Var x:Int = 4;
-                        }         
+                        }
                         Class X{
                         func(){
                             Var x:Int = Y::$y;
@@ -821,11 +821,11 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 454))
 
     def test_455(self):
-        input = """         
+        input = """
                         Class Y{
                             Var $y:Int = 5;
                             Var x:Int = 4;
-                        }         
+                        }
                         Class X{
                         func(){
                             Var x:Int = Y::$y;
@@ -847,7 +847,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 456))
 
     def test_457(self):
-        input = """         
+        input = """
         Class Program {
             main(){
                 Return 1;
@@ -858,11 +858,11 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 457))
 
     def test_458(self):
-        input = """         
+        input = """
                         Class Y{
                             $y(){}
                             x(){}
-                        }         
+                        }
                         Class X{
                         func(){
                             Y::$y();
@@ -875,7 +875,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 458))
 
     def test_459(self):
-        input = """         
+        input = """
                         Class Y{
                             $y(){
                                 Return 1;
@@ -883,7 +883,7 @@ class CheckerSuite(unittest.TestCase):
                             x(){
                                 Return 1;
                             }
-                        }         
+                        }
                         Class X{
                         func(){
                             Var x:Y = New Y();
@@ -896,7 +896,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 459))
 
     def test_460(self):
-        input = """         
+        input = """
                         Class Y{
                             $y(){
                                 Return 1;
@@ -904,7 +904,7 @@ class CheckerSuite(unittest.TestCase):
                             x(){
                                 Return 1;
                             }
-                        }         
+                        }
                         Class X{
                         func(){
                             Var x:Y = New Y();
@@ -917,7 +917,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 460))
 
     def test_461(self):
-        input = """         
+        input = """
                         Class Y{
                             $y(){
                                 Return 1;
@@ -930,7 +930,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 461))
 
     def test_462(self):
-        input = """         
+        input = """
                         Class Y{
                             $y(){
                                 Return 1;
@@ -938,7 +938,7 @@ class CheckerSuite(unittest.TestCase):
                             x(){
                                 Return 1;
                             }
-                        } 
+                        }
                         Class Program{
                             z(){
                                 Return 1;
@@ -948,7 +948,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 462))
 
     def test_463(self):
-        input = """         
+        input = """
                         Class Y{
                             $y(){
                                 Return 1;
@@ -956,7 +956,7 @@ class CheckerSuite(unittest.TestCase):
                             x(){
                                 Return 1;
                             }
-                        } 
+                        }
                         Class Program{
                             $main(){
                                 Return 1;
@@ -966,7 +966,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 463))
 
     def test_464(self):
-        input = """         
+        input = """
                         Class Y{
                             $y(){
                                 Return 1;
@@ -974,7 +974,7 @@ class CheckerSuite(unittest.TestCase):
                             x(){
                                 Return 1;
                             }
-                        } 
+                        }
                         Class Program{
                             $main(y:Int){
                             }
@@ -983,12 +983,12 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 464))
 
     def test_465(self):
-        input = """         
+        input = """
         Class Y{
             $y(){
                 Return 1;
             }
-        } 
+        }
         Class Program{
             abc(){}
         }
@@ -997,7 +997,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 465))
 
     def test_466(self):
-        input = """         
+        input = """
                         Class Y{
                             Var y:Int = 1;
                             foo(){
@@ -1009,7 +1009,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 466))
 
     def test_467(self):
-        input = """         
+        input = """
                         Class Y{
                         Val y:Int=10;
                         }
@@ -1023,7 +1023,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 467))
 
     def test_468(self):
-        input = """     
+        input = """
                         Class X{
                         Var x:Int = 1;
                         foo(){
@@ -1039,7 +1039,7 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 468))
 
     def test_469(self):
-        input = """     
+        input = """
                         Class X{
                         Var x:Int = 1;
                         foo(){
@@ -1055,94 +1055,94 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 469))
 
     def test_470(self):
-        input = """     
+        input = """
                         Class E {
-                           func() {                        
-                           }                        
-                        }                        
-                        Class Test{                        
-                          test() {                        
-                                Var m: E = New E();                        
-                                Return m.func;                       
-                          }                        
+                           func() {
+                           }
+                        }
+                        Class Test{
+                          test() {
+                                Var m: E = New E();
+                                Return m.func;
+                          }
                         } """
         expect = "Undeclared Attribute: func"
         self.assertTrue(TestChecker.test(input, expect, 470))
 
     def test_471(self):
-        input = """     
+        input = """
         Class E {
-           func() {                        
-           } 
+           func() {
+           }
            Constructor(y:Int){
-           }                       
-        }                        
-        Class Test{  
-            Var y: String = "Hello World";                  
-            Var m: E = New E(1);              
-            Var x: E = New E();                                
+           }
+        }
+        Class Test{
+            Var y: String = "Hello World";
+            Var m: E = New E(1);
+            Var x: E = New E();
         } """
         expect = "Type Mismatch In Expression: NewExpr(Id(E),[])"
         self.assertTrue(TestChecker.test(input, expect, 471))
 
     def test_472(self):
-        input = """     
+        input = """
         Class E {
         Var test:String = "test_472";
-           func() {                        
-           } 
+           func() {
+           }
            Constructor(y:Int){
-           }                       
-        }                        
-        Class Test{                        
-          Var m: E = New E(1);              
-          Val x: String = New E(1);                                
+           }
+        }
+        Class Test{
+          Var m: E = New E(1);
+          Val x: String = New E(1);
         } """
         expect = "Type Mismatch In Constant Declaration: ConstDecl(Id(x),StringType,NewExpr(Id(E),[IntLit(1)]))"
         self.assertTrue(TestChecker.test(input, expect, 472))
 
     def test_473(self):
-        input = """     
+        input = """
                         Class E {
-                           $func() {                        
-                           } 
+                           $func() {
+                           }
                            Constructor(y:Int){
-                           }                       
-                        }                        
-                        Class Test{ 
-                            cak(){                     
-                                E::$func();   
-                                E::$foo();                             
+                           }
+                        }
+                        Class Test{
+                            cak(){
+                                E::$func();
+                                E::$foo();
                             }
                         }"""
         expect = "Undeclared Method: $foo"
         self.assertTrue(TestChecker.test(input, expect, 473))
 
     def test_474(self):
-        input = """     
+        input = """
                         Class E {
-                           $func() { 
-                                Return 1;                       
-                           } 
+                           $func() {
+                                Return 1;
+                           }
                            Constructor(y:Int){
-                           }                       
-                        }                        
-                        Class Test{ 
-                            cak(){                     
-                                Var y:Int = E::$func();   
-                                Var x:Int = E::$foo();                             
+                           }
+                        }
+                        Class Test{
+                            cak(){
+                                Var y:Int = E::$func();
+                                Var x:Int = E::$foo();
                             }
                         }"""
         expect = "Undeclared Method: $foo"
         self.assertTrue(TestChecker.test(input, expect, 474))
 
     def test_475(self):
-        input = """     
+        input = """
                         Class Y {
-                           Var y:Int = 1;                      
-                        }                        
-                        Class X{ 
-                            Var x:Y = New Y(); 
+                           Var y:Int = 1;
+                        }
+                        Class X{
+                            Var x:Y = New Y();
                         }
                         Class Z{
                             foo(){
@@ -1155,12 +1155,12 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 475))
 
     def test_476(self):
-        input = """     
+        input = """
                         Class Y {
-                           Var y:Int = 1;                      
-                        }                        
-                        Class X{ 
-                            Var x:Y = New Y(); 
+                           Var y:Int = 1;
+                        }
+                        Class X{
+                            Var x:Y = New Y();
                         }
                         Class Z{
                             foo(){
@@ -1173,12 +1173,12 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 476))
 
     def test_477(self):
-        input = """     
+        input = """
                         Class Y {
-                           Var y:Int = 1;                      
-                        }                        
-                        Class X{ 
-                            Var $x:Y = New Y(); 
+                           Var y:Int = 1;
+                        }
+                        Class X{
+                            Var $x:Y = New Y();
                         }
                         Class Z{
                             foo(){
@@ -1191,12 +1191,12 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 477))
 
     def test_478(self):
-        input = """     
+        input = """
                         Class Y {
-                           Var y:Int = 1;                      
-                        }                        
-                        Class X{ 
-                            Var $x:Y = New Y(); 
+                           Var y:Int = 1;
+                        }
+                        Class X{
+                            Var $x:Y = New Y();
                         }
                         Class Z{
                             foo(){
@@ -1209,14 +1209,14 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 478))
 
     def test_479(self):
-        input = """     
+        input = """
                         Class Y {
                            Var y:Int = 1;
                            foo(){
                                 Return 1;
-                           }                      
-                        }                        
-                        Class X{ 
+                           }
+                        }
+                        Class X{
                             Var x:Y = New Y();
                             foo(){
                                 Return New Y();
@@ -1236,13 +1236,13 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 479))
 
     def test_480(self):
-        input = """     
+        input = """
                         Class Y {
                            Var y:Int = 1;
                            foo(x:Float; y:String){
-                           }                      
-                        }                        
-                        Class X{ 
+                           }
+                        }
+                        Class X{
                             Var x:Y = New Y();
                             foo(){
                                 Return New Y();
@@ -1260,15 +1260,15 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 480))
 
     def test_481(self):
-        input = """     
+        input = """
                         Class Y {
                            Var y:Int = 1;
                            fooExp(x:Float; y:String){
                                 Return 1;
-                           }  
-                           fooCall(x:Float; y:String){}                    
-                        }                        
-                        Class X{ 
+                           }
+                           fooCall(x:Float; y:String){}
+                        }
+                        Class X{
                             Var x:Y = New Y();
                             foo(){
                                 Return New Y();
@@ -1287,15 +1287,15 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 481))
 
     def test_482(self):
-        input = """     
+        input = """
                         Class Y {
                            Var y:Int = 1;
                            fooExp(x:Float; y:String){
                                 Return 1;
-                           }  
-                           fooCall(x:Float; y:String){}                    
-                        }                        
-                        Class X{ 
+                           }
+                           fooCall(x:Float; y:String){}
+                        }
+                        Class X{
                             Var x:Y = New Y();
                             foo(){
                                 Return New Y();
@@ -1314,19 +1314,19 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 482))
 
     def test_483(self):
-        input = """     
+        input = """
         Class X{
            Var x:Int = 1;
            $foo1(a:Float; b:String){
                 Return Self.x;
-           } 
+           }
            $foo2(x:Float; y:String){
                 Return x;
-           }  
+           }
            $foo3(x:Float; y:String){
                 Return y;
-           }               
-        }                        
+           }
+        }
         Class Y{
             foo2(){
                 Var e:Float = (New X()).x;
@@ -1341,19 +1341,19 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 483))
 
     def test_484(self):
-        input = """     
+        input = """
         Class X{
            Var x:Int = 1;
            $foo1(a:Float; b:String){
                 Return Self.x;
-           } 
+           }
            $foo2(x:Float; y:String){
                 Return x;
-           }  
+           }
            $foo3(x:Float; y:String){
                 Return y;
-           }               
-        }                        
+           }
+        }
         Class Y{
             foo2(){
                 Var e:Float = (New X()).x;
@@ -1368,90 +1368,90 @@ class CheckerSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input, expect, 484))
 
     def test_485(self):
-        input = """     
+        input = """
         Class Y {
            funcMethod1(x:Float; y:String){
                 Var a:Array[Int, 2] = Array(1,1);
                 a = Array(1,1,1);
-           }               
+           }
         }"""
         expect = "Type Mismatch In Statement: AssignStmt(Id(a),[IntLit(1),IntLit(1),IntLit(1)])"
         self.assertTrue(TestChecker.test(input, expect, 485))
 
     def test_486(self):
-        input = """     
+        input = """
         Class Y {
            funcMethod1(x:Float; y:String){
                 Var a:Array[Int, 2] = Array(1,1);
                 a = Array("DSA", "PPL");
-           }               
+           }
         }"""
         expect = "Type Mismatch In Statement: AssignStmt(Id(a),[StringLit(DSA),StringLit(PPL)])"
         self.assertTrue(TestChecker.test(input, expect, 486))
 
     def test_487(self):
-        input = """     
+        input = """
                         Class Y {
                            funcMethod1(x:Float; y:String){
                                 Var a: Array[Array[Int, 2],2] = Array(Array(1,1),Array(1,1));
                                 Var b: Array[Array[Int, 2],2] = Array(Array(1,1),Array(1));
-                           }               
+                           }
                         }"""
         expect = "Illegal Array Literal: [[IntLit(1),IntLit(1)],[IntLit(1)]]"
         self.assertTrue(TestChecker.test(input, expect, 487))
 
     def test_488(self):
-        input = """     
+        input = """
                         Class Y {
                            funcMethod1(x:Float; y:String){
                                 Var a: Array[Array[Int, 2],2] = Array(Array(1,1),Array(1,1));
                                 Var b: Array[Array[Int, 2],2] = Array(Array("CS","CE"),Array("DSA","CA"));
-                           }               
+                           }
                         }"""
         expect = "Type Mismatch In Statement: VarDecl(Id(b),ArrayType(2,ArrayType(2,IntType)),[[StringLit(CS),StringLit(CE)],[StringLit(DSA),StringLit(CA)]])"
         self.assertTrue(TestChecker.test(input, expect, 488))
 
     def test_489(self):
-        input = """     
+        input = """
                         Class Y{
                            funcMethod1(x:Float; y:String){
                                 Var a: Array[Array[Int, 2],2] = Array(Array(1,1),Array(1,1,"Hello World"));
-                           }               
+                           }
                         }"""
         expect = "Illegal Array Literal: [[IntLit(1),IntLit(1)],[IntLit(1),IntLit(1),StringLit(Hello World)]]"
         self.assertTrue(TestChecker.test(input, expect, 489))
 
     def test_490(self):
-        input = """     
+        input = """
                         Class Y {
                            funcMethod1(){
                                 Var y: Array[Array[Int, 2],2] = Array(Array(1,1),Array(1,1));
                                 y[1] = Array(1,1);
                                 y[1][1] = 1;
                                 y = 1;
-                           }               
+                           }
                         }"""
         expect = "Type Mismatch In Statement: AssignStmt(Id(y),IntLit(1))"
         self.assertTrue(TestChecker.test(input, expect, 490))
 
     def test_491(self):
-        input = """     
+        input = """
                         Class Y {
                            funcMethod1(){
                                 Val y: Array[Array[Int, 2],2] = Array(Array(1,1),Array(1,1));
                                 y[1] = Array(1,1);
-                           }               
+                           }
                         }"""
         expect = "Cannot Assign To Constant: AssignStmt(ArrayCell(Id(y),[IntLit(1)]),[IntLit(1),IntLit(1)])"
         self.assertTrue(TestChecker.test(input, expect, 491))
 
     def test_492(self):
-        input = """     
+        input = """
                         Class Y {
                         Val y:Int = 2;
                            funcMethod1(){
                                 Self.y = "abc";
-                           }               
+                           }
                         }"""
         expect = "Cannot Assign To Constant: AssignStmt(FieldAccess(Self(),Id(y)),StringLit(abc))"
         self.assertTrue(TestChecker.test(input, expect, 492))
@@ -1479,7 +1479,7 @@ class CheckerSuite(unittest.TestCase):
     def test_494(self):
         input = """
         Class A{}
-        Class B{Var a : A = New A(1,2,3);}     
+        Class B{Var a : A = New A(1,2,3);}
             """
         expect = "Type Mismatch In Expression: NewExpr(Id(A),[IntLit(1),IntLit(2),IntLit(3)])"
         self.assertTrue(TestChecker.test(input, expect, 494))
@@ -1560,3 +1560,17 @@ class CheckerSuite(unittest.TestCase):
         """
         expect = "No Entry Point"
         self.assertTrue(TestChecker.test(input, expect, 499))
+
+    def test_500(self):
+        input = """
+        Class Program
+        {
+            Val $ABC : Int = 10;
+            foo() {
+                Return 1;
+                Return 2.0;
+           }
+        }
+        """
+        expect = "Type Mismatch In Statement: Return(FloatLit(2.0))"
+        self.assertTrue(TestChecker.test(input, expect, 500))
